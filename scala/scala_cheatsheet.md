@@ -686,6 +686,7 @@ C/C++ と違って、最初の引数が args(0) に入る。
 
 
 
+# ファイル操作
 
 
 ## テキストファイルの読み込み (Sourceクラス)
@@ -707,6 +708,17 @@ Source.fromFile("abc.txt", "MS932")   // エンコード指定
 
 ## バイナリファイルの読み込み
 
+FileInputStream を使う。
+
+TODO
+
+## その他ファイル操作
+
+```
+val f = new File(filePath)
+val str = f.getName()   // パスからファイル名部分のみを取得。いわゆるbasename
+val str = f.fetParent() // パスから親のパス部分のみを取得。いわゆる dirname
+```
 
 
 
