@@ -802,3 +802,30 @@ $ sbt
 ./sbt --error 'set showSuccess := false'  'set outputStrategy := Some(StdoutOutput)' "runMain Hogehoge" > 1.out 
 ```
 
+
+
+# scalatest
+
+## FlatSpec
+
+```scala
+import org.scalatest.FlatSpec
+
+class SetSpec extends FlatSpec {
+  // Subject明示。最初の"it"のところに書くこともできる。
+  behavior of "An empty Set"         
+
+  it should "have size 0" in {       // should,must,can が使える
+    assert(Set.empty.size === 0)
+  }
+
+  it should "produce NoSuchElementException when head is invoked" in {
+    intercept[NoSuchElementException] {
+      Set.empty.head
+    }
+  }
+
+  it should "これこれこういう仕様にする" is (pending)  // pending の場合
+}
+```
+
