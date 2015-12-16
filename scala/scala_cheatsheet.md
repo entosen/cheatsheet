@@ -808,13 +808,26 @@ $ sbt
 
 ## FlatSpec
 
+- http://doc.scalatest.org/2.2.4/index.html#org.scalatest.FlatSpec
+
 ```scala
+package org.scalatest.examples.flatspec.pending
+
 import org.scalatest.FlatSpec
 
-class SetSpec extends FlatSpec {
-  // Subject明示。最初の"it"のところに書くこともできる。
-  behavior of "An empty Set"         
+// この単位(クラスの単位)を Suite と呼ぶ
+class SetSpec extends FlatSpec with GivenWhenThen {
 
+  markup { """
+ここに markdown の形式で自由に
+ドキュメントが書けるよ。
+...
+...
+  """ }
+
+  behavior of "An empty Set"
+
+  // この単位(メソッドの単位)を Test と呼ぶ
   it should "have size 0" in {       // should,must,can が使える
     assert(Set.empty.size === 0)
   }
@@ -825,7 +838,83 @@ class SetSpec extends FlatSpec {
     }
   }
 
-  it should "これこれこういう仕様にする" is (pending)  // pending の場合
+  "A mutable Set" should "allow an element to be added" in {
+    Given("an empty mutable Set")   // 事前状態を表現する
+    val set = mutable.Set.empty[String]
+
+    When("an element is added")    // 刺激や操作を表現する
+    set += "clarity"
+
+    Then("the Set should have size 1")  // 事後状態を表現する
+    assert(set.size === 1)
+
+    And("the Set should contain the added element")
+    assert(set.contains("clarity"))
+
+    info("That's all folks!")
+  }
+
+  // Ignore。一時的にテストを無効に。でも忘れないように、実行すると見える。
+  //  c.f.  DoNotDiscover 
+  ignore should "..." in {...}                 //  it -> ignore
+  "An empty Set" should "...." ignore { ...}   // in -> ignore
+
+  // pending の場合、 `is (pending)` と書くか、メソッドの最後を pending にする
+  // `in (pending)` でもOKなようだ。
+  it should "..." is (pending)  
+
+  it should "......" in {
+    ...   // GivenやWhenなどは通常どおりに出力される。その他コードも実行される
+    pending
+  }
+
+  // Notifiers と alerters
+  it should "..." in {
+    ...
+    info("info is recorded")              // テスト結果内に表示
+    markup("markup is *also* recorded")   // テスト結果内に表示
+    note("notes are sent immediately")    // 即座に表示(緑色)
+    alert("alerts are also sent immediately")   // 即座に表示(黄色)
+    ...
+  }
 }
 ```
+
+主語(Subject)
+
+- behavior of "An empty Set" のように指定する
+- 短縮形として、`"An empty Set" should "have size 0" in { ... }` のように
+  itのところに直接書いても良い
+- it は、直前の主語の指定を継続する
+- 複数形用に they も使うことができる
+
+助動詞
+
+- should, must, can
+
+Ignore
+
+- クラスごと ignore にする場合は、クラスに `@Ignore` をつける
+
+Notifiers と alerters
+
+- info と markup は、テスト結果内に表示。成否によって色が変わる
+  - 仕様の記述の一部である場合はこちらを使う
+- noteとalert は即座に表示。HTMLレポートには表示されない
+  - 長いテストでどこまで進んでいるかを示す場合などに使う
+
+テストのタグづけ
+
+- テストメソッドにタグを付けてグループ化する。
+  その単位でテストのやる/やらないを指定できたりするようだ。
+- とりあえずは、使わなくてもなんとかなるので、省略
+
+Matcher
+
+- assert系の代わりに、より英語の自然な形で記述できるらしい。
+- これも使わなくてもなんとかなるので、省略
+- http://www.scalatest.org/user_guide/using_matchers
+
+
+
 
