@@ -829,15 +829,40 @@ class SetSpec extends FlatSpec with GivenWhenThen {
 
   // この単位(メソッドの単位)を Test と呼ぶ
   it should "have size 0" in {       // should,must,can が使える
-    assert(Set.empty.size === 0)
+
+    assert(Set.empty.size === 0)     // 失敗時: "2 did not equal 1"
+    assertResult(2) { a - b }        // 失敗時: "Expected 2, but got 3."
+
+    // clue 付き
+    assert(Set.empty.size === 0, "this is a clue")
+    assertResult(3, "this is a clue") { 1 + 1 }
   }
 
   it should "produce NoSuchElementException when head is invoked" in {
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException] {   // 例外が発生することを期待する場合
       Set.empty.head
+    }
+
+    withClue("this is a clue") {          // clue付き
+      intercept[IndexOutOfBoundsException] {
+	"hi".charAt(-1)
+      }
     }
   }
 
+  it should "fail,cancelなど" in {
+    fail()                // 失敗を発生させる
+    fail("メッセージ") 
+
+    assume(database.isAvailable)
+    assume(database.isAvailable, "The database was down again")
+    assume(database.getAllUsers.count == 9)
+
+    cancel()
+    cancel("メッセージ")
+  }
+
+  // GivenWhenThen の例
   "A mutable Set" should "allow an element to be added" in {
     Given("an empty mutable Set")   // 事前状態を表現する
     val set = mutable.Set.empty[String]
@@ -915,6 +940,20 @@ Matcher
 - これも使わなくてもなんとかなるので、省略
 - http://www.scalatest.org/user_guide/using_matchers
 
+テストの流れ ( http://doc.scalatest.org/2.2.4/org/scalatest/ParallelTestExecution.html )
+
+- 通常は、各テストクラス(suite)は並行して実行され、
+  suiteの中の各テストはシーケンシャルに実行される
+- 通常、suiteの中の各テストは同一のsuiteのインスタンスの中で実行される。
+  そのため、あるテストでインスタンスに対して変更があると、
+  次のテストに影響してしまうので、(テストの独立性を維持するためには)
+  きちんと後処理する必要がある。
+- 基本的には、各テストはどういう順序で実行されても大丈夫なように、
+  独立性を高く書いたほうがよい
+- OneInstancePerTestトレイトを入れると、
+  テストごとにsuiteインスタンスが作成されるようになる。
+- ParallelTestExecutionトレイトを入れると、各テストが並行して実行される。
+  ParallelTestExecutionトレイトには OneInstancePerTest が含まれるので、
 
 
 
