@@ -253,21 +253,55 @@ null は Nullというクラスの値。AnyRefの全てのクラス(の変数)�
 
 
 
-# 関数
+# 関数・メソッド
 
+## 関数定義
+
+```
+// 引数の型アノテーションは省略できない
+// 戻り型アノテーションは省略可 (つけた方がよい)
+// 引数は必ず val 扱いなので、"val" の明示は不要
 def max(x: Int, y: Int): Int = {
   ...
 }
-// 引数の型アノテーションは省略できない
-// 戻り型アノテーションは省略化 (つけた方がよい)
 
-// 1文だけならにょろかっこ省略
+// 返り値がUnit型の場合は、返り値型と "=" を省略できる
+// 逆にこういう書き方をした場合は、返り値は Unit になる。
+def myPrint(str:String) { ... }
+
+// 1文だけならにょろかっこ省略可
 def max(x: Int, y:Int): Int = if (x > y) x else y
 
-return文がなければ、計算された最後の値を返す
-
+// return文がなければ、計算された最後の値を返す
 return ~(sum & 0xFF) + 1  // return はかっこで囲む必要はない
+```
 
+## 関数リテラル
+
+```
+arg => println(arg)
+(arg: String) => println(arg)
+```
+
+
+関数リテラルが１つの引数を取る1文から構成される場合は、
+引数を明示的に指定しなくても済む。
+部分適用された関数(partially applied function)
+
+
+## 関数を表す型
+
+```
+(引数の型, …) => 戻り型
+(Int, Long) => Double
+Int => Long    // 引数が１つの場合は、丸括弧を省略可
+() => String   // 引数がない場合
+=> String      // 丸括弧が無いのは、関数の型ではなく、名前渡し。 TODO
+
+// 関数を指す変数・関数を引数にとる関数
+var f : ((Int) => String) = null   
+def test(f: (Int) => String) = { f(1) + f(2) + f(3) }
+```
 
 
 ## 呼び出し
@@ -288,14 +322,6 @@ myarray(2) = "Hello"  // myarray.update(2, "Hello")
 
 def greet() = println("Hello, world")  // 引数なし
 
-関数リテラル
-arg => println(arg)
-(arg: String) => println(arg)
-
-
-関数リテラルが１つの引数を取る1文から構成される場合は、
-引数を明示的に指定しなくても済む。
-部分適用された関数(partially applied function)
 
 
 名前渡し。
@@ -307,42 +333,27 @@ http://www.ne.jp/asahi/hishidama/home/tech/scala/def.html
 
 # クラス と オブジェクト
 
-クラス
+## 基本型のクラス定義
 
-```
-class ChecksumAccumulator {
-  // フィールド定義。  val でも var でも可。
-  var sum = 0   // デフォルトでは public
-  private var sum2 = 0
+最初に省略をしていない基本的な形を示す。
+そのあとで色々な簡略形、および追加情報の書き方を示す。
 
-  // メソッド
-  def add(b: Byte): Unit = {  // メソッド引数は val のみ。なのであえて書かない。
-    sum += b
-  }
-  def checksum(): Int = ~(sum & 0xFF) + 1   // 1行でも書ける
+```scala
+class Rational(n: Int, d: Int) extends 親クラス {
+  // クラス名直後の引数は、基本コンストラクタの引数となる
 
-  // 戻り型がUnitの場合は、戻り型と"=" を省略し中かっこで囲む書き方も可。
-  def add(b: Byte) { sum += b }   
-}
-```
-
-イミュータブルなクラス
-
-class Rational(n: Int, d: Int) 
-
-クラス名の後ろのカッコは「クラスパラメーター」。
-  → これを元に基本コンストラクターが生成される。
-      基本コンストラクタはクラスパラメータと同じ引数をとる。
-
-
-class Rational(n: Int, d: Int) {
   require(d != 0)   // 事前条件
 
+  type 型名 = 型
+
   // フィールド定義
+  //    val でも var でも可。 デフォルトは public
   //    書かれた順で初期化されていく
   private val g = gcd(n.abs, d.abs)
   val numer: Int = n / g
   val denom: Int = d / g
+  var 変数名:型 = _   // 初期値をその型のデフォルト値とする
+  var 変数名:型       // 注: これだけだと、abstruct型にしろと怒られる TODO
 
   // 基本コンストラクタ
   //   クラス本体に書かれた(フィールド/メソッド定義以外の)任意のコードは、
@@ -353,14 +364,15 @@ class Rational(n: Int, d: Int) {
   // 最初の処理として同じクラスの他コンストラクタを呼び出さないといけない。
   def this(n: Int) = this(n,1)
 
-  // メソッド定義
+  // メソッド定義  
+  //   関数定義と同様。 デフォルトは public
   //   メソッド引数は val のみ。なのであえてvalとは書かない。
   def add(b: Byte): Unit = {  
     sum += b
   }
 
   // 1行でも書ける。
-  // メンバ変数を参照する場合は this を使う。
+  // メンバ変数を参照する場合は this を使う。ほとんどの場合は省略できる。
   def lessThan(that: Rational) = 
     this.numer * that.donom < that.numer * this.denom
 
@@ -381,8 +393,19 @@ class Rational(n: Int, d: Int) {
   private def gcd(a: Int, b: int): Int = 
     ...
 
-
+  // TODO
+  def apply(...) { ... }
 }
+```
+
+- フィールド名とメソッド名には、同じ名前をつけることはできない。
+  (Scalaは ()がなくても呼び出せるので)
+- 変数・定数・メソッド等の宣言（val・var・def・type）において
+  「= ～」を書かなかった場合、抽象フィールド・抽象メソッドを定義したことになる。
+- クラス名の後ろのカッコは「クラスパラメーター」。
+  - これを元に基本コンストラクターが生成される。
+    -  基本コンストラクタはクラスパラメータと同じ引数をとる。
+
 
 ## アクセス指定子
 
@@ -390,8 +413,16 @@ class Rational(n: Int, d: Int) {
 protected, private。
 protected[hoge], private[hoge] という指定の仕方もあり TODO
 
+http://www.ne.jp/asahi/hishidama/home/tech/scala/class.html#h_access_modifiers
 
-## クラス定義
+基本コンストラクタにアクセス指定子を付けたい場合は、以下のようにする。
+
+```
+class MyClass private (val a:Int, val b:Int) {... }
+              ^^^^^^^
+```
+
+## クラス定義・継承・トレイトまわり
 
 ```
 class クラス名 { ... }
@@ -416,28 +447,7 @@ sealed class クラス名  { }  // 同一ソースファイル内では継承可
 ```
 
 
-## メンバー(フィールド・メソッド)
-
-```
-class クラス名 {
-  type 型名 = 型
-
-  val 定数名 = 値
-
-  var 変数名 = 初期値
-
-  var 変数名:型 = _   // 初期値をその型のデフォルト値とする
-  var 変数名:型       // 注: これだけだと、abstruct型にしろと怒られる TODO
-
-  def メソッド名(引数) = 本体
-}
-```
-
-※ フィールド名とメソッド名には同じものを付けることは出来ない。
-(Scalaは ()がなくても呼び出せるので)
-
-
-## コンストラクタ
+## コンストラクタ・フィールド定義・初期化
 
 Scalaでは、classのブロックの中に直接処理を書くのがコンストラクターになる。
 (基本コンストラクタ)
@@ -507,6 +517,9 @@ class Example(a0:Int, a1:Int) {
 ```
 new クラス名
 new クラス名(引数...)
+(実例)
+val myclass = new ChecksumAccumulator
+val myclass = new ChecksumAccumulator(引数...)
 
 // 「new クラス名～」の後に波括弧「{}」を付けることで、
 // 元のクラスを拡張したインスタンスを生成することが出来る。
@@ -529,32 +542,78 @@ new { 事前初期化   }  with トレイト1 with … { メンバー定義 }
 注  
 よくサンプルで見かける「Array(1,2,3)」「Array("a","b","c")」「List(1,2,3)」
 といったnewを使わない初期化方法は、newが省略されているわけではなく、
-apply()メソッドの呼び出しである。
+コンパニオンオブジェクトの apply()メソッドの呼び出しである。
 
 
+## パラメータ化された型(parameterized types）・いわゆるジェネリクス
+
+http://www.ne.jp/asahi/hishidama/home/tech/scala/generics.html
+
+クラスのジェネリクス
+
+```scala
+class Example[T] {        // 型パラメータが１つ
+  protected var t: T = _
+  def set(t: T): Unit = { this.t = t }
+  def get(): T = { t }
+}
+
+val s = new Example[String]   // 使うとき
+
+class Example[T, U] {     // 型パラメータが２つ
+  def method1(t: T): Unit = { println(t) }
+  def method2(u: U): Unit = { println(u) }
+}
+
+val s = new Example[String, Int]     // 使うとき
+val s = new Example[String, Int]()
+
+// 型パラメタが２つのときは中置記法が使える
+val s = new (String Example Int)    //  Example[String, Int]
+val s = new (String Example Int)()  
+val s = new (String Example Int Example Long)   // Example[Example[String,Int], Long]
+```
+
+メソッドだけを型パラメタ化することも可能
+
+```
+def メソッド名[型パラメーター, …](引数, …) ～
+class Example {
+  def method[T](t: T): T = { t }
+}
+
+val obj = new Example 
+val s = obj.method("abc")         // 使うとき。型推論してくれる
+val s = obj.method[String](null)  // 明示的に型の指定
+```
+
+### 変異指定
+
+中身の親子関係が、入れ物の親子関係にも言えるか。
+
+```
+以下親子関係を
+(親) A <--- B <--- C (子)  のように矢印で表す。
+
+MyList[A] <--- MyList[B] の関係が成り立つか？
+
+MyList[T] :  無関係 (不変、nonvariant、厳密)
+MyList[+T] :  MyList[A] <--- MyList[B] といえる  (共変、covariant)
+MyList[-T] :  MyList[A] ---> MyList[B] といえる  (反変、contravariant)
+```
+
+- ミュータブルなコンテナは不変にすべき
+- イミュータブルなコンテナは共変にすべき
+- 変換処理の入力は反変に、出力は共変にすべき
 
 
+## シングルトンオブジェクト
 
-// implicit --- 暗黙の型変換を定義。 
-// インタプリターが見えるスコープに書かないとだめ。class内に書いてはだめ。
-implicit def intToRational(x: Int) = new Rational(x)
-
-
-
-メソッド中で自分自身を参照するのは this 。
-ほとんどの場合は省略できる。
-
-
-
-
-
-
-
-シングルトンオブジェクト
-
+```
 object ChecksumAccumulator {
   ... // クラス定義と同じような形
 }
+```
 
 シングルトンオブジェクトがクラスと同じ名前を持つとき、
 そのクラスのコンパニオンオブジェクトと呼ぶ。
@@ -565,13 +624,9 @@ object ChecksumAccumulator {
 コンパニオンクラスと同じ名前を共有しないシングルトンオブジェクトは、
 スタンドアロンオブジェクトと呼ばれる。
 
-
-
-使う
-val myclass = new ChecksumAccumulator
-val myclass = new ChecksumAccumulator(引数...)
-
-
+class Queue[T] { ... }
+object Queue { ... }
+というのも可能か？(互いの非公開メンバにアクセスできるか？)
 
 # 識別子
 
@@ -775,13 +830,22 @@ t._2              // Part of a method name, such as tuple getters
 
 暗黙の型変換
 
+// implicit --- 暗黙の型変換を定義。 
+// インタプリターが見えるスコープに書かないとだめ。class内に書いてはだめ。
+implicit def intToRational(x: Int) = new Rational(x)
+
 トレイト
     ミックスイン合成
 
 
 
 
-sbt
+
+
+
+
+
+# sbt
 
 > [warn] there were 5 deprecation warnings; re-run with -deprecation for details
 
