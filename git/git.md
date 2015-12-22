@@ -57,8 +57,18 @@ TODO
 
 ```
 git add ファイル名...    # ファイル指定で add
+
+git add -u    # 既に管理対象、かつ、変更があったファイルをaddする。
 ```
 
+# diff
+
+```
+git diff   # index に add していないモノを表示 (index->WorkTree)
+git diff --cached    # 次の commit で反映される変更を表示 ( HEAD->index)
+git diff HEAD^ HEAD  # 直前の commit による変更を表示
+git diff HEAD^ HEAD --stat
+```
 
 # ブランチ関係 ( branch, checkout, push, pull, merge )
 
