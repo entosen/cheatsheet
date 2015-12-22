@@ -1020,4 +1020,92 @@ Matcher
   ParallelTestExecutionトレイトには OneInstancePerTest が含まれるので、
 
 
+## FunSpec
+
+```scala
+import org.scalatest.FunSpec
+
+class SetSpec extends FunSpec {
+
+  describe("A Set") {
+    describe("when empty") {               // describe は入れ子にできる
+      it("should have size 0") {           // テストは it もしくは they で。
+        assert(Set.empty.size == 0)
+      }
+
+      it("should produce NoSuchElementException when head is invoked") {
+        intercept[NoSuchElementException] {
+          Set.empty.head
+        }
+      }
+
+      it("should have size 0") (pending)   // pending のときはこう書く
+
+      ignore("....") {...}    // ignoreする場合は、こう書く
+      
+      // Given("..."), When("..."), Then("..."), And("...")
+    }
+  }
+}
+```
+
+
+
+# scaladoc
+
+- [Scaladoc - Scaladoc for Library Authors - Scala Documentation](http://docs.scala-lang.org/overviews/scaladoc/for-library-authors.html "Scaladoc - Scaladoc for Library Authors - Scala Documentation")
+- [Scaladoc - Scala Style Guide v1.2.5 documentation](http://yanana.github.io/scala-style/scaladoc/ "Scaladoc - Scala Style Guide v1.2.5 documentation")
+
+markdown(風？) 使える。HTMLタグも使える。
+```
+`monospace`       // 等幅
+''italic text''   // 斜体
+'''bold text'''   // 太字
+__underline__     // 下線
+^superscript^     // 上付き
+,,subscript,,     // 下付き
+[[entity link]], e.g. [[scala.collection.Seq]]      // クラスなどへのリンク
+[[http://external.link External Link]],             // 外部リンク
+  e.g. [[http://scala-lang.org Scala Language Site]]
+
+コード: 
+{{{
+...code...
+}}}
+
+=Heading=, ==Sub-Heading==, etc
+- ordered lists  (効かない？)
+1., i., I., a.  numbered lists
+```
+
+置けるところ:  
+フィールド、メソッド、クラス、トレイト、オブジェクト、パッケージ(特殊)。  
+コンストラクタはクラスと同一なので、@constructor タグを使う。
+
+```
+クラス:  
+    @constructor
+メソッド: 
+    @return  戻り値(one per metohd)
+メソッド, コンストラクタ and/or クラス tags
+    @throw
+    @param f  ...    引数に関する説明 (one per parameter)
+    @tparam T ...    type parameterに関する説明 (one per type parameter)
+Usage tags
+    @see
+    @note
+    @example
+    @usecase
+Other
+    @auther
+    @version
+    @since
+    @todo
+    @deprecated
+    @migration
+    @inheritdoc
+マクロ
+    @define <name> <definition>
+    $name
+```
 
