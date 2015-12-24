@@ -162,6 +162,19 @@ import scala.collection.immutable.Set  // これは通常不要
 HashSetってのもあるよ。
 
 
+Option型
+
+```
+Option[A] --- 値が返らないときがある場合によく使う。
+    Some[A] --- 値が返ったとき
+    None    --- 値がないとき
+
+opt.isEmpty
+opt.isDefined
+ops.nonEmpty
+```
+
+
 マップ Map
 
 これも scala.collection.{immutable,mutable} の２つがある。
