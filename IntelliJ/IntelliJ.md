@@ -43,6 +43,10 @@ sbt test
 sbt doc  --- Tools > Generate Scaladoc
 ```
 
+# 設定
+
+- 行番号を常に表示
+  - 「settings」→「Editor」→「General」「Appearance」の「Show Line Numbers」
 
 # TODO
 
