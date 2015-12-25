@@ -169,6 +169,10 @@ Option[A] --- 値が返らないときがある場合によく使う。
     Some[A] --- 値が返ったとき
     None    --- 値がないとき
 
+Option("aaa")  // オブジェクトを使って生成。nullだとNoneを返す。
+Some("aaa")    // オブジェクトを使って生成。nullだと Some(null) を返す。
+None           // 生成。というかオブジェクト。
+
 opt.isEmpty
 opt.isDefined
 ops.nonEmpty
