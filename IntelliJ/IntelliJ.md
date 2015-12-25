@@ -47,6 +47,8 @@ sbt doc  --- Tools > Generate Scaladoc
 
 - 行番号を常に表示
   - 「settings」→「Editor」→「General」「Appearance」の「Show Line Numbers」
+- (新規作成ファイルの)改行コードを Unix に。
+  - Setting ＞ Editor ＞ Code Style ＞ Line separator (for new file) を "Unix and OS X" に。
 
 # TODO
 
