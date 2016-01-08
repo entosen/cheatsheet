@@ -43,7 +43,6 @@ Boolean: true, false
 "%02x".format(byte)    // 16進表示文字列に変換
 255.toHexString   // "ff"
 255.toOctalString // "377"
-bytes.map(b=>"%02x".format(b)).mkString(" ")  // Array[Byte]の16進表記
 
 // 文字列 → 数値
 "123" toInt
@@ -55,6 +54,16 @@ java.lang.Long.parseLong("123456789ABCDEF", 16)   // 十六進数
 // Array[Byte] ←→ 文字列
 str: String = new String(bb, "UTF-8")
 bb: Array[Byte] = str.getBytes("UTF-8")
+
+
+// Array[Byte] → 16進表記文字列
+bytes.map(b=>"%02x".format(b)).mkString(" ")  // Array[Byte]の16進表記文字列
+bytes.map("%02x".format(_)).mkString(" ")  
+
+// なにか → Byte列を作る
+bytes = Array[Byte](0x32, 0x7f)   // 0x7f 以下限定。
+bytes = Array[Int](0x32, 0xff).map(_.toByte)  
+bytes = Array(0x32, 0xff).map(_.toByte)  
 
 
 // Array[Byte] ←→ 数値  (いわゆる pack,unpack)
@@ -78,6 +87,10 @@ http://docs.oracle.com/javase/jp/8/docs/api/java/nio/ByteBuffer.html
     ちゃんと調べていない。
 
 ```
+
+
+## 文字列
+
 
 
 ## コレクション
@@ -293,11 +306,82 @@ def max(x: Int, y:Int): Int = if (x > y) x else y
 return ~(sum & 0xFF) + 1  // return はかっこで囲む必要はない
 ```
 
+注:
+def で作成されたものは厳密には、メソッドであり関数オブジェクトではない。
+変数に代入したり、関数を引数に取る関数に渡したりする場合は、"_" を使う。
+
+```
+val fp = func _
+val fp: Int=>Long = func    // "_" 不要
+```
+
+もしくは、関数の型であることが明示されている場所への代入は自動的に関数オブジェクトに変換される。
+
+
+
+## パラメータなしメソッドと 空括弧メソッド
+
+お約束として、(主にクラスのメソッドで)引数を取らずに副作用もないメソッドは、
+引数リストのカッコを書かない。
+そういうメソッドを呼び出す際もカッコを書かない。
+
+逆に副作用のあるメソッドは、空括弧メソッドとし、
+呼び出すときも空括弧をつけて呼び出すのがよい。
+
+```
+  def width() = this.width    // よろしくない
+  def width = this.width      // good
+  val w = obj.width   // 呼び出し。まるでメンバーを参照しているような形になる。
+
+  def increment() = ...   // 副作用があるので、空括弧メソッド
+  obj.increment()         // 使うときもからカッコをつける。(つけなくても動くが)
+```
+
+こうすることで、メンバフィールド と 
+パラメタなしメソッドは見た目上区別がなくなるので、
+使う側が、それがメンバで実装されているのかメソッドで実装されているのか、
+意識する必要がなくなる。
+
+更に、パラメタなしメソッドを、メンバフィールドでオーバーライドすることもできる。
+逆も可。
+
+
+
+
+
+
 ## 関数リテラル
 
 ```
-arg => println(arg)
-(arg: String) => println(arg)
+(引数:型, …) => 本体 : 戻り型
+
+(n: Int) => { n + 1 } : Int
+(n: Int) => { n + 1 }
+(n: Int) => n + 1
+
+(m:Int, n:Int) => { m + n }
+(m:Int, n:Int) => m + n
+
+() => { println(123) }
+() => println(123)
+
+// 代入先の変数の型（関数の引数の型）が分かっている場合は、
+// 関数リテラルの引数の型を省略できる
+var f = (n:Int) => n + 1
+f = (n) => n + 1
+f = n => n + 1
+
+// また、引数を明示せず、関数本体でプレースホルダが使える
+f = { _ + 1 }     //  プレースホルダ
+f = _ + 1
+
+var f = (a:Int, b:Int) => { a + b }
+f = { _ + _ }
+
+// 使わない引数がある場合、仮引数名に"_"とつけることができる
+var f = (a:Int, _:Int, _:Int) => { a }
+f = (a:Int, _, _) => { a }
+f = (a, _, _) => { a }
 ```
 
 
@@ -410,7 +494,7 @@ class Rational(n: Int, d: Int) extends 親クラス {
   private def gcd(a: Int, b: int): Int = 
     ...
 
-  // TODO
+  // TODO  これはクラスではなくオブジェクトにあるものか？
   def apply(...) { ... }
 }
 ```
@@ -444,15 +528,16 @@ class MyClass private (val a:Int, val b:Int) {... }
 ```
 class クラス名 { ... }
 
-// 継承。TODO 親クラスのコンストラクタに連鎖する？
-class クラス名 extends 他クラス { ... }   
+// 継承。親クラスの基本コンストラクタに連鎖する。多分。TODO
+class クラス名 extends 親クラス { ... }   
 
 // 親クラスの引数つきコンストラクタに連鎖させる場合
 class クラス名 extends 親クラス(値, ...) { ... }
 
-// トレイト (Javaのインターフェースのようなもの)
+// トレイト (Javaのインターフェースのようなもの) をミックスイン
 class クラス名 extends 親クラス with トレイト
 class クラス名 extends 親クラス with トレイト1 with トレイト2
+//   親クラスが無い場合、1つ目のトレイトはextendsを使う。
 class クラス名 extends トレイト
 class クラス名 extends トレイト1 with トレイト2
 
@@ -462,7 +547,6 @@ sealed class クラス名  { }  // 同一ソースファイル内では継承可
 
 クラス本体に書くことがない場合は、{ } 省略可。
 ```
-
 
 ## コンストラクタ・フィールド定義・初期化
 
@@ -644,6 +728,45 @@ object ChecksumAccumulator {
 class Queue[T] { ... }
 object Queue { ... }
 というのも可能か？(互いの非公開メンバにアクセスできるか？)
+
+
+## トレイト trait
+
+トレイトとクラスの違い
+    1. クラスパラメータ(基本コンストラクタに渡されるパラメタ)を持てない
+    2. super が動的に決まる。？？？
+
+トレイトの使いどころ
+    1. シンインターフェースをリッチインターフェースに変える
+       既に持っている最小限のメソッドを利用して、
+       リッチインターフェースを作る。
+    2. クラスへの積み重ね可能な変更
+        線形化
+
+
+### トレイトの定義
+
+class の定義とほぼ一緒。違いは、
+
+- コンストラクタで引数を持つことができない。
+    - コンストラクタの処理は書ける
+- 引数を持った補助コンストラクタ( def this(～) )を定義することもできない
+
+```
+trait トレイト名 extends 親トレイトまたは親クラス with 他トレイト ... {
+    type 形名 = 型
+    val 定数名 = 初期値
+    var 変数名 = 初期値
+    def メソッド名(引数...): 戻り型 = { 本体 }
+
+    // 抽象メンバー
+    type 形名
+    val 定数名: 型
+    var 変数名: 型
+    def メソッド名(引数...): 戻り型 
+}
+```
+
 
 # 識別子
 
@@ -1048,6 +1171,7 @@ class SetSpec extends FunSpec {
     describe("when empty") {               // describe は入れ子にできる
       it("should have size 0") {           // テストは it もしくは they で。
         assert(Set.empty.size == 0)
+	assertResult(0) { Set.empty.size }      
       }
 
       it("should produce NoSuchElementException when head is invoked") {
@@ -1071,6 +1195,7 @@ class SetSpec extends FunSpec {
 # scaladoc
 
 - [Scaladoc - Scaladoc for Library Authors - Scala Documentation](http://docs.scala-lang.org/overviews/scaladoc/for-library-authors.html "Scaladoc - Scaladoc for Library Authors - Scala Documentation")
+- [Syntax - Scala Wiki - Scala Wiki](https://wiki.scala-lang.org/display/SW/Syntax "Syntax - Scala Wiki - Scala Wiki")
 - [Scaladoc - Scala Style Guide v1.2.5 documentation](http://yanana.github.io/scala-style/scaladoc/ "Scaladoc - Scala Style Guide v1.2.5 documentation")
 
 markdown(風？) 使える。HTMLタグも使える。
@@ -1090,9 +1215,23 @@ __underline__     // 下線
 ...code...
 }}}
 
+見出し:
 =Heading=, ==Sub-Heading==, etc
-- ordered lists  (効かない？)
-1., i., I., a.  numbered lists
+
+リスト: (頭にスペース１つあけないと、効かない)
+
+ - ordered lists  
+ - hogehoge
+   - level2
+
+(1., i., I., A., a. が使えるらしい。)
+ 1. hoge
+ 1. fuga
+    1. aaa
+    1. bbb
+       I. AAA
+       I. BBB
+
 ```
 
 置けるところ:  
@@ -1125,4 +1264,21 @@ Other
     @define <name> <definition>
     $name
 ```
+
+# ベンチマーク sbt-jmh
+
+https://github.com/ktoso/sbt-jmh
+
+```
+実行
+$ sbt jmh:run -i 3 -wi 3 -f1 -t 1 benchmark.*
+か、sbtの中で
+> jmh:run -i 3 -wi 3 -f1 -t 1 benchmark.*
+
+    i  : 計測回数
+    wi : ウォーミングアップ回数
+    f  : 全体（計測回数＋ウォーミングアップ回数）の試行回数
+    t  : スレッド数
+```
+
 
