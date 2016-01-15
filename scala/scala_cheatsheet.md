@@ -266,7 +266,7 @@ Any:
 AnyRef: 
     ==, != : オブジェクトの値（内容）が等しいかどうかを返す。
              自分自身がnullの場合はargもnullのときtrue。
-             null以外の場合はequals()メソッドを呼び出す。
+             null以外の場合はjavaのequals()メソッドを呼び出す。
     eq, ne : インスタンスが同一かどうかを返す。Javaの「==」に相当。
     getClass(), 
     ##(), hashCode(), 
@@ -986,6 +986,53 @@ implicit def intToRational(x: Int) = new Rational(x)
 
 
 # sbt
+
+## ディレクトリ構造
+
+```
+build.sbt
+
+src/main/java       Javaのソースコード置き場
+    jp/co/mydomain.... と続く
+src/main/scala      Scalaのソースコード置き場
+src/main/resources  プログラム中で必要なデータファイルなど
+src/test/java       Javaのテストコード置き場
+src/test/scala      Scalaのテストコード置き場
+src/test/resources  テスト時に必要なサンプルデータファイルなど
+
+```
+
+```
+compile
+
+test
+testOnly テストクラス名
+
+```
+
+## リソースについて
+
+プログラムやテスト中に必要なファイルをどう指定するか。
+リソースを使うと実行環境によらず、クラスからの相対パスかプロジェクトトップからの絶対パスで呼び出せる。
+
+src/main/scala や src/test/scala 以下に置いても、scalaファイル以外は無視されるようで、だめ。
+
+```
+val url1 = getClass.getResource("/simple_mdbm_1.txt")   // src/test/resources/ 直下に置いた場合
+val url2 = getClass.getResource("simple_mdbm_2.txt")    // src/test/resources/ 以下に jp/co/... など同じディレクトリ構造で置いた場合
+val s = Source.fromURL(url)
+```
+
+sbtは、以下のようにコピーしているらしい。(targetが実行環境？)
+
+- src/main/resources/ 以下は、 target/scala-[scalaVersion]/classes 以下に
+- src/test/resources/ 以下は、 target/scala-[scalaVersion]/test-classes 以下に
+
+参考
+[scala - How to access test resources? - Stack Overflow](http://stackoverflow.com/questions/5285898/how-to-access-test-resources "scala - How to access test resources? - Stack Overflow")
+
+
+## 未整理
 
 > [warn] there were 5 deprecation warnings; re-run with -deprecation for details
 
