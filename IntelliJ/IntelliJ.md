@@ -66,6 +66,11 @@ git config --global core.eol lf
 git config --global core.autocrlf false
 ```
 
+- (scala用) クラスパラメーターの折り返し時、インデントを4に。
+  http://kxbmap.hatenablog.com/entry/2015/02/26/031541
+  - Settings > Editor > Code Style > Scala > 
+      - Other > Alternate Indentation for constructor args and parameter declarationsをチェックして4spacesに
+      - Wrapping and... > Method Declaration parameters > Align when multilineのチェックを外す
 
 # 編集
 
