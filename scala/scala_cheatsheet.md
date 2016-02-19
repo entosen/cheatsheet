@@ -91,6 +91,23 @@ http://docs.oracle.com/javase/jp/8/docs/api/java/nio/ByteBuffer.html
 
 ## 文字列
 
+### 加工文字列リテラル 
+
+printfのようなことができる。 scala-2.10.0 より。
+
+> http://docs.scala-lang.org/ja/overviews/core/string-interpolation.html
+
+```scala
+// s補完子
+println(s"Hello, $name")       // Hello, James
+println(s"1 + 1 = ${1 + 1}")  // 任意の式が受けられる
+
+// f補完子
+println(f"$name%s is $height%2.2f meters tall")
+
+// raw補完子
+raw"a\nb"    // エスケープを実行しない
+```
 
 
 ## コレクション
@@ -109,6 +126,10 @@ val numNames = Array("zero", "one", "two")
 val a = Array.ofDim[Int](10, 9)
 val b = Array.ofDim[Int](2, 3, 4)
 
+
+Arrayは == で中身の比較ができない。(他のコレクションはできる)
+a1.sameElements(a2)  // シンプルな配列（一次元配列）でのみ可能
+
 リスト List --- 単一型、イミュータブル(変更不可)
 
 初期化
@@ -117,6 +138,8 @@ val oneTwoTherr = 1 :: 2 :: 3 :: Nil
 val thrill = "Will" :: "fill" :: "until" :: Nil
 val nulllist = List()  // 空リスト
 val nulllist = Nil     // 空リスト
+
+val list = List.fill(10)("a")  // 同じ値が指定回数繰り返されるリスト
 
 操作
 thrill(2)   // 要素の取得。先頭の添え字は0。
@@ -195,6 +218,10 @@ ops.nonEmpty
 マップ Map
 
 これも scala.collection.{immutable,mutable} の２つがある。
+
+Map型は抽象的なトレイト。Mapオブジェクトで生成は可能。
+実際には、
+
 HashMapもある。
 
 import scala.collection.mutable.Map
@@ -207,6 +234,7 @@ treasureMap += (1 -> "Go to island.")
 treasureMap += (2 -> "Find big X on ground.")
 treasureMap += (3 -> "Dig.")
 
+// 取得
 println(treasureMap(2))
 
 
@@ -462,7 +490,7 @@ class Rational(n: Int, d: Int) extends 親クラス {
   println("Created " + n + "/" + d)
 
   // 補助コンストラクタ。 this という名前で定義。
-  // 最初の処理として同じクラスの他コンストラクタを呼び出さないといけない。
+  // *最初の*処理として同じクラスの他コンストラクタを呼び出さないといけない。
   def this(n: Int) = this(n,1)
 
   // メソッド定義  
@@ -528,7 +556,7 @@ class MyClass private (val a:Int, val b:Int) {... }
 ```
 class クラス名 { ... }
 
-// 継承。親クラスの基本コンストラクタに連鎖する。多分。TODO
+// 継承。親クラスの引数なしコンストラクタに連鎖する。
 class クラス名 extends 親クラス { ... }   
 
 // 親クラスの引数つきコンストラクタに連鎖させる場合
@@ -547,6 +575,28 @@ sealed class クラス名  { }  // 同一ソースファイル内では継承可
 
 クラス本体に書くことがない場合は、{ } 省略可。
 ```
+
+
+コンストラクタは(基本コンストラクタも補助コンストラクタも)継承されない。
+
+```
+class A(val v1:Int, val v2:Int) { ... }
+
+// Aに少しだけ機能追加しようと思って、以下のようにしても
+// Bのコンストラクタは引数を取れないし、
+// Aの引数なしコンストラクタを呼ぼうとするのでコンパイルエラー
+class B extends A { ... }  
+
+// 真面目にこのようにするか
+class B(v1: Int, v2:Int) exntends A(v1, v2) { Bでの追加機能... }  
+
+// もし、このコンストラクタ引数の取り回しが面倒な場合は、
+// 以下のように new するときにやる
+val b = new A(1,2) { Bでの追加機能... }
+val b = new A(1,2) with Bでの追加機能を実装したトレイト
+```
+
+
 
 ## コンストラクタ・フィールド定義・初期化
 
@@ -1238,6 +1288,113 @@ class SetSpec extends FunSpec {
 ```
 
 
+## ScalaMock
+
+- http://www.scalatest.org/user_guide/testing_with_mock_objects
+- http://scalamock.org/quick-start/
+
+
+### テストへの組み込み方法
+
+```scala
+import org.scalatest.FlatSpec
+import org.scalamock.scalatest.MockFactory
+
+class ExampleSpec extends FlatSpec with MockFactory with ...  {
+
+}
+```
+
+### モック的スタイル ( expectations-first )
+
+```scala
+val mFunc = mockFunction[Int, String]    // Function Mock
+val heaterMock = mock[Heater]            // Trait, interface Mock
+// テストしたいオブジェクトをモックにつなげて生成
+val coffeeMachine = new CoffeeMachine(heaterMock)  
+
+// expects
+mFunc expects (42) returning "Forty two" once
+
+(mObj.isReady _).expects().returning(true)
+(heaterMock.setPowerState _).expects(PowerState.On)
+(heaterMock.setPowerState _).expects(PowerState.Off)
+(mObj.func1 _).expects(*)   // wildcard
+(mObj.func1 _).expects(~1.0)   // Epsilon Matching
+
+(mObj.func1 _).expects().throws(new RuntimeException("what's that?"))
+
+
+coffeeMachine.makeCoffee()  // 実行。expectどおりになるかをテスト
+```
+
+### スタブ的スタイル ( record-then-verify )
+
+```scala
+val m = stubFunction[Int, String]   // Function Stub
+val heaterStub = stub[Heater]       // Trait, interface Stub
+// テストしたいオブジェクトをスタブにつなげて生成
+val coffeeMachine = new CoffeeMachine(heaterStub)
+
+(heaterStub.isReady _).when().returns(true)  // スタブの挙動を決めてあげて
+
+coffeeMachine.makeCoffee()   // 実際動かす
+
+// どういう風に呼ばれたかを検証
+(heaterStub.setPowerState _).verify(PowerState.On)  
+(heaterStub.setPowerState _).verify(PowerState.Off)
+```
+
+
+
+### 未整理
+
+```
+val fakeDb = stub[PlayerDatabase] 
+
+// configure fakeDb behavior 
+(fakeDb.getPlayerById _) when(222) returns(Player(222, "boris", Countries.Russia))
+(fakeDb.getPlayerById _) when(333) returns(Player(333, "hans", Countries.Germany))
+
+// ↑このメソッドが overload されている場合は、引数型を指定してあげる
+(fakeDb.getPlayerById(_: Int)) ...
+(fakeDb.getPlayerById(_: String)) ...
+
+// use fakeDb
+assert(fakeDb.getPlayerById(222).nickname == "boris")
+```
+
+
+```
+// Proxy mocks (trait や Java interface をモック)
+//    org.scalamock.ProxyMockFactory を mix-in
+val m = mock[Turtle]
+m expects 'setPosition withArgs (10.0, 10.0)
+m expects 'forward withArgs (5.0)
+m expects 'getPosition returning (15.0, 10.0)
+
+// Generated mocks (クラス、singleton/companion object をモック)
+// そのクラスの方に、以下をmixする必要がある
+//     クラス --- org.scalamock.annotation.mock annotation
+//     コンパニオンオブジェクト付きクラス
+//            --- org.scalamock.annotation.mockWithCompanion
+//     シングルトンオブジェクト
+//            --- org.scalamock.annotation.mockObject
+
+// テストコードの方には GeneratedMockFactory を mix-in 
+val m = mock[Turtle]
+m.expects.forward(10.0) twice
+
+val m = mockObject(Turtle)
+m.expects.createTurtle
+
+val m = mock[Turtle]
+m.expects.newInstance('blue)   // 引数付きコンストラクタを使いたい場合？
+m.expects.forward(10.0)
+```
+
+
+
 
 # scaladoc
 
@@ -1291,7 +1448,7 @@ __underline__     // 下線
 メソッド: 
     @return  戻り値(one per metohd)
 メソッド, コンストラクタ and/or クラス tags
-    @throw
+    @throws expeption ...
     @param f  ...    引数に関する説明 (one per parameter)
     @tparam T ...    type parameterに関する説明 (one per type parameter)
 Usage tags
@@ -1315,6 +1472,34 @@ Other
 # ベンチマーク sbt-jmh
 
 https://github.com/ktoso/sbt-jmh
+
+```
+import org.openjdk.jmh.annotations._
+
+@State(Scope.Thread)
+class MyBenchmark {
+
+  @Setup(Level.Iteration)
+  def setup(): Unit = { ... }
+
+  @Benchmark
+  def benchHoge(): Unit = {
+    ... 性能を測りたいコード ...
+  }
+
+  @TearDown(Level.Iteration)
+  def teardown(): Unit = { ... }
+
+}
+```
+
+流れ
+
+- @Benchmark 指定したメソッドが1秒間、${t}スレッド並行で、猛烈に呼ばれる。 
+  → 1イテレーション単位？
+- 上記イテレーション単位が、ウォームアップ用に${wi}回、計測用に${i}回呼ばれる
+  → 1fork？
+- 上記1forkを、${f}回繰り返す
 
 ```
 実行
