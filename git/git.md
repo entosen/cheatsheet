@@ -169,6 +169,16 @@ git mv oldfile newfile   # ファイル名の変更
 ```
 
 
+# 間違えた系
+
+- [Backlinks for: git/コミットログを修正する方法 - TOBY SOFT wiki](http://tobysoft.net/wiki/index.php?plugin=related&amp;page=git%2F%A5%B3%A5%DF%A5%C3%A5%C8%A5%ED%A5%B0%A4%F2%BD%A4%C0%B5%A4%B9%A4%EB%CA%FD%CB%A1)
+
+```
+// 直前のコミットのメッセージを直したい。
+git commit --amend -m "新しいメッセージ"
+```
+
+
 
 # 以下、未整理。
 
