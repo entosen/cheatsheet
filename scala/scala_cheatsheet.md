@@ -112,6 +112,112 @@ raw"a\nb"    // エスケープを実行しない
 
 ## コレクション
 
+ミュータブル(変更可能)とイミュータブル(変更不可)がある。
+
+形として代表的なのは
+
+- Seq (順序を持つ)
+- Set (順序を持たない。重複許さない)
+- Map (value を key に引っ掛けて格納できるやつ)
+
+### Traversable
+
+参考
+
+- [Scalaコレクションメソッドメモ(Hishidama's Scala collection method Memo)](http://www.ne.jp/asahi/hishidama/home/tech/scala/collection/method.html#h_foreach)
+- [Collections - Traversable トレイト - Scala Documentation](http://docs.scala-lang.org/ja/overviews/collections/trait-traversable.html)
+
+コレクションは Traversable トレイトを mix-in しているので、
+以下の操作ができる。
+
+
+```
+// 基本動作
+foreach
+
+// 加算
+c1 ++ c2  // 連結
+
+// map演算
+c.map
+c.flatMap
+c.collect
+
+// 変換
+c.toArray
+c.toList
+c.toIterable
+c.toSeq
+c.toIndexedSeq
+c.toStream
+c.toSet
+c.toMap
+
+// コピー
+c.copyToBuffer
+c.copyToArray
+
+// サイズ
+c.isEmpty
+c.nonEmpty
+c.size
+c.hasDefiniteSize
+
+// 要素取得
+c.head
+c.last
+c.headOption
+c.lastOption
+c.find
+
+// サブコレクション取得
+c.tail
+c.init
+c.slice
+c.take
+c.drop
+c.tageWhile
+c.dropWhile
+c.filter
+c.filterNot
+c.withFilter
+
+// 分割
+c.splitAt
+c.span
+c.partition
+c.groupBy
+
+// 要素条件演算
+c.exists
+c.forall
+c.count
+
+// fold演算？？？
+c.foldLeft
+c.foldRight
+/:
+:/
+c.reduceLeft
+c.reduceRight
+
+// 特定 fold 演算 (numeric か comparable のみ)
+c.sum
+c.product
+c.min
+c.max
+
+// 文字列演算
+c.mkString
+c.addString
+c.stringPrefix
+
+// view演算？？？
+view
+```
+
+
+
 配列 Array --- 単一型、ミュータブル(変更可能)
 
 // String型、長さ3、中身は null, null, null
@@ -181,7 +287,19 @@ println(pair._1)   // 1から始まる！
 println(pair._2)
 
 
-集合 Set
+### 集合 Set
+
+```
+// 基本機能
+contains(elem: A): Boolean
+iterator: Iterator[A]
++= (elem: A): this.type
+-= (elem: A): this.type
+
+
+```
+
+```
 var jetSet = Set("Boeing", "AirBus")   // イミュータブルのSet
 jetSet.contains("Cessna")  // 要素の存在をチェック
 
@@ -196,9 +314,10 @@ import scala.collection.mutable.Set
 import scala.collection.immutable.Set  // これは通常不要
 
 HashSetってのもあるよ。
+```
 
 
-Option型
+### Option型
 
 ```
 Option[A] --- 値が返らないときがある場合によく使う。
@@ -266,7 +385,7 @@ it.toMap        // it が返すキー/値ペアをマップに集める。
 0 to 2  // 0,1,2
 
 
-## 型、Any, AnyVal, AnyRef, Unit, Null, Nothing, 同一比較
+## Scalaの階層構造、型、Any, AnyVal, AnyRef, Unit, Null, Nothing, 同一比較
 
 参考  
 http://www.ne.jp/asahi/hishidama/home/tech/scala/any.html
@@ -287,6 +406,7 @@ Double
 ---------------------------
 ```
 
+```
 Any: 
     ==, != : オブジェクトの値(内容)が等しいかどうかを返す。 
              実態は equals()メソッド
@@ -300,6 +420,7 @@ AnyRef:
     ##(), hashCode(), 
     synchronized[T](arg:T)
 AnyVal: Java のネイティブ型に相当
+```
 
 
 
@@ -308,6 +429,134 @@ Nothing: exit(i) の返り値や、常に例外が返るもの。値が戻らな
 null は Nullというクラスの値。AnyRefの全てのクラス(の変数)に代入できる。
 
 
+### 等価性
+
+TODO コップ本の30章をちゃんと読む
+
+- Any の equals は eq と同じく参照等価性をテストする。
+- Any の hashCode は オブジェクトのアドレスを元に作られる
+
+それがいやだったら equals, hashCode メソッドをオーバーライドする。
+
+```
+override def equals(other: Any): Boolean = {    // other の型は Any で定義すること！
+}
+override def equals(other: Any): Boolean = other match {
+  case that: Point => this.x == that.x && this.y == that.y
+  case _ => false
+}
+```
+
+
+
+
+## 列挙型、Enum
+
+２つの方法がある
+
+- Enumeration を継承したオブジェクトで定義
+  - (メリ) 軽量？ (Enumerationのドキュメントより)
+  - (デメ) match式で、全ての条件を列挙できているかのチェックをやってくれない
+- sealed class を使って定義
+  - (デメ) 重い？
+  - (メリ) match式で、全ての条件を列挙できているかのチェックをやってくれる
+
+### Enumeration を継承したオブジェクトで定義。
+
+[Scala列挙型メモ(Hishidama's Scala Enumeration Memo)](http://www.ne.jp/asahi/hishidama/home/tech/scala/enumeration.html)
+
+```scala
+object E1 extends Enumeration {
+  type E1 = Value    # これをやっておくと、importして使う際に便利。
+  val Matsu, Take, Ume = Value   # Valueは呼び出される度に異なる値を出力する。
+}
+
+object E2 extends Enumeration(10) {
+  val Matsu, Take, Ume = Value   # 指定した番号から始める例
+}
+
+object E3 extends Enumeration {
+  val Matsu = Value(11)          # ID を個別に割り当てる例。
+  val Take  = Value(22)
+  val Ume   = Value(33)
+}
+object E4 extends Enumeration {
+  val Matsu = Value("Matsu")     # 列挙子を個別に割り当てる
+  val Take  = Value("Take")
+  val Ume   = Value("Ume")
+}
+object E5 extends Enumeration {
+  val Matsu = Value(11, "Matsu") 
+  val Take  = Value(22, "Take")
+  val Ume   = Value(33, "Ume")
+}
+object E6 extends Enumeration( "Matsu", "Take", "Ume" ) {
+  val Matsu, Take, Ume = Value
+}
+
+// 使い方
+val e = E1.Matsu
+
+// 使い方２
+import E1._
+val e = Matsu
+def f(e: E1) = println(e)   // typeの定義をしておくことで、変数の型指定に使える
+
+e match {
+  case Matsu => println("松")
+  case Take => println("竹")
+  case Ume => println("梅")
+}
+e match {
+  case Matsu | Take => println("松か竹")
+  case _ =>
+}
+```
+
+### Enumeration を使わずにやる方法
+
+参考: [ScalaのEnumerationは使うな - Scalaで列挙型を定義するには | Scala Cookbook](http://xerial.org/scala-cookbook/recipes/2012/06/29/enumeration/)
+
+
+```
+object DNA {
+  // objectで定義するとsingletonになる
+  case object A extends DNA(0)
+  case object C extends DNA(1)
+  case object G extends DNA(2)
+  case object T extends DNA(3)
+  case object N extends DNA(4)
+
+  // DNAの文字列をすべて並べる。
+  val values = Array(A, C, G, T, N)
+  // 用途によって別の集合を定義することもできる
+  val exceptN = Array(A, C, G, T)
+
+  private val codeTable = Array(A, C, G, T, N, N, N, N)
+
+  def complement(code:Int) : DNA = codeTable((~code & 0x03) | (code & 0x04))
+}
+
+// sealedを付けると、DNAを拡張したクラスはこのファイル内でしか定義できない
+// abstractを付けると、DNAを拡張したクラスはA, C, G, T, N以外にないことを保証できるので
+// match文がexhaustive(すべてのケースを網羅)になる
+sealed abstrat class DNA(val code:Int) {
+    // A, C, G, T, Nをcase objectとすると、クラス名を表示するtoStringが実装される
+    val name = toString
+    // DNAクラスには自由にメソッドを定義できる
+    def complement = DNA.complement(code)
+}
+
+
+// 使い方
+val a : DNA = DNA.G
+
+a match {
+  case DNA.A => ...
+  case DNA.C => ...
+  ...
+}
+```
 
 
 
