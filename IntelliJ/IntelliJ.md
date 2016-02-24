@@ -1,6 +1,48 @@
+# 表示
+
+ソースコードタブの色
+
+  文字色白: 変更なし
+  文字色青: 変更あり
+  文字色緑: 新規追加
+  背景灰: mainコード
+  背景緑: テストコード
+
+
+
+# ショートカット
+
+前提  
+Windows上で、IdeaVim を使っているので、それ前提で。
+
+## 画面全体の表示
+
+ツールWindows
+  Alt+1 で Project
+  Alt+2 で Favorites
+  Alt+3 で Find 
+  ... など
+  番号が出ているのでわかる。
+
+
+## 検索(Find)と移動(Navigate)
+
+現在のファイル内を検索
+
+プロジェクト全体から検索(Unixでいうgrep的な),
+    Edit > Find > Find in Path,  Ctrl+Shift+F
+    → Alt+3 の Find タブに結果が出る。
 
 
 クラスを探す  Ctrl+N
+
+
+## 実行 Run
+
+ファイルをコンパイル
+  Projectタブからファイルを選択し、Ctrl+Shift+F9
+ファイルを実行
+  Projectタブからファイルを選択し、Ctrl+Shift+F10
 
 
 # コード編集
