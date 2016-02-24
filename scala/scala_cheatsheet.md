@@ -235,6 +235,10 @@ val b = Array.ofDim[Int](2, 3, 4)
 
 Arrayは == で中身の比較ができない。(他のコレクションはできる)
 a1.sameElements(a2)  // シンプルな配列（一次元配列）でのみ可能
+sameElements は、null の場合に NullPointerException になってしまう。
+java.utils.Arrays.equals(a1, a2)
+が、null の場合にも対応しており、楽。
+
 
 リスト List --- 単一型、イミュータブル(変更不可)
 
@@ -456,10 +460,14 @@ override def equals(other: Any): Boolean = other match {
 
 - Enumeration を継承したオブジェクトで定義
   - (メリ) 軽量？ (Enumerationのドキュメントより)
+  - (メリ) 大小関係がある
   - (デメ) match式で、全ての条件を列挙できているかのチェックをやってくれない
 - sealed class を使って定義
   - (デメ) 重い？
   - (メリ) match式で、全ての条件を列挙できているかのチェックをやってくれる
+
+参考: [列挙型 (enum) が欲しいときの Enumeration と case object... - tnoda-scala](http://tnoda-scala.tumblr.com/post/106430183326/%E5%88%97%E6%8C%99%E5%9E%8B-enum-%E3%81%8C%E6%AC%B2%E3%81%97%E3%81%84%E3%81%A8%E3%81%8D%E3%81%AE-enumeration-%E3%81%A8-case-object)
+
 
 ### Enumeration を継承したオブジェクトで定義。
 
