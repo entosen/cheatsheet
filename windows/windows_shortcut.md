@@ -1,47 +1,58 @@
 
-�\�L�̏��� Win > Ctrl > Alt > Shift
+表記の順序 Win > Ctrl > Alt > Shift
 
-���z�f�X�N�g�b�v (win10����̂݁H)
+仮想デスクトップ (win10からのみ？)
 
-  Win+Ctrl+D  ���z�f�X�N�g�b�v��ǉ�
-  Win+Ctrl+��  (�����̎��_��)���̉��z�f�X�N�g�b�v�ɐ؂�ւ�
-  Win+Ctrl+��  (�����̎��_��)�E��...
-  Win+Ctrl+F4 ���z�f�X�N�g�b�v�����
+  Win+Ctrl+D  仮想デスクトップを追加
+  Win+Ctrl+←  (自分の視点を)左の仮想デスクトップに切り替え
+  Win+Ctrl+→  (自分の視点を)右の...
+  Win+Ctrl+F4 仮想デスクトップを閉じる
 
-  Windows7��VirtuaWin�ňȉ��̓Ǝ��ݒ�
-    Ctrl+Alt+����       (�����̎��_��)���z�f�X�N�g�b�v<����>�ɐ؂�ւ� (1�`9)
-    Ctrl+Alt+�㉺���E   (�����̎��_��)�w������̉��z�f�X�N�g�b�v�ɐ؂�ւ�
-    Win+Alt+���E        ���݂̃E�B���h�E���w������̉��z�f�X�N�g�b�v�Ɉړ�
+  Windows7のVirtuaWinで以下の独自設定
+    Ctrl+Alt+数字       (自分の視点を)仮想デスクトップ<数字>に切り替え (1～9)
+    Ctrl+Alt+上下左右   (自分の視点を)指定方向の仮想デスクトップに切り替え
+    Win+Alt+左右        現在のウィンドウを指定方向の仮想デスクトップに移動
 
-�E�B���h�E�؂�ւ��E����
+ウィンドウ切り替え・操作
 
-  Win+�����n�́A�^�X�N�o�[��̐����Ŏ����ʒu�Ƀs�����߂���Ă���A�v���𑀍삷��B
-    �s�����߂��P���g���Ă��Ȃ��ꍇ�́A�ғ����̃A�v�����O���[�v������Ă�����т�
-    �ԍ����U���Ă���悤���B
+  Win+数字系は、タスクバー上の数字で示す位置にピン留めされているアプリを操作する。
+    ピン留めを１つも使っていない場合は、稼働中のアプリがグループ化されている並びで
+    番号が振られているようだ。
 
-    Win+����        �J�n�B�A�v�������Ɏ��s����Ă���ꍇ�́A���̃A�v���ɐ؂�ւ���B
-    Win+Shift+����  �V�����C���X�^���X(�V�����E�B���h�E)���J�n����
-    Win+Ctrl+����   �O��̍�ƒ��̃E�B���h�E�ɐ؂�ւ���
-    Win+Alt+����    �W�����v���X�g(�^�X�N�o�[�E�N���b�N�ŏo����)
-    Win+Ctrl+Shift+����    �V�����C���X�^���X���Ǘ��҂Ƃ��ĊJ��
+    Win+数字        開始。アプリが既に実行されている場合は、そのアプリに切り替える。
+    Win+Shift+数字  新しいインスタンス(新しいウィンドウ)を開始する
+    Win+Ctrl+数字   前回の作業中のウィンドウに切り替える
+    Win+Alt+数字    ジャンプリスト(タスクバー右クリックで出るやつ)
+    Win+Ctrl+Shift+数字    新しいインスタンスを管理者として開く
 
 
-  Win+D     �S�ẴE�B���h�E���ŏ����B(���������x�ŕ���)
-  Win+M     �S�ẴE�B���h�E�̍ŏ����B
-  Win+Shift+M     �ŏ������ꂽ�E�B���h�E�𕜌��B
-  Win+Home  ��ƒ��̃E�B���h�E���������ׂẴE�B���h�E���ŏ�������
-            (���������x�ŕ�������)
+  Win+D     全てのウィンドウを最小化。(直後もう一度で復元)
+  Win+M     全てのウィンドウの最小化。
+  Win+Shift+M     最小化されたウィンドウを復元。
+  Win+Home  作業中のウィンドウを除くすべてのウィンドウを最小化する
+            (直後もう一度で復元する)
 
-  Win+��  ��ʂ̍����ɃA�v���܂��̓f�X�N�g�b�v �E�B���h�E���ő剻����B
-          �X�ɑ�����ƕʉ�ʂɃE�B���h�E���ړ�����B
-  Win+��  ��ʂ̉E���ɃA�v���܂��̓f�X�N�g�b�v �E�B���h�E���ő剻����B
-          �X�ɑ�����ƕʉ�ʂɃE�B���h�E���ړ�����B
-  Win+��  �E�B���h�E���ő剻����
-	  ���E�ő剻�̌�ɂ��邱�ƂŁA�E�B���h�E���X�ɏ㔼����(��ʂ�4����1) (Win10����H)
-  Win+��  �E�B���h�E���ŏ�������
-          ���E�ő剻�̌�ɂ��邱�ƂŁA�E�B���h�E���X�ɉ�������(��ʂ�4����1) (Win10����H)
+  Win+←  画面の左側にアプリまたはデスクトップ ウィンドウを最大化する。
+          更に続けると別画面にウィンドウが移動する。
+  Win+→  画面の右側にアプリまたはデスクトップ ウィンドウを最大化する。
+          更に続けると別画面にウィンドウが移動する。
+  Win+↑  ウィンドウを最大化する
+	  左右最大化の後にすることで、ウィンドウを更に上半分に(画面の4分の1) (Win10から？)
+  Win+↓  ウィンドウを最小化する
+          左右最大化の後にすることで、ウィンドウを更に下半分に(画面の4分の1) (Win10から？)
 
-OS�ւ̑���
+  Win+Shift+↑(↓)  ウィンドウを縦方向にだけ最大化する。(↓で戻す)
 
-  Win+L  ���b�N
+  以下、yamy で独自設定
+    Ctrl+Alt+A ウィンドウを左に寄せる
+    Ctrl+Alt+E ウィンドウを右に寄せる
+    Ctrl+Alt+P ウィンドウを上に寄せる
+    Ctrl+Alt+N ウィンドウを下に寄せる
+    Ctrl+Alt+V ウィンドウを見える位置へ移動
+    Ctrl+Alt+X ウィンドウを縦最大化
+    Ctrl+Alt+C ウィンドウを横最大化
+
+OSへの操作
+
+  Win+L  ロック
 
