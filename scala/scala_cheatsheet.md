@@ -168,7 +168,7 @@ c.head
 c.last
 c.headOption
 c.lastOption
-c.find
+c.find(p: (A)=>Boolean) 渡した関数で最初にtrueになった要素のOption値を返す
 
 // サブコレクション取得
 c.tail
@@ -338,7 +338,7 @@ ops.nonEmpty
 ```
 
 
-マップ Map
+### マップ Map
 
 これも scala.collection.{immutable,mutable} の２つがある。
 
@@ -366,6 +366,20 @@ val romanNumeral = Map(
   1->"I", 2->"II", 3->"III", 4->"IV", 5->"V"
 )
 
+Map に対する Traversal 系の操作は、(k,v) のタプルが順に関数に渡される。
+その場合、タプルをバラすのに以下のように書くのが、定石っぽい。
+(partial function。引数１つでmatch１つからなる関数の省略形？)
+
+```
+val x = Map(1 -> "foo", 2 -> "bar")
+x map { case (k,v) => s"$k is $v" }
+
+// c.f. 真面目に書くとこんな感じになる
+x map ( (t) => {
+  val (k,v) = t
+  s"$k is $v"
+  })
+```
 
 
 ## イテレータ
@@ -1129,6 +1143,7 @@ val s = n match {
 シーケンスパターン
 タプルパターン
 型付パターン
+```
 
 
 
@@ -1137,9 +1152,9 @@ val s = n match {
 
 while ( 条件式 ) { ... }
 
-args.foreach( 関数 )
+collection.foreach( 関数 )  //  返り値はない
 
-for (arg <- args ) println(arg)
+for (arg <- args ) println(arg)   // 返り値はない
 
 
 ## 例外
@@ -1382,6 +1397,12 @@ class SetSpec extends FlatSpec with GivenWhenThen {
 ...
 ...
   """ }
+
+  markup { 
+    """
+      こういう書き方をすると、
+      行頭のインデントをいい感じでのぞいてくれるようだ。
+    """.stripMargin}
 
   behavior of "An empty Set"
 
