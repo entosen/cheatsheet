@@ -1312,17 +1312,59 @@ implicit def intToRational(x: Int) = new Rational(x)
 ## ディレクトリ構造
 
 ```
+// ビルド定義ファイル
 build.sbt
+project/
+  Build.scala
 
-src/main/java       Javaのソースコード置き場
-    jp/co/mydomain.... と続く
-src/main/scala      Scalaのソースコード置き場
-src/main/resources  プログラム中で必要なデータファイルなど
-src/test/java       Javaのテストコード置き場
-src/test/scala      Scalaのテストコード置き場
-src/test/resources  テスト時に必要なサンプルデータファイルなど
+// ソースコード
+src/
+  main/
+    resources/
+      <メインの jar に含むデータファイル>
+    scala/
+      <メインの Scala ソースファイル>
+      jp/co/mydomain.... と続く
+    java/
+      <メインの Java ソースファイル>
+  test/
+    resources/
+      <テストの jar に含むデータファイル>
+    scala/
+      <テストの Scala ソースファイル>
+    java/
+      <テストの Java ソースファイル>
 
+// ビルド成果物
+target/                    // sbt clean をすると中身が消される
+  resolution-cache/
+  scala-2.10/
+    classes/               // クラスファイルが格納
+    test-classes/          // テストコードのクラスファイルを格納
+    api/                   // scaladoc の出力
+  streams/
+  test-reports/            // テストの結果
+
+  test-workdir/            // テスト時に一時的にファイルを置いたりするところ(独自)
 ```
+
+こういうのはどこに置けばよいか
+
+- 本番のコードで読み込みたいファイル
+  - src/main/resources 直下                 // ※1
+  - src/main/resources/jp/co/.... 以下      // ※1
+- テストのコードで読み込みたいファイル → test/resources
+  - src/test/resources 直下                 // ※1
+  - src/test/resources/jp/co/.... 以下      // ※1
+- テスト時に出力したり、一時的にファイルを操作したいとき
+  - target/test-workdir/jp/co/.... 以下に作るのはどうだろうか。 ※2
+
+※1: 後述の「リソースについて」を参照
+※2: 後述の「テストでのファイルの出力」を参照
+
+
+
+## sbt コマンド
 
 ```
 compile
@@ -1353,6 +1395,23 @@ sbtは、以下のようにコピーしているらしい。(targetが実行環�
 参考
 [scala - How to access test resources? - Stack Overflow](http://stackoverflow.com/questions/5285898/how-to-access-test-resources "scala - How to access test resources? - Stack Overflow")
 
+
+## テストでのファイルの出力
+
+前提。
+scalatestの各テストは、
+カレントディレクトリがプロジェクトのトップディレクトリで動く。
+
+テストの中でファイルを出力するときは、target/test-workdir/jp/co/..... 以下にしよう(独自)
+```
+val packagedir = getClass.getPackage.getName.replace('.', '/')
+val outDir = new File("target/test-workdir/", packagePath)
+outDir.mkdirs
+val outputFile = new File(outDir, "output.txt")
+val writer = new PrintWriter(outputFile)
+writer.write(....)
+writer.close
+```
 
 ## 未整理
 
