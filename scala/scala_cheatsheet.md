@@ -1229,12 +1229,41 @@ FileInputStream を使う。
 
 TODO
 
-## その他ファイル操作
+## java.io.File クラス
+
+ファイルパスとそれに対する操作ができる。
 
 ```
-val f = new File(filePath)
+// 作り方
+new File("./hoge.txt")
+new File("dirname", "filename.txt")   // パスの連結
+
+// 取得系メソッド
 val str = f.getName()   // パスからファイル名部分のみを取得。いわゆるbasename
-val str = f.fetParent() // パスから親のパス部分のみを取得。いわゆる dirname
+val str = f.getParent() // パスから親のパス部分のみを取得。いわゆる dirname
+getParentFile, getPath
+isAbsolute, getAbsolutePath, getAbsoluteFile, 
+getCanonicalPath, getCanonicalFile
+
+canRead, canWrite, canExecute
+
+exists, isDirectory, isFile, isHidden
+lastModified, length, 
+
+list, listFiles,
+listRoots,
+getTotalSpace, getFreeSpace, getUsableSpace
+
+// 操作系メソッド
+setReadOnly, setWritable, setReadable, setExecutable
+setLastModified, 
+
+createNewFile
+delete
+deleteOnExit
+mkdir, mkdirs
+renameTo
+createTempFile
 ```
 
 
@@ -1362,6 +1391,16 @@ target/                    // sbt clean をすると中身が消される
 ※1: 後述の「リソースについて」を参照
 ※2: 後述の「テストでのファイルの出力」を参照
 
+参考: ディレクトリ取得の方法
+```
+// カレントディレクトリの取得
+new java.io.File(".").getCanonicalPath
+System.getProperty("user.dir")
+
+// パッケージ名の取得
+getClass.getPackage.getName
+val packagedir = getClass.getPackage.getName.replace('.', '/')
+```
 
 
 ## sbt コマンド
