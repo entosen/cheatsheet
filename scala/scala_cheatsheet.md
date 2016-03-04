@@ -1116,35 +1116,113 @@ if ( 条件式 ) { ... }
 if ( 条件式 ) 単文
 
 
-## match式
+## match式 (パターンマッチ)
+
+参考: [Scala matchメモ(Hishidama's Scala match Memo)](http://www.ne.jp/asahi/hishidama/home/tech/scala/match.html "Scala matchメモ(Hishidama's Scala match Memo)")
+
+基本構文
+- マッチした最初のものだけが使われる
+- match は値を返す
 
 ```
-定数パターン(5,true,"hoge"などなど) --- その値にマッチするかどうか
-ワイルドカードパターン(_) --- 何にでもマッチ。ただし右辺で参照できない。
-
 var n = 1
 val s = n match {
   case 1 => "いち"
   case 2 => "に"
-  case 3 => "さん"
+  case 3 =>              // 次のcaseが来るまでは一連の処理。最後の値が返る
+    "み"
+    "さん"
+  case 0 =>              // `=>` の右側に何も書かなければ何もしない
+  case _ => "たくさん"   // ワイルドカードパターン。なんにでもマッチ
+                         // ワイルドカードパターンなくてもいい。
+			 // マッチするのがなかったら例外 MatchError
+}
+```
+
+`=>` の右辺で値を使わなくてよい場合
+
+```
+n match {   // 数値
+  case 1 => "いち"
+  case 2 => "に"
+  case 4 | 9 | 13 => "不吉"  //  複数パターン。どれかに当たればマッチ
   case _ => "たくさん"
 }
 
-変数パターン --- 何にでもマッチ。その変数にbind。
+s match {  // 文字列
+  case "abc" => 1
+  case "def" => 2
+}
 
-  パターンに変数(valでも)を書いた場合の注意
-  * 変数名が大文字で始まる単純名: 定数パターン。その値にマッチするか。
-  * 変数名が小文字で始まる単純名: 変数パターン。つまり何にでもマッチ。
-  * `変数名` とした場合: 定数パターン
-  * オブジェクト名.変数名とした場合(this.pi, obj.piなど): 定数パターン
+a match {   // a: Array[Int]
+  case Array(1,2,3) => 1
+  case Array(4,5,6) => 2
+}
 
+t match {   // t: (Int, String)
+  case (1,"abc") =>  11
+  case (2,"abc") => 21
+  case (1,"def") => 12
+  case (2,"def") => 22
+}
 
-コンストラクタパターン
-シーケンスパターン
-タプルパターン
-型付パターン
+obj match {    // 値の一部の項目だけマッチしていればいい場合
+  case (1, _) => "tup2-1"
+  case (2, _) => "tup2-2"
+  case (_, 3) => "tup2-3"
+  case (_, _, _) => "tup3"
+} 
+
+lst match {    // 引数が可変になる場合 `_*` でその他を表せる。末尾のみ。
+  case List(1, _*) => "one"
+  case List(2, _*) => "two"
+}
+
+obj match {    // 型でのマッチング
+  case _: String => "文字列"
+  case _: Int    => "整数"
+  case _: Set[_] => "集合"    // Set[Int]などとやっても、中の型は無視される
+  case _         => "知らない"
+}
 ```
 
+マッチした値を取得する
+```
+obj match {    // obj が Any だとして、型ごとに処理を分ける。
+  case s: String => s.length  // s は String型として扱える
+  case a: Array[_] => a.length
+  case l: List[_] => l.size
+}
+
+obj match {     // 中身の一部を取得 (タプル)
+  case (1, s)    => "one " + s
+  case (2, s)    => "two " + s
+  case (_, s, _) => "tup3 " + s
+}
+
+obj match {    // 「@」を使うと、caseにマッチした値全体と、
+               //  一部分を変数に入れたものが受け取れる。
+  case t @ (_,b)   => t + "=" + b
+  case t @ (_,_,c) => t + "=" + c
+}
+
+opt match {        // Option の中身を取り出すときの定石
+  case Some(v) => v
+  case _       => "default"
+}
+```
+
+TODO
+- コンストラクタパターン
+- シーケンスパターン
+- タプルパターン
+- 型付パターン
+
+パターンに変数(valでも)を書いた場合の注意
+* 変数名が大文字で始まる単純名: 定数パターン。その値にマッチするか。
+* 変数名が小文字で始まる単純名: 変数パターン。つまり何にでもマッチ。
+* `変数名` とした場合: 定数パターン
+* オブジェクト名.変数名とした場合(this.pi, obj.piなど): 定数パターン
 
 
 
