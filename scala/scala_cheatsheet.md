@@ -1847,7 +1847,19 @@ m.expects.newInstance('blue)   // 引数付きコンストラクタを使いた�
 m.expects.forward(10.0)
 ```
 
+```
+import org.scalatest.{ FlatSpec, PrivateMethodTester }
 
+class PersonSpec extends FlatSpec with PrivateMethodTester {
+
+  "A Person" should "transform correctly" in {
+      val p1 = new Person(1)
+      val transform = PrivateMethod[Person]('transform)
+      assert(p2 === invokePrivate transform(p1))
+    }
+  }
+}
+```
 
 
 # scaladoc
@@ -1922,6 +1934,86 @@ Other
     @define <name> <definition>
     $name
 ```
+
+# ログ (Logging)
+
+- Scala用ラッパーライブラリ: scala-logging
+- 共通ログインターフェースライブラリ: SLF4J
+- バックエンドライブラリ: logback
+
+参考
+
+- http://logback.qos.ch/manual/introduction_ja.html
+
+
+## コードに書く側の仕組み
+
+```
+import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
+
+// logger_name の指定があれば、以下のように
+val logger = Logger(LoggerFactory.getLogger("logger_name"))
+// 一般的にはクラス名を書くことが多いようだ
+// (階層になっているので後で設定で切り分けし易い)
+val logger = Logger(LoggerFactory.getLogger(getClass))
+
+// Logging, LazyLogging, StrictLogging というトレイトもあり。
+// logger インスタンス変数が定義されます。
+// logger_name はクラス名が自動で使われる？
+class MyClass extends Logging {
+  logger.debug("foo")
+}
+
+logger.trace("hoge")
+logger.debug("foo")
+logger.info("bar")
+logger.warn("baz")
+logger.error("baz")
+```
+
+遅延評価って言っているのは、
+scala-logging では、
+自動的に以下のようなコードに変換されるらしいので、
+someHeavyFunc が呼ばれるのは、実際に出力されるとき。
+つまり、infoを出力する設定になっていない場合は、 someHeavyFunc は評価されない。
+```
+logger.info("===" + someHeavyFunc + "===")
+↓
+if ( logger.isInfoEnabled ) {
+  logger.info("===" + someHeavyFunc + "===")
+}
+```
+
+
+
+## ログを出力する側の仕組み
+
+logback の設定ファイル
+
+> http://logback.qos.ch/manual/configuration_ja.html#auto_configuration
+
+- logback はクラスパス上でlogback.groovyというファイルを探します。
+- 見つからなかったら、今度はクラスパス上でlogback-test.xmlというファイルを探します。
+  (普通は src/test/resources 以下に配置)
+- 見つからなかったら、今度はクラスパス上でlogback.xmlというファイルを探します。
+  (普通は src/main/resources 以下に配置)
+- 何も見つからなかったら、自動的にBasicConfiguratorを使って設定します。
+  ロギング出力は直接コンソールに出力されるようになります。
+
+
+logback.xml
+
+- property 変数みたいなもの
+- appender 
+  - 「どの場所にどういうフォーマットでログを出力するのか」を定義する
+  - filterでどのログレベル(trace, debug, info, warn, error)のログを出すのか決める。
+  - patternでログのフォーマットを決める
+  - ローテーション、非同期、ファイルの圧縮もここで決める。
+- logger
+  - ロガー名とappender を対応づける？？？
+
+
 
 # ベンチマーク sbt-jmh
 
