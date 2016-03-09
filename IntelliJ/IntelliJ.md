@@ -114,6 +114,22 @@ git config --global core.autocrlf false
       - Other > Alternate Indentation for constructor args and parameter declarationsをチェックして4spacesに
       - Wrapping and... > Method Declaration parameters > Align when multilineのチェックを外す
 
+
+Editor Tab まわりの設定
+
+- Editor > General > Editor Tabs
+  - "Hide tabs if there is no space" は嫌いなので、チェックを外す
+  - "Hide file extension in editor tabs" チェックを入れてみる
+  - "Mark modified tabs with asterisk" チェックを入れてみる
+      - 効いてない？一度ついてもすぐ消えてしまう。
+  - "Show tabs in single row" を外してみる
+      - これ外して、複数行になっている側のウィンドウに C-W H で移れなくなった...。C-W C-W は効く。
+      - IdeaVim に Bug 上がってた。
+  	Ctrl-w + h doesn't alway work (window navigation to the left window) : VIM-795
+  	https://youtrack.jetbrains.com/issue/VIM-795
+  - "When closing active editor" は "Activate most recently opened tab" にしてみる。
+
+
 # 編集
 
 ## 置換
