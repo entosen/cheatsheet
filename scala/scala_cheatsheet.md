@@ -704,6 +704,12 @@ var f : ((Int) => String) = null
 def test(f: (Int) => String) = { f(1) + f(2) + f(3) }
 ```
 
+c.f 名前渡し。
+
+http://www.ne.jp/asahi/hishidama/home/tech/scala/def.html
+関数を取る関数。関数がいつ評価されるか。
+関数が渡るのか、関数を実行した結果が渡るのか。
+
 
 ## 呼び出し
 max(3,5)
@@ -724,12 +730,35 @@ myarray(2) = "Hello"  // myarray.update(2, "Hello")
 def greet() = println("Hello, world")  // 引数なし
 
 
+## PartialFunction
 
-名前渡し。
-http://www.ne.jp/asahi/hishidama/home/tech/scala/def.html
-関数を取る関数。関数がいつ評価されるか。
-関数が渡るのか、関数を実行した結果が渡るのか。
+書きかけ
+- isDefinedAt
+- lift
+- orElse
 
+## 関数の合成
+
+```
+// 関数の合成。２つの関数を連鎖させた新しい関数を作る
+// f1 の結果を引数にとり、f2 を実行する関数を返す。
+// つまり x を渡すと f2(f1(x)) を実行して返すような関数を作る
+  f1 andThen f2
+  f2 compose f1
+
+// c.f. 処理結果を踏まえた連鎖
+// Option型を使うと、1つ目の処理がうまくいったときのみ、
+// その結果を使って2つ目の処理を行うということができる
+// (flatMap という名前が直感的ではない。Maybeモナド。名前はあまり気にするな)
+f1: (A) => Option[B]
+f2: (B) => Option[C]
+val result: Option[C] = f1 flatMap f2
+```
+
+c.f. Option型
+- flatMap
+- map
+- getOrElse
 
 
 # クラス と オブジェクト
