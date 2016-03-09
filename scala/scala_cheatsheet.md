@@ -189,7 +189,8 @@ c.partition
 c.groupBy
 
 // 要素条件演算
-c.exists
+c.exists(p: (A)=>Boolean)  1つでも条件にあうものがあればTrue
+(c.f.) c.contains(elem: A1)  一致するものが1つでもあればTrue (Seqのみ？)
 c.forall
 c.count
 
