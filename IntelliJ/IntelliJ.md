@@ -130,6 +130,18 @@ Editor Tab まわりの設定
   - "When closing active editor" は "Activate most recently opened tab" にしてみる。
 
 
+IdeaVim まわりの設定。
+
+ホームディレクトリに `.ideavimrc` というファイルを置くと読み込んでくれる。
+ただし Windows の場合は、環境変数HOME ではなく、
+`C:\Users\(ユーザー名)\.ideavimrc` 決め打ちでしか読み込んでくれないようだ。
+
+```
+" Stop Bell
+set visualbell
+set noerrorbells
+```
+
 # 編集
 
 ## 置換
