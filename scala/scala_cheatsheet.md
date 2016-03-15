@@ -1517,7 +1517,7 @@ val packagedir = getClass.getPackage.getName.replace('.', '/')
 compile
 
 test
-testOnly テストクラス名
+testOnly *テストクラス名   // 本来(packageの?)フルパス指定なので、'*'つける
 
 ```
 
