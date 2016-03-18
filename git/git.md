@@ -188,7 +188,16 @@ git reset HEAD <file>...
 
 # 以下、未整理。
 
+```
+git stash                     // 現在の変更の 積み込み
+git stash list                // 一覧の表示
+git stash apply               // 直近 stash した変更を読み込み
+git stash apply stash@{2}     // 名前で指定
+git stash apply --index       // ステージ処理もされる
 
+git stash drop stash@{0}      // stash から消す
+git stash pop                 // 直近のを適用して、同時にそれはリストから消す
+```
 
 
 
