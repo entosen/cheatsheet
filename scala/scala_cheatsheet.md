@@ -91,6 +91,53 @@ http://docs.oracle.com/javase/jp/8/docs/api/java/nio/ByteBuffer.html
 
 ## 文字列
 
+ドキュメントは java の String と、scala の StringOps を見る。
+- http://docs.oracle.com/javase/jp/8/docs/api/java/lang/String.html
+
+```
+val s: String = "hogehoge"
+val s: String = "foo\nbar"
+val s = """abc
+          |\n\n\n
+          |def""".stripMergin
+// 3つクオートの中ではエスケープは効かない
+// stripMergin は marginChar(デフォルトは '|' 以降のみを有効に)
+
+s.length
+s.size
+s.codePointCount(0, s.length)
+
+s.equalsIgnoreCase("ABC")
+s.isEmpty
+s.nonEmpty
+
+// 検索
+s.indexOf('a')
+s.latIndexOf('a')
+s.indexOfSlice("abc", 0)   // 正規表現ではない。第2引数は、n回目のマッチの位置。
+s.lastIndexOfSlice("abc", 0) 
+s.contains('b')
+s.contains("abc")
+
+// 置換
+s.replace('a', 'x')    // 全部置換
+s.replace("ab", "x")   // "ab" を "x" に置換。正規表現使えない
+
+s.replaceAll("[a-z]+", "123")   // 正規表現使える
+s.replaceFirst("[a-z]+", "123")
+
+s * n
+```
+
+### StringBuilder
+
+```
+val buf = new StringBuilder()
+buf.append("aaaaa\n")
+buf.append("bbbbb\n")
+buf.result
+```
+
 ### 加工文字列リテラル 
 
 printfのようなことができる。 scala-2.10.0 より。
@@ -1267,6 +1314,13 @@ for (arg <- args ) println(arg)   // 返り値はない
 
 ## 例外
 
+```
+// 投げる
+throw new IlligalArgumentException()
+throw new IlligalArgumentException("hogehgoe")
+throw new IlligalArgumentException("hogehgoe", throwable)
+
+// キャッチする
 try {
   式
   …
@@ -1278,6 +1332,11 @@ try {
 } finally {
   式
 }
+
+// Exception の操作
+ex.getMessage   // message 文字列
+ex.toString     // Exceptionクラス名: message文字列
+```
 
 
 # main関数 コマンドライン引数
@@ -1400,6 +1459,12 @@ rnd.nextInt(imax)   // 範囲は、[0, imax)
 begin: Long = System.nanoTime();  // 経過時間の測定に使用
 ```
 
+## URLencode,URLdecode
+
+```
+val encoded = java.net.URLEncoder.encode(raw, "UTF-8")
+val decoded = java.net.URLDecoder.decode(encoded, "UTF-8")
+```
 
 # チートシート
 
