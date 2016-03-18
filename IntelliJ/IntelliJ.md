@@ -158,3 +158,10 @@ set noerrorbells
     でもこれ、半角全角考慮しない文字数っぽいので、半角文字数換算で出してほしい
 
 
+# トラブルシュート
+
+java のメソッドが見つからなくなった。
+
+jdkのアップデートで発生。
+File > Project Structure > SDKs > JDK home path を アップデートした最新のものに変更する。
+C:\Program Files\Java\jdk1.8.0_73  とか。
