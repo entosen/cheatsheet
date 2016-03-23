@@ -1127,6 +1127,7 @@ class Queue[T] { ... }
 object Queue { ... }
 というのも可能か？(互いの非公開メンバにアクセスできるか？)
 
+シングルトンオブジェクトが初期化されるのは、最初にアクセスされたとき。
 
 ## トレイト trait
 
@@ -1465,6 +1466,25 @@ begin: Long = System.nanoTime();  // 経過時間の測定に使用
 val encoded = java.net.URLEncoder.encode(raw, "UTF-8")
 val decoded = java.net.URLDecoder.decode(encoded, "UTF-8")
 ```
+
+## Config
+
+JAVA の Propertiesクラスを使うのが一般的。
+設定ファイルフォーマットは、以下の loadメソッドのところに記載。
+- http://docs.oracle.com/javase/jp/8/docs/api/java/util/Properties.html
+
+```
+import java.util.Properties
+import java.ioFileInputStream
+val confFileName = "hoge.conf"
+val prop = new Properties
+prop.load(new FileInputStream(confFileName))
+// FileInputSteram だとASCII以外受け付けてくれないかも
+// Readを使うと大丈夫かも。実験してない。
+
+prop.getProperty("key1")
+```
+
 
 # チートシート
 
