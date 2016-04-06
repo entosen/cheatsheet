@@ -1872,6 +1872,7 @@ class SetSpec extends FunSpec {
 
 - http://www.scalatest.org/user_guide/testing_with_mock_objects
 - http://scalamock.org/quick-start/
+- http://scalamock.org/api/index.html#org.scalamock.package
 
 
 ### テストへの組み込み方法
@@ -1887,6 +1888,7 @@ class ExampleSpec extends FlatSpec with MockFactory with ...  {
 
 ### モック的スタイル ( expectations-first )
 
+全体の流れ
 ```scala
 val mFunc = mockFunction[Int, String]    // Function Mock
 val heaterMock = mock[Heater]            // Trait, interface Mock
@@ -1907,6 +1909,101 @@ mFunc expects (42) returning "Forty two" once
 
 coffeeMachine.makeCoffee()  // 実行。expectどおりになるかをテスト
 ```
+
+期待する関数がオーバーロードされている場合の指定
+```
+(m.overloaded(_: Int)).expects(10)
+(m.overloaded(_: String)).expects("foo")
+(m.overloaded[Double] _).expects(1.23)
+(m.curried(_: Int)(_: Double)).expects(10, 1.23)
+(m.polymorphic(_: List[Int])).expects(List(1, 2, 3))
+(m.polymorphic[String] _).expects("foo")
+``` 
+
+> Overloaded method cannot be mocked if one of its parameters is a generic available to the trait. ・ Issue #93 ・ paulbutcher/ScalaMock
+> https://github.com/paulbutcher/ScalaMock/issues/93
+
+引数のマッチング
+```
+// 任意の関数を使ってチェック
+// (例1)オブジェクトの中身をチェックしたいとき
+(leaderBoardMock.addPointsForPlayer _) expects (where {
+  (player: Player, points: Int) => player.id == 789 && points == 100
+})
+
+// (例2)引数間の大小を比較したいとき
+mockedFunction expects (where { _ < _ }) // expects that arg1 < arg2
+```
+
+返す値
+```
+// 何も指定しないと null が返る
+
+// 単純に値を返す場合、 returning を使う
+(m.getPosition _).expects().returning(15.0, 10.0)
+// 引数から計算した値を返す場合、 onCall を使う
+m expects (*) onCall { _ + 1 }
+m expects (*,*) onCall( (arg1: Int, arg2: Int) => arg1 * arg2 )
+
+// 例外を発生させる場合 throws を使う
+m expects ("this", "that") throws new RuntimeException("what's that?")
+```
+
+呼び出し回数
+```
+// 何も指定しないと1回だけ呼ばれることを期待
+
+// 回数を指定する場合
+m1.expects(42).returns(42).repeat(3 to 7)
+m2 expects (3) repeat 10
+
+// エイリアス (http://scalamock.org/api/org/scalamock/CallHandler.html)
+m1.expects("this", "that").once
+m2.expects().returns("foo").noMoreThanTwice
+m3.expects(42).repeated(3).times
+```
+
+呼び出し順序
+```
+// 指定しなければ順不同
+
+// 順序指定する場合。inSequence を使う。
+inSequence {
+  m expects (1)
+  m expects (2)
+}
+
+// 順序依存関係が2通りある場合。(例: 1と3はどちらが先でも可)
+inSequence {
+  m expects (1)
+  m expects (2)
+}
+inSequence {
+  m expects (3)
+  m expects (4)
+}
+
+m(3)
+m(1)
+m(2)
+m(4)
+
+// こんな風に入れ子にもできる
+(m.a _).expects()
+inSequence {
+  (m.b _).expects()
+  inAnyOrder {
+    (m.c _).expects()
+    inSequence {
+      (m.d _).expects()
+      (m.e _).expects()
+    }
+    (m.f _).expects()
+  }
+  (m.g _).expects()
+}
+```
+
 
 ### スタブ的スタイル ( record-then-verify )
 
@@ -1935,10 +2032,6 @@ val fakeDb = stub[PlayerDatabase]
 // configure fakeDb behavior 
 (fakeDb.getPlayerById _) when(222) returns(Player(222, "boris", Countries.Russia))
 (fakeDb.getPlayerById _) when(333) returns(Player(333, "hans", Countries.Germany))
-
-// ↑このメソッドが overload されている場合は、引数型を指定してあげる
-(fakeDb.getPlayerById(_: Int)) ...
-(fakeDb.getPlayerById(_: String)) ...
 
 // use fakeDb
 assert(fakeDb.getPlayerById(222).nickname == "boris")
