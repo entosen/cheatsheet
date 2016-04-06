@@ -383,6 +383,10 @@ None           // 生成。というかオブジェクト。
 opt.isEmpty
 opt.isDefined
 ops.nonEmpty
+
+// OptionのSeq を中身のSeqにする。
+optList = List[Option[Int]](Some(100), None, Some(200))
+optList.flatMap(x=>x)   // List(100,200)
 ```
 
 
@@ -1337,6 +1341,13 @@ try {
 // Exception の操作
 ex.getMessage   // message 文字列
 ex.toString     // Exceptionクラス名: message文字列
+
+// stack trace 
+ex.printStackTrace()   // 標準エラー出力へ
+
+val sw = new StringWriter  // 文字列へ
+e.printStackTrace(new PrintWriter(sw))
+sw.toString
 ```
 
 
