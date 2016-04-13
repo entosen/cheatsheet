@@ -2154,6 +2154,24 @@ Other
     $name
 ```
 
+# scalastyle
+
+警告を止めたいとき。http://www.scalastyle.org/configuration.html
+```
+// scalastyle:off magic.number
+... 
+// scalastyle:on magic.number
+
+1行なら
+naughty()  // scalastyle:ignore
+```
+
+チェック項目のId http://www.scalastyle.org/rules-0.5.0.html
+```
+magic.number
+method.length
+```
+
 # ログ (Logging)
 
 - Scala用ラッパーライブラリ: scala-logging
@@ -2278,4 +2296,9 @@ $ sbt jmh:run -i 3 -wi 3 -f1 -t 1 benchmark.*
     t  : スレッド数
 ```
 
+# feature
+
+```
+import scala.language.postfixOps   // 後置オペレーター
+```
 
