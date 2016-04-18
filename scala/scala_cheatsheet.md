@@ -1469,6 +1469,36 @@ renameTo
 createTempFile
 ```
 
+# 外部コマンド、シェルコマンド
+
+TODO どういう風にシェルの解釈がはいるか。
+```
+import scala.sys.process._
+
+Process("ls").run   // 実行(非同期。終了を待たない)
+Process("ls").!     // 終了コードを返す
+Process("ls").!!    // 標準出力の結果を返す
+Process("ls").lines    // 標準出力の結果を行ごとにリストとして返す
+
+// 文字列でも可
+"ls" run
+"ps aux" #| "grep java" !            // パイプは #|演算子
+"ps aux" #> new File("hoge.txt") !   // リダイレクト
+
+// 引数を明示する場合  Seq[String] を使う
+Seq("ps", "aux") !!
+```
+
+windows で動かす場合は、シェルの解釈に癖があり、ダブルクオートが落ちる場合がある
+```
+  val mylib_version = System.getProperty("os.name") match {
+    case os if os.contains("Windows") =>
+      Seq("awk", """/mylib/ {printf(\"[%s,%s]\", $5, $6); exit}""", "mylib.versions").!!.trim
+    case _ =>
+      Seq ("awk", """/mylib/ {printf("[%s,%s]", $5, $6); exit}""", "mylib.versions").!!.trim
+  }
+  "mylib" % "mylib" % mylib_version
+```
 
 
 # こんなときはどうする？
