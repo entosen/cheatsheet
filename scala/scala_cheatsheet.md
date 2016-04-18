@@ -399,6 +399,7 @@ Map型は抽象的なトレイト。Mapオブジェクトで生成は可能。
 
 HashMapもある。
 
+```
 import scala.collection.mutable.Map
 val treasureMap = Map[Int, String]()
 
@@ -412,11 +413,18 @@ treasureMap += (3 -> "Dig.")
 // 取得
 println(treasureMap(2))
 
+// 要素を抜く
+map -= key       // 自分自身(Map) を返す
+map.remove(key)  // Option[V] を返す
+```
+
 
 イミュータブルMap
+```
 val romanNumeral = Map(
   1->"I", 2->"II", 3->"III", 4->"IV", 5->"V"
 )
+```
 
 Map に対する Traversal 系の操作は、(k,v) のタプルが順に関数に渡される。
 その場合、タプルをバラすのに以下のように書くのが、定石っぽい。
@@ -433,6 +441,9 @@ x map ( (t) => {
   })
 ```
 
+Mapの種類
+
+- AnyRefMap : 中身の一致(==)ではなく参照の一致(equals)によってキー同一性を行うMap
 
 ## イテレータ
 
@@ -1402,11 +1413,24 @@ Source.fromFile("abc.txt", "MS932")   // エンコード指定
 ```
 
 
-## バイナリファイルの読み込み
+## バイナリファイルの読み書き
 
-FileInputStream を使う。
+FileInputStream, FileOutputStream を使う。
 
-TODO
+```
+val file = new File(workdirFile, "out.bin")
+var out: FileOutputStream = null
+try {
+  out = new FileOutputStream(file)  // 引数は文字列でも可
+  out.write(bytes)
+} finally {
+  if ( out != null ) {
+    out.close()
+  }
+}
+```
+
+
 
 ## java.io.File クラス
 
@@ -1604,6 +1628,21 @@ System.getProperty("user.dir")
 // パッケージ名の取得
 getClass.getPackage.getName
 val packagedir = getClass.getPackage.getName.replace('.', '/')
+
+// パッケージパスも含めたクラス名の取得
+getClass.getName
+val classdir = getClass.getName.replace('.', '/')
+
+
+// テストでなにかファイル出力したいときはこんな感じ
+val classdir = getClass.getName.replace('.', '/')
+val workdir = new File("target/test-workdir", classdir).toString
+
+// workdir を掘っておく
+val workdirFile = new java.io.File(workdir)
+if ( ! workdirFile.exists ) {
+  workdirFile.mkdirs()
+}
 ```
 
 
