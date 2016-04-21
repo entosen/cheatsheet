@@ -169,6 +169,15 @@ git mv oldfile newfile   # ファイル名の変更
 ```
 
 
+# remote
+
+複数の remote をあつかう。
+```
+git remote -v   # 確認
+git remote add remoteName remoteUrl
+git remote -v   # 確認
+```
+
 # 間違えた系
 
 - [Backlinks for: git/コミットログを修正する方法 - TOBY SOFT wiki](http://tobysoft.net/wiki/index.php?plugin=related&amp;page=git%2F%A5%B3%A5%DF%A5%C3%A5%C8%A5%ED%A5%B0%A4%F2%BD%A4%C0%B5%A4%B9%A4%EB%CA%FD%CB%A1)
