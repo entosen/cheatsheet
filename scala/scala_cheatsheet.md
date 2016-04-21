@@ -411,7 +411,9 @@ treasureMap += (2 -> "Find big X on ground.")
 treasureMap += (3 -> "Dig.")
 
 // 取得
-println(treasureMap(2))
+treasureMap(2)           // キーが無ければ例外
+treasureMap.get(2)       // 値をOptionに入れて返す。キーがなければNone
+treasureMap.contains(2)  // キーが存在するかどうかを Booleanで返す
 
 // 要素を抜く
 map -= key       // 自分自身(Map) を返す
@@ -2239,6 +2241,7 @@ naughty()  // scalastyle:ignore
 ```
 magic.number
 method.length
+parameter.number
 ```
 
 # ログ (Logging)
