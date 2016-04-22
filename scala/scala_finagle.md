@@ -8,8 +8,11 @@ https://twitter.github.io/util/docs/index.html#package
 
 val f: Future
 
-’l‚ğæ‚èo‚·
-Await.result(f) ¨ ¬Œ÷:Future‚Ì’†‚ÌŒ^A¸”s:—áŠO
+Future ã‚’ä½œã‚‹
+f = Future(response)    // ã“ã‚Œã§ã„ã„ã®ã‹ï¼Ÿ
+
+å€¤ã‚’å–ã‚Šå‡ºã™
+Await.result(f) â†’ æˆåŠŸ:Futureã®ä¸­ã®å‹ã€å¤±æ•—:ä¾‹å¤–
 
 
 
@@ -23,7 +26,7 @@ request.host = "www.scala-lang.org"
 val request = RequestBuilder()
   .url("http://www.example.com/test")
   .addParameter("key", "value")   // this doesn't exist
-  .buildGet()      // POST‚Ìê‡‚Í .buildPost
+  .buildGet()      // POSTã®å ´åˆã¯ .buildPost
 request    // should be a GET request for http://www.example.com/test?key=value
 
 .url(new URL("https", host, 443, path))
@@ -31,19 +34,19 @@ request    // should be a GET request for http://www.example.com/test?key=value
 .buildPost(Buf.Utf8(string))
 
 
-’l‚ğæ‚èo‚·
+å€¤ã‚’å–ã‚Šå‡ºã™
 
 req.method: Method
     == Method.Get
     == Method.Post
-req.uri: String   ¨ ƒpƒX‚ÆƒNƒGƒŠƒXƒgƒŠƒ“ƒO‚Ì•”•ª
+req.uri: String   â†’ ãƒ‘ã‚¹ã¨ã‚¯ã‚¨ãƒªã‚¹ãƒˆãƒªãƒ³ã‚°ã®éƒ¨åˆ†
 req.host: Option[String]
 req.path: String
 req.referer: Option[String]
 req.remoteAddress: InetAddress
-  req.remoteAddress.getHostAddress: String ¨ IpƒAƒhƒŒƒX
-  req.remoteAddress.getHostName: String ¨ ƒzƒXƒg–¼
-req.remoteHost: String (111.111.111.111Œ`®‚Ì•¶š—ñ)
+  req.remoteAddress.getHostAddress: String â†’ Ipã‚¢ãƒ‰ãƒ¬ã‚¹
+  req.remoteAddress.getHostName: String â†’ ãƒ›ã‚¹ãƒˆå
+req.remoteHost: String (111.111.111.111å½¢å¼ã®æ–‡å­—åˆ—)
 req.userAgent: Option[String]
 
 req.contentString: String
@@ -56,11 +59,11 @@ req.cookie: CookieMap
 http://twitter.github.io/finagle/docs/#com.twitter.finagle.http.Status$
 
 ```
-ì‚é
+ä½œã‚‹
 http.Response(req.version, http.Status.Ok)
 setContentString(s)
 
-’l‚ğæ‚èo‚·
+å€¤ã‚’å–ã‚Šå‡ºã™
 res.statusCode: Int
 res.statusCode == http.Status.Ok.code
 res.status.reason     // "Bad Request"
