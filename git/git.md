@@ -178,6 +178,37 @@ git remote add remoteName remoteUrl
 git remote -v   # 確認
 ```
 
+# .ignore
+
+> [Git] .gitignoreの仕様詳解 - Qiita
+> http://qiita.com/anqooqie/items/110957797b3d5280c44f
+
+```
+/を含まない行（fileなど）
+    .gitignore以下の全サブディレクトリ下にあるこの名前のファイル or ディレクトリを無視する
+末尾以外にのみ/を含む行（/file, /path/to/file, path/to/fileなど）
+    .gitignoreが置いてあるディレクトリをカレントディレクトリとする相対パスで指定されるファイル or ディレクトリを無視する
+    先頭の/はルートを意味せず単に無視される
+末尾だけ/な行（directory/など）
+    .gitignore以下の全サブディレクトリ下にあるこの名前のディレクトリを無視する
+末尾以外にも末尾にも/を含む行（/directory/, /path/to/directory/, path/to/directory/など）
+    .gitignoreが置いてあるディレクトリをカレントディレクトリとする相対パスで指定されるディレクトリを無視する
+    先頭の/はルートを意味せず単に無視される
+!で始まる行（!/path/to/fileなど）
+    !以降のパターン文字列が示すファイル or ディレクトリを無視しない
+    前の無視指定を上書きする
+    以降の無視指定に上書きされうる
+空行 or #で始まる行
+    解釈されない 
+```
+
+除外(git-2.7以降)
+```
+/.idea
+!/.idea/codeStyleSettings.xml
+```
+
+
 # 間違えた系
 
 - [Backlinks for: git/コミットログを修正する方法 - TOBY SOFT wiki](http://tobysoft.net/wiki/index.php?plugin=related&amp;page=git%2F%A5%B3%A5%DF%A5%C3%A5%C8%A5%ED%A5%B0%A4%F2%BD%A4%C0%B5%A4%B9%A4%EB%CA%FD%CB%A1)
@@ -201,6 +232,7 @@ git reset HEAD <file>...
 //            つまりreset後、git的には未ステージの変更あり状態になる
 git reset --soft HEAD^
 ```
+
 
 
 # 以下、未整理。
