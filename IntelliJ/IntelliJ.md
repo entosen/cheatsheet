@@ -108,12 +108,28 @@ git config --global core.eol lf
 git config --global core.autocrlf false
 ```
 
-- (scala用) クラスパラメーターの折り返し時、インデントを4に。
-  http://kxbmap.hatenablog.com/entry/2015/02/26/031541
-  - Settings > Editor > Code Style > Scala > 
-      - Other > Alternate Indentation for constructor args and parameter declarationsをチェックして4spacesに
-      - Wrapping and... > Method Declaration parameters > Align when multilineのチェックを外す
+## code style の設定
 
+> Copying Code Style Settings
+> https://www.jetbrains.com/help/idea/2016.1/copying-code-style-settings.html?origin=old_help
+
+code style の設定場所には以下のものがあるようだ
+
+- default: IntelliJ の標準の設定
+- Globalのカスタム設定: 名前をつけて保存できる。無意識でも設定を変えると"Default(1)" とかになっているはず。
+  実体は `~/.Idea2016/config/codestyles` にある
+- Projectの設定: カスタム設定をProjectの設定として保存できる。
+  実体はプロジェクトの `.idea/codeStyleSettings`。
+
+scala用設定。
+Settings > Editor > Code Style > Scala > 
+
+- クラスパラメーターの折り返し時、行頭からのインデントにする
+  - Wrapping and... > Method Declaration parameters > Align when multilineのチェックを外す
+- scaladoc の2行目移行の`*`の位置、1行目の1つ目の`*`の位置に揃える
+  - ScalaDoc > Use scaladoc indent for leading asterisk のチェックを外す
+- import文で `{ NameA, NameB, }` のように波括弧の内側に空白を開ける
+  - Spaces > Other > Spaces after open and befor close braces in imports
 
 Editor Tab まわりの設定
 
