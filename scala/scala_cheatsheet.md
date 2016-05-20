@@ -225,7 +225,7 @@ c.take
 c.drop
 c.tageWhile
 c.dropWhile
-c.filter   // Booleanを返すpartial function。
+c.filter   // Booleanを返す関数オブジェクト(predicate)を渡す
 c.filterNot
 c.withFilter
 
