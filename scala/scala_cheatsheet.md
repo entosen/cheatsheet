@@ -225,7 +225,7 @@ c.take
 c.drop
 c.tageWhile
 c.dropWhile
-c.filter
+c.filter   // Booleanを返すpartial function。
 c.filterNot
 c.withFilter
 
@@ -264,6 +264,23 @@ c.stringPrefix
 view
 ```
 
+Seq
+
+Iterable に加え index でアクセスできる。
+```
+s(2)  // 2番めの要素を取得 (先頭は 0 )
+
+// 指定した条件を満たす最初の要素のindexを返す。見つからなければ -1 。
+s.indexWhere(要素の条件式)
+s.lastIndexWhere(要素の条件式)
+// 指定した要素が最初に出てくるindexを返す。見つからなければ-1 。
+s.indexOf(elem)
+s.lastIndexOf(elem)
+
+s.startsWith
+s.endWith
+s.indexOfSlice
+```
 
 
 配列 Array --- 単一型、ミュータブル(変更可能)
@@ -307,6 +324,8 @@ thrill.init   // 末尾を除いた残りのリストを返す
 thrill.tail   // 先頭を除いた残りのリストを返す
 thrill.drop(2)   // 先頭の2要素を除いた残りのリストが返される
 thrill.dropRight(2)   // 末尾の2要素を除いた残りのリストが返される
+
+list1 :+ elem   // 末尾に elem を追加した新しいリストを返す
 
 val list3 = list1 ::: list2  // 連結した新しいList
 val newlist = 1 :: list2     // 先頭に要素を追加した新しいList。cons操作。
@@ -426,6 +445,9 @@ map.remove(key)  // Option[V] を返す
 val romanNumeral = Map(
   1->"I", 2->"II", 3->"III", 4->"IV", 5->"V"
 )
+
+map - 3  // 要素を抜いた新しいMapを返す
+map + (6 -> "VI")  // 要素を追加した新しいMapを返す
 ```
 
 Map に対する Traversal 系の操作は、(k,v) のタプルが順に関数に渡される。
@@ -465,7 +487,9 @@ it.toMap        // it が返すキー/値ペアをマップに集める。
 ```
 
 
-0 to 2  // 0,1,2
+0 to 4      // 0,1,2,3,4
+0 until 4   // 0,1,2,3
+seq.indices  // そのseqを舐めるための添字のリスト
 
 
 ## Scalaの階層構造、型、Any, AnyVal, AnyRef, Unit, Null, Nothing, 同一比較
@@ -1361,6 +1385,10 @@ ex.printStackTrace()   // 標準エラー出力へ
 val sw = new StringWriter  // 文字列へ
 e.printStackTrace(new PrintWriter(sw))
 sw.toString
+
+// 自分で例外を定義
+class MyException(message :String = null, cause :Throwable = null) 
+  extends Exception(message, cause)
 ```
 
 
@@ -1938,6 +1966,24 @@ class SetSpec extends FunSpec {
 }
 ```
 
+## FeatureSpec
+
+```scala
+import org.scalatest.FeatureSpec
+class SetSpec extends FeatureSpec {
+
+  feature("The user can pop an element off the top of the stack") {
+ 
+    scenario("pop is invoked on a non-empty stack") {
+    }
+ 
+    scenario("pop is invoked on an empty stack") {
+    }
+
+  }
+
+}
+```
 
 ## ScalaMock
 
