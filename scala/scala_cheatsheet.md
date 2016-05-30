@@ -230,10 +230,10 @@ c.filterNot
 c.withFilter
 
 // 分割
-c.splitAt
-c.span
-c.partition
-c.groupBy
+c.splitAt     // 先頭n個 と 残りに整理する
+c.span        // 最初からpredicateがtrueである範囲と残りに分割する
+c.partition   // predicate の結果で２つに分割する
+c.groupBy     // 判定関数の結果で、Mapに整理する
 
 // 要素条件演算
 c.exists(p: (A)=>Boolean)  1つでも条件にあうものがあればTrue
@@ -490,6 +490,7 @@ it.toMap        // it が返すキー/値ペアをマップに集める。
 0 to 4      // 0,1,2,3,4
 0 until 4   // 0,1,2,3
 seq.indices  // そのseqを舐めるための添字のリスト
+0 to 10 by 2 // 0,2,4,6,8,10
 
 
 ## Scalaの階層構造、型、Any, AnyVal, AnyRef, Unit, Null, Nothing, 同一比較
@@ -1519,6 +1520,23 @@ Process("ls").lines    // 標準出力の結果を行ごとにリストとして
 Seq("ps", "aux") !!
 ```
 
+stderr の内容も取りたい場合はこう。
+o,e は改行が除かれてくるっぽいので注意
+```
+val logger = ProcessLogger(
+    (o: String) => println("out " + o),
+    (e: String) => println("err " + e))
+とか
+val out = new StringBuilder
+val err = new StringBuilder
+val logger = ProcessLogger(
+    (o: String) => out.append(o),
+    (e: String) => err.append(e))
+とかやって
+
+"ls" ! logger
+```
+
 windows で動かす場合は、シェルの解釈に癖があり、ダブルクオートが落ちる場合がある
 ```
   val mylib_version = System.getProperty("os.name") match {
@@ -2288,6 +2306,7 @@ naughty()  // scalastyle:ignore
 magic.number
 method.length
 parameter.number
+no.whitespace.before.left.bracket
 ```
 
 # ログ (Logging)
