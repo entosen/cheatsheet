@@ -5,6 +5,13 @@ Finegle
 ## Future
 
 https://twitter.github.io/util/docs/index.html#package
+http://qiita.com/taketon_/items/f8757ae6c00b08aeb0c8
+
+Futureの状態
+- 未完了
+- 成功
+- 失敗
+
 
 val f: Future
 
@@ -15,7 +22,31 @@ f = Future(response)    // これでいいのか？
 Await.result(f) → 成功:Futureの中の型、失敗:例外
 
 
+### Future を返す関数側
 
+```
+def mySlowService(request: String): Future[String] = {
+  ...
+  // 問題が起こったときは、例外を投げる
+  throw new HogehogeException("...")
+  ...
+  // 問題なく処理ができたときは、結果をFutureでくるんで返す
+  Future("hogehoge")
+}
+```
+
+### Futureを返す関数を呼び出す側
+
+```
+val myFuture = mySlowService(request)
+val serviceResult = myFuture.get()
+  // 未完了なら完了までブロックする
+  // 成功なら、Futureの中身(つまり実行結果)を返す
+  // 失敗なら、例外を投げる
+
+```
+
+flatMap で処理をつなげる
 
 
 
