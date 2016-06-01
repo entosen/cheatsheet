@@ -699,12 +699,12 @@ return ~(sum & 0xFF) + 1  // return はかっこで囲む必要はない
 def で作成されたものは厳密には、メソッドであり関数オブジェクトではない。
 変数に代入したり、関数を引数に取る関数に渡したりする場合は、"_" を使う。
 
+もしくは、関数の型であることが明示されている場所への代入は自動的に関数オブジェクトに変換される。
+
 ```
 val fp = func _
 val fp: Int=>Long = func    // "_" 不要
 ```
-
-もしくは、関数の型であることが明示されている場所への代入は自動的に関数オブジェクトに変換される。
 
 
 
@@ -722,6 +722,7 @@ val fp: Int=>Long = func    // "_" 不要
   def width = this.width      // good
   val w = obj.width   // 呼び出し。まるでメンバーを参照しているような形になる。
 
+  def greet() = println("Hello, world")  // 引数なし
   def increment() = ...   // 副作用があるので、空括弧メソッド
   obj.increment()         // 使うときもからカッコをつける。(つけなくても動くが)
 ```
@@ -801,22 +802,61 @@ http://www.ne.jp/asahi/hishidama/home/tech/scala/def.html
 
 
 ## 呼び出し
-max(3,5)
 
-// メソッドのパラメタが１つだけなら、ドットや括弧を使わずに呼び出せる
+```
+max(3,5)
+```
+
+### 省略
+
+- [Scalaメソッド定義メモ(Hishidama's Scala def Memo)](http://www.ne.jp/asahi/hishidama/home/tech/scala/def.html "Scalaメソッド定義メモ(Hishidama's Scala def Memo)")
+
+```
+// scalaでは、オブジェクトとメソッドの間のピリオドを省略できる
+str.substring(1,3)   
+str substring(1,3)
+
+// 引数のないメソッドの場合、ピリオドの他に丸括弧も省略できる
+obj.toString() 
+obj.toString
+obj toString()
+obj toString
+
+// 引数が1つのメソッドも丸括弧を省略できる (中置記法)
+str.eq("abc")
+str eq("abc")
+str.eq "abc"   // これはできない
+str eq "abc"
+
 0 to 2              // (0).to(2)
 Console println 10  // Console.println(10)
 1 + 2               // (1).+(2)
 
-※ 演算子の結合性 コロンは右、それ以外は左。
+// 末尾がコロン「:」で終わるメソッドでは、ピリオドを付けない場合は左右を入れ替える。
+// ※ 演算子の結合性 コロンは右、それ以外は左。
+list.+:("aa")
+"aa" +: list   // リストの先頭に要素を追加した新しいリスト
 
+// 引数1個の場合、丸括弧の代わりにとげ括弧を使うことができる
+// （「値を渡す」というより「処理を渡す（記述する）」というニュアンスの時に使用する）
+str.eq("abc")
+str.eq{"abc"} // 以下の例は、本来あまりやらない(処理じゃないので)
+str eq{"abc"}
+
+list map { ... } とか
+```
+
+
+### apply, update メソッド
+
+```
 // 変数に括弧で囲んだ1つ以上の値を適用 -> applyメソッドが呼ばれる
 myarray(2)  // myarray.apply(2) が呼ばれる。結果2番目の要素が返る。
+
 // 括弧で囲んだ1つ以上の引数を伴う変数への代入 -> updateメソッドが呼ばれる
 myarray(2) = "Hello"  // myarray.update(2, "Hello")
+```
 
-
-def greet() = println("Hello, world")  // 引数なし
 
 
 ## PartialFunction
@@ -2016,6 +2056,7 @@ class SetSpec extends FeatureSpec {
 import org.scalatest.FlatSpec
 import org.scalamock.scalatest.MockFactory
 
+// クラスに MockFactory をextends してあげるひつようがある。
 class ExampleSpec extends FlatSpec with MockFactory with ...  {
 
 }
@@ -2387,6 +2428,66 @@ logback.xml
 - logger
   - ロガー名とappender を対応づける？？？
 
+
+## ログを出力していることをテストする方法
+
+参考
+- [Logbackのログ出力内容をJUnitとMockitoでテストする方法 - Qiita](http://qiita.com/sifue/items/45ff10586ef609df1bc2 "Logbackのログ出力内容をJUnitとMockitoでテストする方法 - Qiita")
+- [Checking Logback based Logging in Unit Tests | Autodidacticism](http://bloodredsun.com/2014/06/03/checking-logback-based-logging-in-unit-tests/ "Checking Logback based Logging in Unit Tests | Autodidacticism")
+
+```
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.classic.{Logger => LogbackLogger, Level}
+import ch.qos.logback.core.Appender
+import org.scalatest.FunSpec
+import org.scalamock.scalatest.MockFactory
+import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
+
+class Testee() {
+
+  val logger = Logger(LoggerFactory.getLogger("Testee"))
+
+  def method1(): Unit = {
+
+    logger.error("TARGET 123")
+
+    logger.error("TARGET 456")
+  }
+
+}
+
+class ScalaLoggingTest extends FunSpec with MockFactory {
+
+  it("scala logging でログが出力されることの確認") {
+
+    val testee = new Testee
+
+    val mockAppender = stub[Appender[ILoggingEvent]]
+    (mockAppender.getName _).when().returns("MOCK")
+
+    val testeeLogbackLogger = 
+      LoggerFactory.getLogger("Testee").asInstanceOf[LogbackLogger]
+    testeeLogbackLogger.addAppender(mockAppender)
+
+    try {
+      testee.method1()
+
+      (mockAppender.doAppend _)
+        .verify(where { (e: ILoggingEvent) =>
+          e.getFormattedMessage.contains("TARGET 123") &&
+            e.getLevel == Level.ERROR
+        })
+
+    } finally {
+      testeeLogbackLogger.detachAppender(mockAppender)
+    }
+
+  }
+
+}
+
+```
 
 
 # ベンチマーク sbt-jmh
