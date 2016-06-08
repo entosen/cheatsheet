@@ -2198,6 +2198,16 @@ coffeeMachine.makeCoffee()   // 実際動かす
 (heaterStub.setPowerState _).verify(PowerState.Off)
 ```
 
+```
+// 特定の引数で呼ばれた場合を記述
+(m.func _).when(222).returns(true)
+
+// 渡された引数に応じた値を returnsする場合
+(m.func _).when(*).onCall {
+  arg: Int => arg + 1
+}
+
+```
 
 
 ### 未整理
