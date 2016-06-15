@@ -846,6 +846,21 @@ str eq{"abc"}
 list map { ... } とか
 ```
 
+### 可変長引数としてSeqを渡す
+
+`: _*` を使う。
+
+参考: [可変長引数としてリストを渡す - A Memorandum](http://etc9.hatenablog.com/entry/20100519/1274285392 "可変長引数としてリストを渡す - A Memorandum")
+
+```
+def output(strs: String*){ ... } 
+// 通常
+output("hoge1", "hoge2", "hoge3")
+
+// Seqを渡す
+val seq = Seq[String]("hoge1", "hoge2", "hoge3")
+output(seq: _*)
+```
 
 ### apply, update メソッド
 
@@ -2120,6 +2135,12 @@ mockedFunction expects (where { _ < _ }) // expects that arg1 < arg2
 // 引数から計算した値を返す場合、 onCall を使う
 m expects (*) onCall { _ + 1 }
 m expects (*,*) onCall( (arg1: Int, arg2: Int) => arg1 * arg2 )
+
+// 引数に 名前渡しが含まれていてそれを使いたい場合
+// (1引数のonCall(Product=>A)を使う。その場合名前渡しの部分は Function0 になる
+def getElse(i: Int)(f: => String): String = { ... }
+(m.getElse(_:Int)(_: String)).expect(10, *)
+  .onCall(_.productElement(1).asInstanceOf[() => String]())
 
 // 例外を発生させる場合 throws を使う
 m expects ("this", "that") throws new RuntimeException("what's that?")
