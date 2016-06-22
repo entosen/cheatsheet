@@ -228,6 +228,7 @@ c.dropWhile
 c.filter   // Booleanを返す関数オブジェクト(predicate)を渡す
 c.filterNot
 c.withFilter
+c.distinct // (Seqのみ？ Seqから重複するitemを除く。unique的な)
 
 // 分割
 c.splitAt     // 先頭n個 と 残りに整理する
