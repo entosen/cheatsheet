@@ -221,12 +221,12 @@ c.find(p: (A)=>Boolean) 渡した関数で最初にtrueになった要素のOpti
 c.tail
 c.init
 c.slice
-c.take
-c.drop
-c.tageWhile
-c.dropWhile
-c.filter   // Booleanを返す関数オブジェクト(predicate)を渡す
-c.filterNot
+c.take(n) // 最初のn個
+c.drop(n) // 最初のn個を除いた残り
+c.takeWhile(p) // 先頭から p が true である限り (初めて p がfalseになる１つ前まで)
+c.dropWhile(p) // 先頭から p が true である限りの部分を除いた残り
+c.filter(p)    // p がtrueの要素を抽出。Booleanを返す関数オブジェクト(predicate)を渡す。
+c.filterNot(p) // p がfalseの要素を抽出。
 c.withFilter
 c.distinct // (Seqのみ？ Seqから重複するitemを除く。unique的な)
 
