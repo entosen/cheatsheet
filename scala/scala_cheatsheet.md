@@ -302,7 +302,7 @@ val b = Array.ofDim[Int](2, 3, 4)
 Arrayは == で中身の比較ができない。(他のコレクションはできる)
 a1.sameElements(a2)  // シンプルな配列（一次元配列）でのみ可能
 sameElements は、null の場合に NullPointerException になってしまう。
-java.utils.Arrays.equals(a1, a2)
+java.util.Arrays.equals(a1, a2)
 が、null の場合にも対応しており、楽。
 
 
@@ -1779,6 +1779,20 @@ if ( ! workdirFile.exists ) {
 }
 ```
 
+## build.sbt
+
+```
+name := "study-scala-finagle-future"
+
+version := "1.0"
+
+scalaVersion := "2.11.8"
+
+libraryDependencies += "com.twitter" %% "finagle-http" % "6.33.0"
+libraryDependencies += "org.apache.kafka" %% "kafka" % "0.8.2.2" exclude("org.slf4j", "slf4j-log4j12")
+libraryDependencies += "org.json4s" %% "json4s-native" % "3.3.0"
+
+```
 
 ## sbt コマンド
 
