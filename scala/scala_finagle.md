@@ -23,15 +23,16 @@ val f = Future {
     成功なら値を返す。
 }
 
-以下ではだめ。(例外がFutureの外にあり、捕捉されない)
+// 以下ではだめ。(例外がFutureの外にあり、捕捉されない)
 def hoge(i: Int): Future[Int] = {
     ...
     Future(999)
 }
 ```
 
-注
-- com.twitter.util.Future の apply は非同期実行(並列実行)してくれない。
+【注】
+com.twitter.util.Future の apply は非同期実行(並列実行)してくれない。
+並列実装したいときは、後述の FuturePool を使う。
 
 
 その他テスト時などに便利な生成方法
