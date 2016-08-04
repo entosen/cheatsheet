@@ -1,38 +1,54 @@
-�V�F���X�N���v�g
+シェルスクリプト
 
 ```
-if [ ���� ] ; then
+if [ 条件 ] ; then
     ...
 fi
 ```
 
-test�R�}���h
+testコマンド
 
-    �t�@�C���n
-    -e File   ���݂���� True
+    ファイル系
+    -e File   存在すれば True
 
 
 ls 
-    -S     �t�@�C���T�C�Y�Ń\�[�g
+    -S     ファイルサイズでソート
 
 
 
 pushd
 popd
 dirs
-    -c  �N���A
-    -v  �c�\��
+    -c  クリア
+    -v  縦表示
 
 
 
+# 文字列操作
+
+シェルスクリプトで、正規表現で文字列中の一部を抜き出す
+
+```
+echo $input | sed -E 's/^.*\.feserver([0-9]+)\..*$/\1/'
+    行頭から行末までマッチさせないと、だめ
+
+echo $input | grep -E -o '\.feserver([0-9]+)\.'
+    こんな感じか？ パターンのところだけ出力してくれる
+    試していない。
+```
+
+
+
+# ネットワーク
 
 wget
 
 ```
 wget -nv -O - --save-headers 'http://entosen.tokyo:8080/status.html'
-    -q    �G���[���������o���Ȃ�
-    -nv   �G���[���ɂ͂�����o�͂���
-    �Ȃ�  �i���o�[�̂悤�Ȃ��̂��o��
+    -q    エラー時も何も出さない
+    -nv   エラー時にはそれを出力する
+    なし  進捗バーのようなものを出す
 
 # POST
 wget -nv -O - --save-headers --post-data 'data.......' 'http://entosen.tokyo:8080'
@@ -43,12 +59,12 @@ curl
 ```
 curl http://www.example.com/
 
-    -s  �i���ƃG���[��\�����Ȃ�
+    -s  進捗とエラーを表示しない
 
-    -i  ���X�|���X�w�b�_��\������
-    -v  �ʐM�̂������ڍׂɕ\������
+    -i  レスポンスヘッダを表示する
+    -v  通信のやり取りを詳細に表示する
 
-    �f�[�^�̎w��B�t�@�C�������w�肷��ꍇ�� @�t�@�C����
+    データの指定。ファイル名を指定する場合は @ファイル名
 	--data <data>                 
 	--data-binary <data>   
 	--data-urlencode <data>   
