@@ -121,6 +121,7 @@ code style の設定場所には以下のものがあるようだ
 - Projectの設定: カスタム設定をProjectの設定として保存できる。
   実体はプロジェクトの `.idea/codeStyleSettings`。
 
+
 scala用設定。
 Settings > Editor > Code Style > Scala > 
 
@@ -144,6 +145,11 @@ Editor Tab まわりの設定
   	Ctrl-w + h doesn't alway work (window navigation to the left window) : VIM-795
   	https://youtrack.jetbrains.com/issue/VIM-795
   - "When closing active editor" は "Activate most recently opened tab" にしてみる。
+
+Right margin まわりの設定
+
+- Editor > General > Appearance > Show right margin にチェック
+- Editor > Code Style > Right margin (columns) を 80に。
 
 
 IdeaVim まわりの設定。
