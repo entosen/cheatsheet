@@ -52,6 +52,49 @@ vimの swap ファイルなどは、リポジトリの .gitignore に入れる�
 *.sw?
 ```
 
+# リポジトリを作る
+
+## 既にあるリポジトリをcloneしてくる
+
+## 新たに作ったプロジェクトを github に登録する
+
+## 新たに作ったプロジェクトを github に登録する (IntelliJ版)
+
+- IntelliJ で新規プロジェクトを開始。
+- ファイルを追加
+- メニュー ＞ VCS ＞ Enable Version Control Integration...
+  - Git を選択 
+  - (git init相当の処理が行われているはず)
+  - (ホームディレクトリの IdeaProject 以下のPJフォルダが、git管理下になっている)
+- 必要なら git config で設定を行う (user.name, user.emailをリポジトリごとに返る場合など)
+- .gitignore を作成
+- ここまでやると、IntelliJ の "Version Control" タブに "Unversioned Files" として作ったファイルが出てきているはずなので、"Default" に移す。
+- IntelliJ からコミット (ローカルリポジトリにコミットされる)
+
+この時点では
+```
+> git branch -avv
+* master 4ea4f36 ログメッセージほげほげほげ
+
+> git remove -v 
+(何も出ない)
+```
+
+- github の UIからリポジトリを作成しておく
+- `git remote add origin git@github.com:__USERNAME__/__REPOSITORY__.git`
+これでいいのか？社内からだと github に SSHアクセスできないので、https://github の形式にしないとだめかも。
+
+- git push 
+fast-forward updateじゃないのでrejectされちゃう。
+
+- git fetch
+- git merge ごにょごにょ
+- git push
+
+
+
+
+
 
 
 # 典型的な開発のときのコマンド
@@ -178,7 +221,9 @@ git remote add remoteName remoteUrl
 git remote -v   # 確認
 ```
 
-# .ignore
+# .gitignore
+
+## .gitignore の仕様
 
 > [Git] .gitignoreの仕様詳解 - Qiita
 > http://qiita.com/anqooqie/items/110957797b3d5280c44f
@@ -205,6 +250,35 @@ git remote -v   # 確認
 除外(git-2.7以降)
 ```
 /.idea
+!/.idea/codeStyleSettings.xml
+```
+
+
+## サンプル
+
+### scala,sbt とか
+
+```
+*.class
+*.log
+
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+
+# InteliJ specific
+/.idea/*
 !/.idea/codeStyleSettings.xml
 ```
 
