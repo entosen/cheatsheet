@@ -34,6 +34,16 @@ BigDecimal : BigDecimal(1.0), 1:BigDecimal, BigDecimal(1,2)→0.01
 Boolean: true, false
 ```
 
+演算子
+```
+a / b  // 割り算。どちらかがFloat系なら少数点以下も計算。
+       // 両方整数型なら 商。
+a % b  // 剰余。 
+       // どちらかがFloat系でも可。整数の商と、Double型の余り
+
+```
+
+
 ```
 // 数値→ 数値変換
 数値.toInt
@@ -211,14 +221,14 @@ c.size
 c.hasDefiniteSize
 
 // 要素取得
-c.head
+c.head    // 先頭の要素を返す。
 c.last
 c.headOption
 c.lastOption
 c.find(p: (A)=>Boolean) 渡した関数で最初にtrueになった要素のOption値を返す
 
 // サブコレクション取得
-c.tail
+c.tail    // 先頭以外を返す。headと対。長さ1のときは、空のコレクションが返る
 c.init
 c.slice
 c.take(n) // 最初のn個
@@ -438,6 +448,11 @@ treasureMap.contains(2)  // キーが存在するかどうかを Booleanで返�
 // 要素を抜く
 map -= key       // 自分自身(Map) を返す
 map.remove(key)  // Option[V] を返す
+
+// キー一覧を取得など
+map.keys         // キー一覧を取得: Iterable[A]
+map.keySet       // キー一覧を取得: Set[A]
+map.values       // バリュー一覧を取得: Iterable[B]
 ```
 
 
@@ -687,6 +702,7 @@ def max(x: Int, y: Int): Int = {
 
 // 返り値がUnit型の場合は、返り値型と "=" を省略できる
 // 逆にこういう書き方をした場合は、返り値は Unit になる。
+// あまり推奨されない。
 def myPrint(str:String) { ... }
 
 // 1文だけならにょろかっこ省略可
@@ -695,6 +711,17 @@ def max(x: Int, y:Int): Int = if (x > y) x else y
 // return文がなければ、計算された最後の値を返す
 return ~(sum & 0xFF) + 1  // return はかっこで囲む必要はない
 ```
+
+引数
+```
+// デフォルト引数 (あまり推奨はされていないようだ)
+def myFunc(i1: Int = 10): String = ...
+myFunc()    // i1 は 10 で呼ばれる
+myFunc(30)  // i1 は 30 で呼ばれる
+
+```
+
+
 
 注:
 def で作成されたものは厳密には、メソッドであり関数オブジェクトではない。
@@ -1432,6 +1459,14 @@ try {
   式
 }
 
+// 全ての例外をキャッチする
+  case e: Throwable => ...
+// NonFatal を使うのがおすすめ。
+  import scala.util.control.NonFatal
+  case NonFatal(e) =>  ...
+  // _: VirtualMachineError | _: ThreadDeath | _: InterruptedException | 
+  // _: LinkageError | _: ControlThrowable
+
 // Exception の操作
 ex.getMessage   // message 文字列
 ex.toString     // Exceptionクラス名: message文字列
@@ -1448,6 +1483,20 @@ class MyException(message :String = null, cause :Throwable = null)
   extends Exception(message, cause)
 ```
 
+### 代表的な例外
+
+```
+MatchError (scala, RuntimeException)
+    match式で該当のものがなかった場合
+
+IllegalArgumentException (java.lang, RuntimeException)
+    不正な引数、または不適切な引数をメソッドに渡したことを示すためにスローされます。
+    require(式) が満たされなかったとき
+
+NoSuchElementException (java.util, RuntimeException)
+    リクエストされている要素が存在しないことを示します。
+    Mapにキーが存在しないとき
+```
 
 # main関数 コマンドライン引数
 
