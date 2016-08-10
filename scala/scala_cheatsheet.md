@@ -2283,6 +2283,10 @@ coffeeMachine.makeCoffee()   // 実際動かす
 (heaterStub.setPowerState _).verify(PowerState.Off)
 ```
 
+verify は、そういう引数で呼ばれたのが指定回数(デフォルトは1回)であればよい。
+それ以外の引数で呼ばれたのは何回あってもいい。
+
+
 ```
 // 特定の引数で呼ばれた場合を記述
 (m.func _).when(222).returns(true)
