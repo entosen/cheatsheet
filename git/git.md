@@ -12,7 +12,18 @@ git config --global push.default simple
 git config --global core.eol lf 
 git config --global core.autocrlf false
 
+    core.autocrlf は、
+	true: コミット時に CRLF→LF。チェックアウト時に LF→CRLF
+	input: コミット時のみ CRLF→LF に変換 (Windowsのみtrueと同じ)
+	false: 変換しない
+
+# VBAコードなど windows関係のファイルだけからなるリポジトリの場合は
+# 以下がよいと思う
+git config core.eol crlf
+git config core.autocrlf false   # 上でしていれば不要
 ```
+
+
 
 確認 
 
@@ -76,7 +87,7 @@ vimの swap ファイルなどは、リポジトリの .gitignore に入れる�
 > git branch -avv
 * master 4ea4f36 ログメッセージほげほげほげ
 
-> git remove -v 
+> git remote -v 
 (何も出ない)
 ```
 
