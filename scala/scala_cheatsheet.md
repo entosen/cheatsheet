@@ -2506,7 +2506,7 @@ if ( logger.isInfoEnabled ) {
 
 ## ログを出力する側の仕組み
 
-logback の設定ファイル
+### logback の設定ファイル
 
 > http://logback.qos.ch/manual/configuration_ja.html#auto_configuration
 
@@ -2519,7 +2519,7 @@ logback の設定ファイル
   ロギング出力は直接コンソールに出力されるようになります。
 
 
-logback.xml
+### logback.xml
 
 - property 変数みたいなもの
 - appender 
@@ -2529,6 +2529,32 @@ logback.xml
   - ローテーション、非同期、ファイルの圧縮もここで決める。
 - logger
   - ロガー名とappender を対応づける？？？
+
+### logback.xml の変数置換
+
+値が書けるところには、シェル風の変数置換が書ける。
+
+```
+変数の展開
+<root level="${ROOT_LOGLEVEL:-trace}">
+
+変数のセットの方法(優先度高い順)
+1. property xml要素で設定する
+    xmlファイル中で設定
+	<property name="ROOT_LOGLEVEL" value="info" />
+    外部プロパティファイルから読み込み
+	<property file="/aaa/bbb/ccc.conf" />
+	そのファイルの中では、
+	ROOT_LOGLEVEL=info
+    外部ファイルの代わりに、クラスパス上のリソースを指定することも可
+	<property resource="resource1.properties" />
+
+2. システムプロパティ(java コマンドの -D オプション)で設定
+    java -DROOT_LOGLEVEL="info" MyApp2
+
+3. 環境変数
+```
+
 
 
 ## ログを出力していることをテストする方法
