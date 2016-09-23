@@ -1960,6 +1960,13 @@ class SetSpec extends FlatSpec with GivenWhenThen {
       Set.empty.head
     }
 
+    // intercept は発生した例外を戻り値として返すので、
+    // さらにそれをassertすることも可能
+    val ex = intercept[NoSuchElementException] {
+      Set.empty.head
+    }
+    asser( ex.message == "...." )
+
     withClue("this is a clue") {          // clue付き
       intercept[IndexOutOfBoundsException] {
 	"hi".charAt(-1)
