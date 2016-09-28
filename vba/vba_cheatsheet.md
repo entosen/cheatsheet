@@ -52,8 +52,6 @@
 - 大文字小文字は区別されない？
 - インデント幅は？ 空白？ タブ？
 
-vimキーバインドは使えないか？
-
 
 ## 基本構文
 
@@ -84,6 +82,11 @@ Dim i As Integer, n As Integer
 ' 定数を宣言
 Const myName As String = "..."
 ```
+
+変数名は大文字小文字を区別しないと思っていた方がいい。
+本当はどうかわからないが、VBAのエディタでは、
+大文字小文字はどちらかに揃えられてしまうので、入力できない。
+
 
 [データ型の概要](https://msdn.microsoft.com/ja-jp/library/office/gg251528.aspx "データ型の概要")
 
@@ -431,7 +434,7 @@ End With
 
 定義
 ```
-Sub mysub0()
+Sub mysub0()        ' 引数をとらない。この場合でも定義の空括弧は必要。
     ...
 End Sub
 
@@ -447,6 +450,19 @@ Function sq(x As Double) As Double  ' 値を返す関数
     ...
     sq = x * x    ' 名前 = 結果  とすることで値が返される
 End Function
+
+
+' 引数は参照渡しのため、
+' プロシージャの中で代入すると呼び出し元の変数値を変更することができる
+' 値渡しにしたい場合は、ByVal を引数名の前に付ける。
+Sub mySub22(ByVal name As String, ByVal age As Integer)
+    ...
+End Sub
+
+' デフォルト引数
+Sub mySubDefault(Optional age As Integer = 18)
+    ...
+End Sub
 ```
 
 途中で抜けたい場合は
@@ -455,22 +471,26 @@ Exit Sub
 Exit Function
 ```
 
+
+
 呼び出し
 ```
+' Subプロシージャの呼び出し
 mysub0
 mysub1 "aaa"
 mysub2 "aaa", 18
 ' Subプロシージャの引数を括弧付きで囲むことも可能なよう
-mysub1("aaa")
+' やっぱりだめかも。引数１つだからうまくいっていただけかも。
+' mysub1("aaa")  ○
+' mysub2("aaa", 18)  ×
 
+' Function の呼び出し
 d = sq(x)     ' 引数のリストを括弧で囲む
 
 ' 名前付き引数を用いて呼び出す
 Offset(rowOffset:=3, columnOffset:=3)
 ```
 
-引数は参照渡しのため、
-プロシージャの中で代入すると呼び出し元の変数値を変更することができる
 
 再帰呼び出しも可
 
@@ -661,6 +681,108 @@ Range.Column ' 最初の領域の先頭列の列番号。 Long型
 ```
 
 
+## 保護、ロック、編集させたくない
+
+あるセルの内容を編集できなくするには、
+「セルのロックが有効、かつ、ワークシートの保護が有効」にする。
+
+### セルのロック
+
+UIからは、セルの書式設定 ＞ 保護 ＞ ロック 。
+
+VBAからは
+```
+' ロック状態の参照
+Range("A1:B3").Locked
+  → True : ロックされている
+  → False : ロックされていない
+  → Null : 混在
+
+' 設定
+Range("A1:B3").Locked = True
+```
+
+### シートの保護
+
+UIからは、校閲 ＞ シートの保護
+
+オプションとして、保護中でも許可する操作をチェックボックスで選べる。
+
+UIからシートの保護をON/OFFする場合は、「許可する操作」の状態は保持される。
+
+VBAでやる場合
+```
+' 参照
+ActiveSheet.ProtectContents  ' シート保護の有効無効
+ActiveSheet.ProtectionMode   ' TrueならUIからのみ変更不可。FalseならUI・スクリプトともに変更不可
+ActionSheet.Protection       ' 「許可する操作」の状態
+    .AllowFormattingCells
+    .AllowFormattingColumns
+    .AllowFormattingRows
+    .AllowDeletingColumns
+    .AllowDeletingRows
+    .AllowInsertingColumns
+    .AllowInsertingRows
+    .AllowInsertingHyperlinks
+    .AllowFiltering
+    .AllowSorting
+
+' 操作
+ActiveSheet.Protect     ' シートの保護
+ActiveSheet.Protect UserInterfaceOnly:=True     ' UIからのみ変更不可にする
+' 上記操作では、UIの「許可する操作」の状態は引き継がれず、基本Falseにされてしまう。
+' なので、追加の引数でそれらを希望の状態に設定する必要がある。
+' UserInterfaceOnly の指定は、ファイルを閉じるまでしか有効じゃない。
+
+ActiveSheet.UnProtect   ' シートの保護の解除
+```
+
+```
+' 指定したシートの状態を文字列で表現して返す
+Function toStringSheetProtection(s As WorkSheet) As String
+    Dim p As Protection
+    Set p = s.Protection
+    toStringSheetProtection = "" _
+        & "ProtectContents          = " & s.ProtectContents & Char(10) _
+        & "ProtectionMode           = " & s.ProtectionMode & Char(10) _
+        & "AllowFormattingCells     = " & p.AllowFormattingCells & Chr(10) _
+        & "AllowFormattingColumns   = " & p.AllowFormattingColumns & Chr(10) _
+        & "AllowFormattingRows      = " & p.AllowFormattingRows & Chr(10) _
+        & "AllowDeletingColumns     = " & p.AllowDeletingColumns & Chr(10) _
+        & "AllowDeletingRows        = " & p.AllowDeletingRows & Chr(10) _
+        & "AllowInsertingColumns    = " & p.AllowInsertingColumns & Chr(10) _
+        & "AllowInsertingRows       = " & p.AllowInsertingRows & Chr(10) _
+        & "AllowInsertingHyperlinks = " & p.AllowInsertingHyperlinks & Chr(10) _
+        & "AllowFiltering           = " & p.AllowFiltering & Chr(10) _
+        & "AllowSorting             = " & p.AllowFiltering & Chr(10)
+End Function
+```
+
+```
+' 許可操作を保持したまま、Protect操作をする
+Sub protectWithPresentAllows( _
+    sheet As Worksheet, _
+    Optional UserInterfaceOnly As Boolean = False)
+
+    Dim p As Object
+    Set p = sheet.protection
+
+    sheet.Protect _
+        UserInterfaceOnly:=UserInterfaceOnly, _
+        AllowFormattingCells:=p.AllowFormattingCells, _
+        AllowFormattingColumns:=p.AllowFormattingColumns, _
+        AllowFormattingRows:=p.AllowFormattingRows, _
+        AllowInsertingColumns:=p.AllowInsertingColumns, _
+        AllowInsertingRows:=p.AllowInsertingRows, _
+        AllowInsertingHyperlinks:=p.AllowInsertingHyperlinks, _
+        AllowDeletingColumns:=p.AllowDeletingColumns, _
+        AllowDeletingRows:=p.AllowDeletingRows, _
+        AllowSorting:=p.AllowSorting, _
+        AllowFiltering:=p.AllowFiltering, _
+        AllowUsingPivotTables:=p.AllowUsingPivotTables
+
+End Sub
+```
 
 # 未整理
 
@@ -680,3 +802,6 @@ https://msdn.microsoft.com/ja-jp/library/ff194068.aspx
 
 プロシージャ、制御構文、変数、セル、シート、各種関数の使用方法解説 - Excel VBA
 http://www.239-programing.com/excel-vba/index.html
+
+vimキーバインドは使えないか？
+
