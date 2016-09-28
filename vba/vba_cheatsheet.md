@@ -183,6 +183,16 @@ Not b    ' 否定
 a And b  ' 論理積 (整数に使うとbit論理積になるので注意)
 a Or b   ' 論理和 (整数に使うと(略))
 a Xor b  ' 排他的論理和 (これも整数に使うと(略) か？)
+
+```
+
+And, Or は短絡評価してくれない。
+つまり、 Andの左辺がFalseでも、右辺の評価がされる。。。
+VB.NET には以下のようなのがあるらしいが、VBAでは使えないようだ。
+
+```
+a AndAlso b ' 論理積 (短絡評価する)
+a OrElse b ' 論理積 (短絡評価する)
 ```
 
 ### Variant 型
@@ -227,22 +237,26 @@ Set r = Range("A1:C3")
 ' Setをつけないと
 ' 「オブジェクト変数または With ブロック変数が設定されていません。」と言われる
 ' r = Range("A1:C3") 
+
+' Object以外のものを Set で入れようとすると 「型が一致しません」エラーになる
+Dim v As Variant
+Set v = True
 ```
 
 ### キャスト
 
 型変換関数
 ```
-CBool
-CByte
-CCur
-CDate
-CDbl
-CInt
-CLng
-CSng
-CVar
-CStr
+CBool(式)
+CByte(式)
+CCur(式)
+CDate(式)
+CDbl(式)
+CInt(式)
+CLng(式)
+CSng(式)
+CVar(式)
+CStr(式)
 ```
 
 ### 配列
@@ -293,11 +307,27 @@ c.Add Item:="アイテム2", Key:="i2"
 
 c.Count  ' 要素数取得
 c(1)     ' Add した順の番号を指定して。先頭は1。
-c("i1")  ' Add したときの Key を指定子て。
+c("i1")  ' Add したときの Key を指定して。
 
 For Each elm In c
     ...
 Next elm
+```
+
+### Null とか Empty とか Nothing とか
+
+参考: [NullとEmptyとNothingと空の文字列の違い：Access VBA｜即効テクニック｜Excel VBAを学ぶならmoug](https://www.moug.net/tech/acvba/0050010.html)
+
+- 長さ0の文字列
+- 値0の文字列
+- Empty
+- Null
+- Nothing
+
+```
+Debug.Print VarType(myVar)  '--> 1（定数vbNull）と表示される
+Debug.Print TypeName(myVar) '--> Null　と表示される
+Debug.Print IsNull(myVar)   '--> True　と表示される
 ```
 
 
@@ -600,7 +630,7 @@ Rangeはコレクションでもある。しかし、コレクションの単位
 - 普通に作ると、セル単位。 Areas順、かつ、矩形の左から右、折り返して下の行、という順でまわる
 - Rows で作ると、行単位に回る。
 - Columns で作ると、列単位に回る。
-- Rows,Colums で作ったRangeも、引数なしのCellsプロパティで、セル単位のRangeに変換できる
+- Rows,Columns で作ったRangeも、引数なしのCellsプロパティで、セル単位のRangeに変換できる
 
 ### 生成
 
