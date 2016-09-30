@@ -830,7 +830,7 @@ End Sub
 ' 高速化のため
 Application.ScreenUpdating = False  ' 画面更新抑制
 ...                                 ' 大量の更新を行う
-Application.ScreenUpdating = True   ' 画面更新抑制
+Application.ScreenUpdating = True   ' 画面更新抑制 (これはやらなくてもマクロが終了したら自動でTrueに戻る)
 ```
 
 Visual Basic 言語リファレンス
