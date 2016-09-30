@@ -39,6 +39,32 @@ echo $input | grep -E -o '\.feserver([0-9]+)\.'
 ```
 
 
+# 時刻
+
+```
+# 今の時刻
+date                   # Fri Sep 30 13:31:25 JST 2016
+date +%s               # Unixtime で出力
+date +%Y%m%d-%H%M%S    # YYYYMMDD-HHMMSS 形式で出力
+
+# 指定時刻
+date -d '2015/04/25'
+date -d '30 days'      # 30日後。day でも days でもいい。'30days' でもいい。
+                       # month, year, hour, minute, second
+                       # month は 月の末日の方は注意
+date -d '1 day ago'    # 1日前。ago をつけると過去方向
+date -d '-3 days'      # マイナスも過去方向
+date -d tomorrow       # tomorrow, yesterday, week, fortnight
+
+date -d '2013/09/04 12:17:00'  # 日時で指定
+date -d '@1382282400'  # unixtimeで指定
+
+date -d '2015/04/25 1 month'   # 組み合わせ。
+
+# 標準入力を変換 (各行を -d 指定して実行した効果)
+echo '2016/01/01' | date -f -
+```
+
 
 # ネットワーク
 
