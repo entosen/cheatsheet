@@ -710,6 +710,16 @@ Range.Row    ' 最初の領域の先頭行の行番号。 Long型
 Range.Column ' 最初の領域の先頭列の列番号。 Long型
 ```
 
+値のセット・削除
+```
+Range.Value = 1
+
+Range.Clear         ' 全てクリア
+Range.ClearContents ' 数式、文字列をクリア
+Range.ClearFormats  ' 書式をクリア
+Range.ClearComments ' コメント文をクリア
+Range.ClearOutline  ' アウトラインをクリア
+```
 
 ## 保護、ロック、編集させたくない
 
