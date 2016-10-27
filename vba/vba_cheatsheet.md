@@ -153,6 +153,10 @@ a = b  ' 等しい  これはなぜ代入にならないのか？
 a <> b    ' 等しくない
 ```
 
+```
+Sqr(f)   ' 平方根 sqrt
+```
+
 ### 文字列型
 
 ```
@@ -323,6 +327,19 @@ Next elm
 - Empty
 - Null
 - Nothing
+
+### Empty (Variant型の1値)
+
+- 初期化していない Variant型。
+- 未入力のセル。一度入力してクリアしたセル。
+
+```
+Debug.Print VarType(v)   ' 0 (定数vbEmpty)
+Debug.Print TypeName(v)  ' Empty
+Debug.Print IsEmpty(v)   ' True
+```
+
+### Null
 
 ```
 Debug.Print VarType(myVar)  '--> 1（定数vbNull）と表示される
