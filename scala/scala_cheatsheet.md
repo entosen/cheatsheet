@@ -1851,6 +1851,7 @@ compile
 test
 testOnly *テストクラス名   // 本来(packageの?)フルパス指定なので、'*'つける
 
+dependencyTree  // ライブラリの依存関係のグラフが見られる
 ```
 
 ## リソースについて
