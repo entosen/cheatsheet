@@ -1169,6 +1169,24 @@ new { 事前初期化   }  with トレイト1 with … { メンバー定義 }
 コンパニオンオブジェクトの apply()メソッドの呼び出しである。
 
 
+scala-2.11 から。(まだ Experimental かも)
+元のクラスが、SAM(Single Abstract Method、つまり1つの抽象メソッドを持つクラス)場合、
+それを実装したインスタンスはもっと簡単に書ける糖衣構文がある (知らないと読めない...)
+
+```
+// 元の書き方
+val thread = new Thread(new Runnable {
+   def run() {
+     println("hello world")
+   }
+})
+// 変更後
+val thread = new Thread(() => println("hello world"))
+// 分解して書くとこんな感じ
+val r: Runnable = () => println("hello world")
+val thread = new Thread(r)
+```
+
 ## パラメータ化された型(parameterized types）・いわゆるジェネリクス
 
 http://www.ne.jp/asahi/hishidama/home/tech/scala/generics.html
@@ -1504,8 +1522,8 @@ scalaプログラムのエントリポイントになるには、
 mainメソッドを持つスタンドアロンシングルトンオブジェクトが必要。
 
 object Summer {
-  def main(args: Array[String]) {   // 引数は Array[String]。
-    ...                             // 結果型 Unit 。なので等号が省略。
+  def main(args: Array[String]): Unit = {   // 引数は Array[String]。
+    ...                                     // 結果型 Unit
   }
 }
 
@@ -1841,6 +1859,22 @@ libraryDependencies += "com.twitter" %% "finagle-http" % "6.33.0"
 libraryDependencies += "org.apache.kafka" %% "kafka" % "0.8.2.2" exclude("org.slf4j", "slf4j-log4j12")
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.3.0"
 
+// 除外するときはこんな感じ
+libraryDependencies += ("org.apache.kafka" %% "kafka" % "0.10.0.0"
+  exclude("org.slf4j", "slf4j-log4j12")
+  exclude("javax.jms", "jms")
+  exclude("com.sun.jdmk", "jmxtools")
+  exclude("com.sun.jmx", "jmxri")
+  // exclude("org.slf4j", "slf4j-simple")
+)
+
+// 除外は、こうも書けるらしい
+libraryDependencies +=
+  "org.apache.zookeeper" % "zookeeper" % "3.4.9" excludeAll(
+    ExclusionRule(name = "jms"),
+    ExclusionRule(name = "jmxtools"),
+    ExclusionRule(name = "jmxri")
+    )
 ```
 
 ## sbt コマンド
