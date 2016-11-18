@@ -1671,6 +1671,26 @@ windows で動かす場合は、シェルの解釈に癖があり、ダブルク
   "mylib" % "mylib" % mylib_version
 ```
 
+# スレッド、並行処理など
+
+参考: [今まで知らなかった 5 つの事項: java.util.concurrent 第 2 回](http://www.ibm.com/developerworks/jp/java/library/j-5things5.html "今まで知らなかった 5 つの事項: java.util.concurrent 第 2 回")
+
+## 同期、待ち合わせの仕組み
+
+### CountDownLatch
+
+(Javaの機能。)
+競馬の出走ゲート。Countが0になるまで待たせるための仕組み。
+別スレッドで動いている何かの処理が終わるまで待つような場合に使える。
+
+```scala
+import java.util.concurrent.CountDownLatch
+val latch = new CountDownLatch(1)
+latch.await()   // 待つスレッド。カウントが0になるまで待つ。
+latch.countdown()  // 待たせる側のスレッド。カウントを１つ減らす。
+```
+
+
 
 # こんなときはどうする？
 
