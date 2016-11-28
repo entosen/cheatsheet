@@ -136,7 +136,24 @@ s.replace("ab", "x")   // "ab" を "x" に置換。正規表現使えない
 s.replaceAll("[a-z]+", "123")   // 正規表現使える
 s.replaceFirst("[a-z]+", "123")
 
+// 繰り返し
 s * n
+
+// 分割と結合
+
+// 指定位置で2つに分割 (前半の文字数が指定の数になるように分割)
+"abcdefg".splitAt(3)  // ("abc", "defg")
+"abcdefg".splitAt(0)  // ("", "abcdefg")
+"abcdefg".splitAt(10) // ("abcdefg", "")
+
+// Char型引数のsplit (単純な文字で分割。先頭の区切り文字は有効。末尾の区切り文字は無効)
+"a.b.c".split('.')  // Array("a", "b")
+"".split('.')       // Array("")
+"a.".split('.')     // Array("a")
+".a.".split('.')    // Array("", "a")
+"..a..".split('.')  // Array("", "", "a")
+".".split('.')      // Array()
+"..".split('.')     // Array()
 ```
 
 ### StringBuilder
@@ -222,14 +239,14 @@ c.hasDefiniteSize
 
 // 要素取得
 c.head    // 先頭の要素を返す。
-c.last
+c.last    // 末尾の要素を返す。
 c.headOption
 c.lastOption
 c.find(p: (A)=>Boolean) 渡した関数で最初にtrueになった要素のOption値を返す
 
 // サブコレクション取得
 c.tail    // 先頭以外を返す。headと対。長さ1のときは、空のコレクションが返る
-c.init
+c.init    // 末尾以外を返す。lastと対。長さ1のときは、空のコレクションが返る
 c.slice
 c.take(n) // 最初のn個
 c.drop(n) // 最初のn個を除いた残り
@@ -1738,7 +1755,46 @@ prop.load(new FileInputStream(confFileName))
 // FileInputSteram だとASCII以外受け付けてくれないかも
 // Readを使うと大丈夫かも。実験してない。
 
-prop.getProperty("key1")
+prop.getProperty("key1")          // 返り値は String型
+                                  // キーが存在しない場合は null が返る
+prop.getProperty("key1").toLong   // 必要なら型変換
+```
+
+キーが存在しない場合、nullが返って判定がやりにくいので、
+以下のようなヘルパークラスを作るとよいかも。
+```
+  class PropertiesHelper(prop: Properties) {
+    var errornum: Int = 0
+
+    def get[A](key: String, transFunc: String => A, valOnError: A): A = {
+      try {
+        prop.getProperty(key) match {
+          case null => throw new NoSuchElementException(key)
+          case v =>
+            logger.info(s"reading properties: $key: $v")
+            transFunc(v)
+        }
+      } catch {
+        case NonFatal(e) =>
+          logger.error(s"reading properties: $key: ${e.toString}")
+          errornum += 1
+          valOnError
+      }
+    }
+
+    def getString(key: String): String = get(key, (v)=>v, "")
+    def getLong(key: String): Long = get(key, _.toLong, 0L)
+  }
+
+  val helper = new PropertiesHelper(prop)
+
+  val connectString = helper.getString("statusmonitor_zookeeper_connectstring")
+  val sleepTimeMillis = helper.getLong("statusmonitor_interval_millisec")
+
+  if ( helper.errornum > 0 ) {
+    logger.error("failed reading properties for StatusMonitor")
+    throw new NoSuchElementException()
+  }
 ```
 
 
