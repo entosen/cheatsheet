@@ -1642,12 +1642,14 @@ createTempFile
 
 # 外部コマンド、シェルコマンド
 
+参考: scala.sys.process.ProcessBuilder
+
 TODO どういう風にシェルの解釈がはいるか。
 ```
 import scala.sys.process._
 
 Process("ls").run   // 実行(非同期。終了を待たない)
-Process("ls").!     // 終了コードを返す
+Process("ls").!     // 終了コードを返す(Int)
 Process("ls").!!    // 標準出力の結果を返す
 Process("ls").lines    // 標準出力の結果を行ごとにリストとして返す
 
@@ -1665,16 +1667,18 @@ o,e は改行が除かれてくるっぽいので注意
 ```
 val logger = ProcessLogger(
     (o: String) => println("out " + o),
-    (e: String) => println("err " + e))
+    (e: String) => println("err " + e)
+)
 とか
 val out = new StringBuilder
 val err = new StringBuilder
 val logger = ProcessLogger(
     (o: String) => out.append(o),
-    (e: String) => err.append(e))
+    (e: String) => err.append(e)
+)
 とかやって
 
-"ls" ! logger
+"ls" ! logger    // loggerは `!`メソッドの引数。 Process("ls").!(logger)
 ```
 
 windows で動かす場合は、シェルの解釈に癖があり、ダブルクオートが落ちる場合がある
