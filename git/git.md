@@ -8,6 +8,11 @@ git config --global user.name "John Doe"
 git config --global user.email johndoe@example.com
 git config --global push.default simple
 
+# windows でも今は(NTFSは)大文字小文字区別できるので、false にしておく。
+# true だと、ファイル名の大文字小文字を変更したときに git にうまく伝わらない。
+# global の方ではなく、リポジトリ毎の設定の方でこれが true にされているケースがある？
+git config --global core.ignorecase false
+
 # windows でも unix的改行コードが中心なので、以下を設定しておく。
 git config --global core.eol lf 
 git config --global core.autocrlf false
@@ -21,6 +26,7 @@ git config --global core.autocrlf false
 # 以下がよいと思う
 git config core.eol crlf
 git config core.autocrlf false   # 上でしていれば不要
+
 ```
 
 
