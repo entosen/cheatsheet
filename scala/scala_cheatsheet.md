@@ -146,7 +146,9 @@ s * n
 "abcdefg".splitAt(0)  // ("", "abcdefg")
 "abcdefg".splitAt(10) // ("abcdefg", "")
 
-// Char型引数のsplit (単純な文字で分割。先頭の区切り文字は有効。末尾の区切り文字は無効)
+// Char型引数のsplit (scalaで用意)
+// (単純な文字で分割。先頭の区切り文字は有効。末尾の区切り文字は無効) 
+// 戻り値は Array[String] 型。
 "a.b.c".split('.')  // Array("a", "b")
 "".split('.')       // Array("")
 "a.".split('.')     // Array("a")
@@ -154,6 +156,12 @@ s * n
 "..a..".split('.')  // Array("", "", "a")
 ".".split('.')      // Array()
 "..".split('.')     // Array()
+
+// Array[Char]型引数のsplit (scalaで用意)
+TODO
+
+// 正規表現を引数に渡して分割する (javaで用意)
+TODO
 ```
 
 ### StringBuilder
@@ -1560,9 +1568,34 @@ object Summer extends App {
 
 args   // コマンドライン引数
 C/C++ と違って、最初の引数が args(0) に入る。
-プログラム名(C/C++ の argv[0] に相当)は、
+プログラム名(C/C++ の argv[0] に相当)は、取れないっぽい。
 
+## exit
 
+```
+sys.exit(1)  // 引数はInt型
+```
+
+## 出力
+
+```
+print("aaa")     // STDOUTへ
+println("aaa")   // STDOUTへ。改行あり
+printf("aaa %d", num)   
+
+sys.stderr.println("eee")  // STDERR へ。
+```
+
+## 起動方法
+
+```
+scala hoge.scala
+
+# sbt で assembly してできた jar から起動する場合
+java \
+    -cp path/to/hoge.jar \
+    package.name.to.hoge.HogeMain "$@"  # main関数を定義したオブジェクト名
+```
 
 # ファイル操作
 
@@ -1763,6 +1796,24 @@ prop.getProperty("key1")          // 返り値は String型
                                   // キーが存在しない場合は null が返る
 prop.getProperty("key1").toLong   // 必要なら型変換
 ```
+
+
+上記のように明示的にファイルを読み込む以外に、
+システムプロパティ というあらかじめシステムが持っているPropertiesもある。
+
+```
+val hoge = System.getProperty("key")
+val hoge = System.getProperty("key", "default")
+val prop: Properties = System.getProperties()
+```
+
+システムプロパティに値をセットする方法
+
+- コマンドラインの `-D` オプション
+- System.setProperties(props: Properties)
+- System.setProperty("key", "value")
+- System.clearProperty("key")
+
 
 キーが存在しない場合、nullが返って判定がやりにくいので、
 以下のようなヘルパークラスを作るとよいかも。
@@ -2655,6 +2706,10 @@ if ( logger.isInfoEnabled ) {
 ### logback.xml の変数置換
 
 値が書けるところには、シェル風の変数置換が書ける。
+
+変数名のルールについて記載がない。
+おそらくシェルスクリプトの変数名([A-Za-z0-9_], 先頭は数字ダメ) は使える。
+システムプロパティから引っ張ってくることが可能なのであれば、`.` なども使えるかもしれないが実験していない。
 
 ```
 変数の展開
