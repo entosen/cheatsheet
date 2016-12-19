@@ -418,3 +418,38 @@ curl http://www.example.com/
 	--data-urlencode <data>   
 ```
 
+# 虎の巻
+
+## true になるまで繰り返し実行
+
+運用のスクリプトなどで、最大で指定時間まで、
+一定時間ごとにコマンドを実行し、条件が満たされるまで待つ。
+
+```
+function wait_until_true() {
+    # usage: wait_until_true max_wait_ces command
+    local max_wait_sec=$1
+    shift
+
+    local deadline
+    local now
+    deadline=`date +%s -d "$max_wait_sec secs"`
+
+    echo -n "Waiting for '$@' " >&2
+    sleep 1
+    while true ; do
+        echo -n "." >&2
+        if eval "$@" ; then
+           echo >&2
+           return 0
+        fi
+        sleep 1
+
+        now=`date +%s`
+        if [ $now -gt $deadline ] ; then
+           echo >&2
+           return 1
+        fi
+    done
+}
+```
