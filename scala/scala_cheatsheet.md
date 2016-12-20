@@ -272,10 +272,10 @@ c.partition   // predicate の結果で２つに分割する
 c.groupBy     // 判定関数の結果で、Mapに整理する
 
 // 要素条件演算
-c.exists(p: (A)=>Boolean)  1つでも条件にあうものがあればTrue
-(c.f.) c.contains(elem: A1)  一致するものが1つでもあればTrue (Seqのみ？)
-c.forall
-c.count
+c.exists(p: (A)=>Boolean)   // 1つでも条件にあうものがあればTrue。元がemptyの場合はTrue。
+(c.f.) c.contains(elem: A1) // 一致するものが1つでもあればTrue (Seqのみ？)
+c.forall(p: (A)=>Boolean)   // 全ての要素が条件にある場合のみTrue。元がemptyの場合はTrue。
+c.count(p: (A)=>Boolean)    // 条件に合う要素数を数える
 
 // fold演算？？？
 c.foldLeft
