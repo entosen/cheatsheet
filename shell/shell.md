@@ -346,6 +346,30 @@ echo $input | grep -E -o '\.feserver([0-9]+)\.'
     試していない。
 ```
 
+# バイナリ操作
+
+od
+hexdump
+xxd
+
+
+
+1バイトずつ16進表記に変換して出力するスクリプト
+
+```perl
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+while(1) {
+    my $input;
+    read(STDIN, $input, 1) || last;
+    my $byte = unpack("C", $input);
+    printf "%02x ", $byte;
+}
+print "\n";
+```
 
 # 時刻
 
