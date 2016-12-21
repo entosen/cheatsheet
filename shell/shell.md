@@ -279,8 +279,26 @@ echo "main end"
 - 変数名に使える文字列は、[A-Za-z0-9_] 。ただし先頭は数字以外。
 - 大文字小文字は区別される。
 
+### 位置パラメータ
 
-デフォルト値
+TODO
+
+位置パラメータを上書きする方法
+```
+set -- 111 222 333
+```
+
+### 空白を含む扱い
+
+```
+VALUE_B="hoge     fuga"
+$VALUE_A=$VALUE_B         # 空白5つがちゃんと保持される。
+```
+
+TODO どういうとき空白が詰まる？
+
+
+### デフォルト値
 ```
 # なければ代わりにデフォルト値を返す
 ${FOO-aaa}   # FOOが未使用であれば、 aaa 値を返す (代入はしない)
@@ -313,6 +331,159 @@ echo $output
 
 参考
 - bash: https://www.gnu.org/software/bash/manual/bashref.html#Word-Splitting
+
+
+
+## getopt
+
+参考
+- [bash によるオプション解析 - Qiita](http://qiita.com/b4b4r07/items/dcd6be0bb9c9185475bb "bash によるオプション解析 - Qiita")
+
+だいたい以下の方法がある
+
+- ビルトインコマンドの `getopts` を使う。 → ロングオプション使えない
+- コマンド版の `getopt`
+    - gnu版(Linuxに最初から入っているのはこれ)。 → ロングオプションも使えるし、空白など含んでもきちんと扱える。
+    - 従来版(MacOSXに最初から入っているのはこれらしい)。 → 貧弱で、いろいろ制限がある。
+- 自前で処理する。 
+
+基本的に gnu版の getopt が入っているなら、それを使うのが一番よい。
+
+### gnu版 getopt
+
+拡張版や enhanced版とも呼ばれる。
+
+- getopt (enhanced) のマニュアルの日本語訳
+    - [getoptのヘルプ・マニュアル／リナックスコマンド](http://www.linux-cmd.com/getopt.html "getoptのヘルプ・マニュアル／リナックスコマンド")
+
+拡張版であれば、引数に空白を含んでいても適切に扱える。
+
+コマンドの書式
+
+```
+(従来版の動作になる)
+getopt optstring parameters             
+
+(拡張版の動作になる)
+getopt [options] [--] optstring parameters
+getopt [options] -o|--options optstring [options] [--] parameters
+```
+
+拡張版のサンプル
+```
+#!/bin/sh
+
+function usage_and_exit() {
+    local exitcode="$1"
+    echo "Usage: $0 [-a] [-d dir] item..." >&2
+    exit "$exitcode"
+}
+
+if !  OPT=`getopt -o 'ad:' -l 'alpha,delta:' -- "$@"`
+then
+    usage_and_exit 1   # 指定外のオプションが入力された場合もここ。
+fi
+eval set -- "$OPT"     # 従来版では setに渡していただけだが、拡張版では eval する。
+
+# debug ここから
+i=1
+for a in "$@" ; do
+    echo "[$i]:$a"
+    i=$((i + 1))
+done
+# debug ここまで
+
+while true
+do
+    case "$1" in
+        -a | --alpha) FLAG_A=1
+            shift
+            ;;
+        -d | --delta) VALUE_D=$2
+            shift 2     # 引数とるやつは shift 2
+            ;;
+        --) shift
+            break
+            ;;
+        *)
+            echo "Internal error!" >&2  # 基本ここには入ることないはず。
+            exit 1
+            ;;
+    esac
+done
+
+
+echo "FLAG_A=$FLAG_A"
+echo "VALUE_D=$VALUE_D"
+echo "\$#=$#"
+i=1
+for a in "$@" ; do
+    echo "[$i]:$a"
+    i=$((i + 1))
+done
+```
+
+従来版のサンプル(ロングオプション使えない。空白などがきちんと扱えないので注意！)
+```
+#!/bin/sh
+
+function usage_and_exit() {
+    local exitcode="$1"
+    echo "Usage: $0 [-a] [-d dir] item..." >&2
+    exit "$exitcode"
+}
+
+set -- `getopt 'ad:' "$@"`
+if [ $? -ne 0 ] ; then
+    usage_and_exit 1
+fi
+
+# debug ここから
+i=1
+for a in "$@" ; do
+    echo "[$i]:$a"
+    i=$((i + 1))
+done
+# debug ここまで
+
+for OPT in "$@"
+do
+    case $OPT in
+        -a) FLAG_A=1
+            shift
+            ;;
+        -d) VALUE_D=$2
+            shift 2     # 引数とるやつは shift 2
+            ;;
+        --) shift
+            break
+            ;;
+    esac
+done
+
+
+echo "FLAG_A=$FLAG_A"
+echo "VALUE_D=$VALUE_D"
+
+echo "\$#=$#"
+i=1
+for a in "$@" ; do
+    echo "[$i]:$a"
+    i=$((i + 1))
+done
+```
+
+
+
+### getopts
+
+ビルトインコマンドなので、早い？ 空白を含んでいても扱える。
+ロングオプションは使えない。
+
+コマンド書式
+```
+getopts optstring name [args]
+```
 
 
 
