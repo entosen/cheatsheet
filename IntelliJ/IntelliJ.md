@@ -98,15 +98,45 @@ build.sbt に追記したら(そのままではだめで)、
 # 設定
 
 - 行番号を常に表示
-  - 「settings」→「Editor」→「General」「Appearance」の「Show Line Numbers」
+    - 「settings」→「Editor」→「General」「Appearance」の「Show Line Numbers」
 - (新規作成ファイルの)改行コードを Unix に。
-  - Setting ＞ Editor ＞ Code Style ＞ Line separator (for new file) を "Unix and OS X" に。
-  - 合わせて、以下のgitの設定もしておくといい。
+    - Setting ＞ Editor ＞ Code Style ＞ Line separator (for new file) を "Unix and OS X" に。
+    - 合わせて、以下のgitの設定もしておくといい。
+	```
+	git config --global core.eol lf 
+	git config --global core.autocrlf false
+	```
+- File > Settings > Editor > File Encodings >
+    - IDE Encoding, Project Encoding, を UTF-8 に
+- File > Settings > Build,Execution,Deployment > Build Tools > SBT
+    - VM parameters に `-Dfile.encoding=UTF-8` を追加
+    - Use auto-import を OFF に
+- File > Settings > Editor > Color & Fonts > Font で、Consolas の 12 に。
+- File > Settings > Apperance and Behavior > System Settings > Password
+    - Do not save, forget password after restart
 
-```
-git config --global core.eol lf 
-git config --global core.autocrlf false
-```
+- Run > Edit Configuration > Defaults > SBT Task > VM Parameters >
+    - `-Dfile.encoding=UTF-8` を追加
+
+
+Editor Tab まわりの設定
+
+- Editor > General > Editor Tabs
+  - "Hide tabs if there is no space" は嫌いなので、チェックを外す
+  - "Hide file extension in editor tabs" チェックを入れてみる
+  - "Mark modified tabs with asterisk" チェックを入れてみる
+      - 効いてない？一度ついてもすぐ消えてしまう。
+  - "Show tabs in single row" を外してみる
+      - これ外して、複数行になっている側のウィンドウに C-W H で移れなくなった...。C-W C-W は効く。
+      - IdeaVim に Bug 上がってた。
+  	Ctrl-w + h doesn't alway work (window navigation to the left window) : VIM-795
+  	https://youtrack.jetbrains.com/issue/VIM-795
+  - "When closing active editor" は "Activate most recently opened tab" にしてみる。
+
+Right margin まわりの設定
+
+- Editor > General > Appearance > Show right margin にチェック
+- Editor > Code Style > Right margin (columns) を 80に。
 
 ## code style の設定
 
@@ -132,27 +162,8 @@ Settings > Editor > Code Style > Scala >
 - import文で `{ NameA, NameB, }` のように波括弧の内側に空白を開ける
   - Spaces > Other > Spaces after open and befor close braces in imports
 
-Editor Tab まわりの設定
 
-- Editor > General > Editor Tabs
-  - "Hide tabs if there is no space" は嫌いなので、チェックを外す
-  - "Hide file extension in editor tabs" チェックを入れてみる
-  - "Mark modified tabs with asterisk" チェックを入れてみる
-      - 効いてない？一度ついてもすぐ消えてしまう。
-  - "Show tabs in single row" を外してみる
-      - これ外して、複数行になっている側のウィンドウに C-W H で移れなくなった...。C-W C-W は効く。
-      - IdeaVim に Bug 上がってた。
-  	Ctrl-w + h doesn't alway work (window navigation to the left window) : VIM-795
-  	https://youtrack.jetbrains.com/issue/VIM-795
-  - "When closing active editor" は "Activate most recently opened tab" にしてみる。
-
-Right margin まわりの設定
-
-- Editor > General > Appearance > Show right margin にチェック
-- Editor > Code Style > Right margin (columns) を 80に。
-
-
-IdeaVim まわりの設定。
+## IdeaVim まわりの設定。
 
 ホームディレクトリに `.ideavimrc` というファイルを置くと読み込んでくれる。
 ただし Windows の場合は、環境変数HOME ではなく、
@@ -163,6 +174,13 @@ IdeaVim まわりの設定。
 set visualbell
 set noerrorbells
 ```
+
+## scalariform を走らせるための設定
+
+- Run > Edit Configuration > 追加 > SBT Task
+    - Tasks: `compile test:compile`
+    - before launch: `Build` が入っていたのを抜く
+
 
 # 編集
 
