@@ -1522,7 +1522,7 @@ e.printStackTrace(new PrintWriter(sw))
 sw.toString
 
 // 自分で例外を定義
-class MyException(message :String = null, cause :Throwable = null) 
+class MyException(message: String = null, cause: Throwable = null) 
   extends Exception(message, cause)
 ```
 
