@@ -333,6 +333,74 @@ echo $output
 - bash: https://www.gnu.org/software/bash/manual/bashref.html#Word-Splitting
 
 
+## 算術演算
+
+### シェルの置換で (Arithmetic Expansion)
+
+シェルの機能での算術演算は以下の形がある
+
+- `((expression))` : 式の結果が
+- `$((expression))` : 算術式を評価してその結果に置換
+
+
+
+詳しくは man bash で "Arithmetic Expansion" および "ARITHMETIC EVALUATION"。
+
+整数だけでなく、小数でもOKっぽい？？？一部？？？
+
+10進数表現だけ？？
+
+```sh
+$(( ...算術表現... ))
+
+# 算術展開の中では変数展開の`$`は不要
+a=5
+b=3
+c=$((a + b))   # 空白をあけているが、あけなくてもOK。
+echo $c        # → 8
+
+# カッコ含め複雑な式も書ける
+$(((10 + b / 2) * 3 + c ** 2 ))
+```
+
+算術式表現
+
+使える演算子と結合順 (man bash から)
+```
+演算子
+   id++ id--
+	  variable post-increment and post-decrement
+   ++id --id
+	  variable pre-increment and pre-decrement
+   - +    unary minus and plus (単項のプラスとマイナス。いわゆる符号)
+   ! ~    logical and bitwise negation
+   **     exponentiation べき乗
+   * / %  multiplication, division, remainder
+   + -    addition, subtraction
+   << >>  left and right bitwise shifts
+   <= >= < >
+	  comparison
+   == !=  equality and inequality
+   &      bitwise AND
+   ^      bitwise exclusive OR
+   |      bitwise OR
+   &&     logical AND
+   ||     logical OR
+   expr?expr:expr
+	  conditional operator
+   = *= /= %= += -= <<= >>= &= ^= |=
+	  assignment
+   expr1 , expr2
+	  comma
+
+数値
+    123    # 十進数
+    0777   # 先頭が0である定数は 8進数
+    0xff   # 0x, 0X 始まりは 16進数
+    5#22   # 5進数で10。→ 12
+
+```
+
 
 ## getopt
 
