@@ -300,6 +300,56 @@ project/plugins/project/
 ```
 
 
+# 本家をforkしたリポジトリで、本家に追従しながら開発
+
+以下の三角関係を頭に入れておく
+
+- 本家リポジトリ (リモート。例えばgithub上)
+- 俺リポジトリ (リモート。例えばgithub上。本家リポジトリをforkしてできた)
+- ローカルリポジトリ (ローカル。俺リポジトリを git clone)
+
+```
+github の UI上から本家リポジトリをforkして、俺リポジトリを作る
+
+# 俺リポジトリをローカルに git clone
+git clone <俺リポジトリのURL>
+
+    # 確認
+    git branch -avv 
+      master                      ...[origin/master]...   # ローカル
+      remotes/origin/master                               # 俺リポジトリ
+
+    git remote -v
+    origin  https://github.com/hirkatou/mdbm.git (fetch)    # 俺リポジトリ
+    origin  https://github.com/hirkatou/mdbm.git (push)
+
+# 本家リポジトリを git remote add。 upstreamという名前が一般的らしい
+git remote add upstream https://github.com/yahoo/mdbm.git
+
+    # 確認
+    git remote -v
+    origin  https://github.com/hirkatou/mdbm.git (fetch)        # 俺リポジトリ
+    origin  https://github.com/hirkatou/mdbm.git (push)
+    upstream        https://github.com/yahoo/mdbm.git (fetch)   # 本家リポジトリ
+    upstream        https://github.com/yahoo/mdbm.git (push)
+
+# 本家リポジトリを fetch
+git fetch upstream
+
+    # 確認
+    git branch -avv 
+      master                     ...[origin/master]...   # ローカル
+      remotes/origin/master                              # 俺リポジトリ
+      remotes/upstream/master                            # 本家リポジトリ
+
+# 本家リポジトリの変更をローカルにマージ
+git merge upstream/master
+
+# 更にそれを俺リポジトリにpush
+git push
+```
+
+
 # 間違えた系
 
 - [Backlinks for: git/コミットログを修正する方法 - TOBY SOFT wiki](http://tobysoft.net/wiki/index.php?plugin=related&amp;page=git%2F%A5%B3%A5%DF%A5%C3%A5%C8%A5%ED%A5%B0%A4%F2%BD%A4%C0%B5%A4%B9%A4%EB%CA%FD%CB%A1)
