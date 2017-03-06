@@ -10,7 +10,7 @@ help command
 # alias
 alias    # 現在のalias設定を表示
 
-# which みたいなの
+# which, where みたいなの (複数あるときは複数返る)
 gcm command
 gcm command | fl
 Get-Command | Format-List
@@ -24,6 +24,10 @@ gci env: | grep HOME
 $env:HOME    # string型で返る
 gci env:HOME # DirectoryEntryオブジェクト (NameとValueがある)
 
+
+# 現在位置
+pwd
+Get-Location
 
 # カレントディレクトリを移動する (cd)
 cd mydir           
