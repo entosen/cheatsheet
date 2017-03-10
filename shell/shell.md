@@ -555,6 +555,41 @@ getopts optstring name [args]
 
 
 
+## ユニットテスト、単体テスト
+
+shunit2 というのと bats というのがメジャーっぽい。
+
+shunit2 の Assertion の書き方がクオートしないといけないのが少し気持ちわるいのと、
+bats の方が、表示が洗練されているし、コマンドの出力・exitcodeの取得も楽そう。
+
+### bats
+
+ドキュメント: [sstephenson/bats: Bash Automated Testing System](https://github.com/sstephenson/bats)
+
+```sh
+#!/usr/bin/env bats
+
+@test "addition using bc" {
+  result="$(echo 2+2 | bc)"       # 中括弧の中の各行が全てassertion。/bin/sh -e の様に失敗するとそこで止まる。
+  [ "$result" -eq 4 ]
+}
+
+@test "addition using dc" {
+  result="$(echo 2 2+p | dc)"
+  [ "$result" -eq 4 ]
+}
+
+# エラーになるような動作をチェックしたい場合は runコマンドを使う
+# STDERR も含め $output に入るっぽい。
+@test "invoking foo with a nonexistent file prints an error" {
+  run foo nonexistent_filename
+  [ "$status" -eq 1 ]
+  [ "$output" = "foo: no such file 'nonexistent_filename'" ]
+}
+```
+
+
+
 
 ## 未整理
 
