@@ -82,7 +82,7 @@ vimの swap ファイルなどは、リポジトリの .gitignore に入れる�
 $ git init
 $ git add .
 $ git commit -m "Initial commit"
-$ git remote add origin git@git.corp.yahoo.co.jp:hirkatou/hogehoge.git   # <-- 適切に変える
+$ git remote add origin git@github.com:myname/hogehoge.git   # <-- 適切に変える
 $ git push origin master
 ```
 
@@ -331,18 +331,18 @@ git clone <俺リポジトリのURL>
       remotes/origin/master                               # 俺リポジトリ
 
     git remote -v
-    origin  https://github.com/hirkatou/mdbm.git (fetch)    # 俺リポジトリ
-    origin  https://github.com/hirkatou/mdbm.git (push)
+    origin  https://github.com/myrepo/foo.git (fetch)    # 俺リポジトリ
+    origin  https://github.com/myrepo/foo.git (push)
 
 # 本家リポジトリを git remote add。 upstreamという名前が一般的らしい
-git remote add upstream https://github.com/yahoo/mdbm.git
+git remote add upstream https://github.com/origrepo/foo.git
 
     # 確認
     git remote -v
-    origin  https://github.com/hirkatou/mdbm.git (fetch)        # 俺リポジトリ
-    origin  https://github.com/hirkatou/mdbm.git (push)
-    upstream        https://github.com/yahoo/mdbm.git (fetch)   # 本家リポジトリ
-    upstream        https://github.com/yahoo/mdbm.git (push)
+    origin  https://github.com/myrepo/foo.git (fetch)        # 俺リポジトリ
+    origin  https://github.com/myrepo/foo.git (push)
+    upstream        https://github.com/origrepo/foo.git (fetch)   # 本家リポジトリ
+    upstream        https://github.com/origrepo/foo.git (push)
 
 # 本家リポジトリを fetch
 git fetch upstream
@@ -401,4 +401,9 @@ git stash pop                 // 直近のを適用して、同時にそれは�
 ```
 
 
+# github 検索
 
+```
+user:
+filename:
+```
