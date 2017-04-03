@@ -38,6 +38,14 @@ Set-Location mydir
 # ls みたいなの
 dir
 ls
+
+
+
+# ファイル操作
+
+# ディレクトリ作成
+ni foo -itemType Directory
+New-Iterm foo -itemType Directory
 ```
 
 
