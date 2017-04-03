@@ -372,6 +372,10 @@ git commit --amend -m "新しいメッセージ"
 
 
 ```
+// add する前の変更を元に戻したい
+git checkout <file>...
+
+
 // いらないファイルをaddしてしまった。取り消したい。
 // 更新でも、新規で追加したファイルでもOK。
 git reset HEAD <file>...
