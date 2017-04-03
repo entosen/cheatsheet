@@ -306,7 +306,7 @@ ${FOO:-aaa}  # FOOが未使用か空文字列であれば、 aaa 値を返す (�
 
 # 上に加えて、代入もしてしまう
 ${FOO=aaa}   # FOOが未使用であれば、FOOにaaaを代入し、aaaを返す。
-${FOO:=aaa}   # FOOが未使用であれば、FOOにaaaを代入し、aaaを返す。
+${FOO:=aaa}   # FOOが未使用か空文字列であれば、FOOにaaaを代入し、aaaを返す。
 ```
 
 ### Word-Splitting 空白や改行を含む変数展開
