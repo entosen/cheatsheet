@@ -202,3 +202,25 @@ ifelse(os, Linux, {{{
 ここは、{{{os}}} が Linux 以外のときに出力されます。
 }}})
 ```
+
+
+```
+changequote({{{,}}})dnl
+dnl 引数にenv名を指定する
+define({{{GEN_BOOTSTRAP}}},{{{dnl
+  bootstrap_$1:
+    profile: bootstrap
+    steps:
+      bootstrap:
+        fab_task: chef.bootstrap:$1
+        fab_arg: ''
+    settings:
+      foo: foofoofoo
+      bar: barbarbar
+}}})dnl
+changequote(`,')dnl
+
+GEN_BOOTSTRAP(`myenv1)
+GEN_BOOTSTRAP(`myenv2)
+GEN_BOOTSTRAP(`myenv3)
+```
