@@ -393,16 +393,35 @@ git reset --soft HEAD^
 
 # 以下、未整理。
 
-```
-git stash                     // 現在の変更の 積み込み
-git stash list                // 一覧の表示
-git stash apply               // 直近 stash した変更を読み込み
-git stash apply stash@{2}     // 名前で指定
-git stash apply --index       // ステージ処理もされる
+### stash
 
-git stash drop stash@{0}      // stash から消す
-git stash pop                 // 直近のを適用して、同時にそれはリストから消す
+参考
+- [Git - 作業を隠す](https://git-scm.com/book/ja/v1/Git-%E3%81%AE%E3%81%95%E3%81%BE%E3%81%96%E3%81%BE%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB-%E4%BD%9C%E6%A5%AD%E3%82%92%E9%9A%A0%E3%81%99)
+
 ```
+# スタックに隠す(積む)。ステージ(git add)されている変更も含まれる
+git stash
+
+# 一覧表示
+git stash list
+
+# 戻す
+git stash apply              # 最近の
+git stash apply stash@{2}    # 指定
+
+# ファイル変更を戻すだけでなく、以前のステージ状態も戻す
+git stash apply --index
+
+# スタックから削除
+git stash drop statsh@{0}
+
+# スタック適用と削除を同時に
+git stash pop
+
+# 積んだ差分を確認する
+git diff HEAD..stash@{0}
+```
+
 
 
 # github 検索
