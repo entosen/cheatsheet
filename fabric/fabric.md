@@ -87,3 +87,43 @@ output.command        # 要求したコマンド。(例) `testcommand 1`
 output.real_command   # 実際に実行したコマンド。(例) `/bin/bash -l -c "testcommand 1"`
 ```
 
+
+## 環境, env
+
+参考ドキュメント
+
+- [環境辞書、 env - Fabric ドキュメント](http://fabric-ja.readthedocs.io/ja/latest/usage/env.html)
+- [fab オプションと引数 - Fabric ドキュメント](http://fabric-ja.readthedocs.io/ja/latest/usage/fab.html)
+
+### 既存の設定
+
+TODO
+
+### 独自の設定を追加
+
+単なる辞書なので、独自の設定を追加することも可能。(ただし、名前の衝突には注意)。
+
+設定をグローバル変数ではなく env に入れることのメリットは、
+fabの起動時の `--set` コマンドラインオプションでセットすることができる。
+ただし、スクリプト内でのセットの方が優先されるので注意。
+
+ベストプラクティスとしては以下のような感じになると思う。
+
+```python
+from fabric.api import task, env
+
+if 'my_threshold' not in env:
+    env.my_threashold = 75
+
+@task
+def check(th=env.my_threashold):
+    if a > th:
+	...
+```
+
+```sh
+% fab check                          # th は 75
+% fab --set my_threashold=60 check   # th は 60
+% fab check:th=50                    # th は 50
+```
+
