@@ -1,4 +1,14 @@
 
+## ホストの指定
+
+```python
+execute(タスク, host=ホスト名)
+execute(タスク, hosts=[ホスト名, ...])
+# 注: execute の戻り値は、ホスト名をキーとして辞書
+```
+
+run() や sudo() は、host, hosts などのホスト指定は受け付けない。
+
 
 ## オペレーション
 
