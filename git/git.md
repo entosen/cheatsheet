@@ -27,6 +27,8 @@ git config --global core.autocrlf false
 git config core.eol crlf
 git config core.autocrlf false   # 上でしていれば不要
 
+# 日本語を含むファイル名を扱う場合、以下を入れないと git add などの表示で日本語が出ない
+git config core.quotepath false
 ```
 
 
