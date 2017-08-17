@@ -97,6 +97,15 @@ output.command        # 要求したコマンド。(例) `testcommand 1`
 output.real_command   # 実際に実行したコマンド。(例) `/bin/bash -l -c "testcommand 1"`
 ```
 
+run,sudo は、標準だと stdout と stderr を結合した文字列を戻り値とする。
+stdout と stderr を別々に取り出したい場合は、以下のようにする。
+
+```
+ret = run("cmd", pty=False, combine_stderr=False)   # この２つを両方Falseにしないと交じる
+str(ret)      # → stdout のみ取れる
+ret.stderr    # → stderr のみ取れる
+```
+
 
 ## 環境, env
 
