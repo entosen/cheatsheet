@@ -775,12 +775,14 @@ print "\n";
 # 時刻
 
 ```
-# 今の時刻
-date                   # Fri Sep 30 13:31:25 JST 2016
-date +%s               # Unixtime で出力
-date +%Y%m%d-%H%M%S    # YYYYMMDD-HHMMSS 形式で出力
+date -d STRING は display つまり表示
+    +FORMAT が出力のフォーマット
+date -s STRING は set つまり設定
 
-# 指定時刻
+# 今の時刻を表示
+date                   # Fri Sep 30 13:31:25 JST 2016
+
+# 指定時刻を表示
 date -d '2015/04/25'
 date -d '30 days'      # 30日後。day でも days でもいい。'30days' でもいい。
                        # month, year, hour, minute, second
@@ -793,6 +795,11 @@ date -d '2013/09/04 12:17:00'  # 日時で指定
 date -d '@1382282400'  # unixtimeで指定
 
 date -d '2015/04/25 1 month'   # 組み合わせ。
+
+# 特定のフォーマットで出力 (-d STRING との組み合わせも可)
+date +%s               # Unixtime で出力
+date +%Y%m%d-%H%M%S    # YYYYMMDD-HHMMSS 形式で出力
+
 
 # 標準入力を変換 (各行を -d 指定して実行した効果)
 echo '2016/01/01' | date -f -
