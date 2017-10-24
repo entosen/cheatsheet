@@ -25,6 +25,7 @@ deactivate
 ### パッケージ管理, pip
 
 ```
-pip install パッケージ
+pip freeze               // インストールされているパッケージ一覧を表示
+pip install パッケージ   // インストール
 ```
 
