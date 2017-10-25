@@ -72,6 +72,8 @@ rapidjson の場合、解釈は厳密。
 例えば、"123" は、文字列タイプとしてしか解釈しない。(IsNumberはfalseになる)
 1 を Boolタイプとしては解釈しない。
 
+ただし、`123` は IsDouble は false だが、GetDouble はエラーにならずに動作する。
+
 ```
 v.IsNull()
 
