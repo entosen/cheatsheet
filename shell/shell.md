@@ -805,6 +805,19 @@ date +%Y%m%d-%H%M%S    # YYYYMMDD-HHMMSS 形式で出力
 echo '2016/01/01' | date -f -
 ```
 
+## ntp
+
+```
+# 時刻が大幅にずれたときは、ntpd が時刻合わせを諦めてしまうので、
+# 以下で強制的に同期させる
+cat /etc/ntp.conf     # ntp サーバのIPアドレスを確認
+sudo ntpdate NTPサーバ
+
+# ntpd がいつの間にかいなくなったときは、以下で再開
+sudo /etc/init.d/ntpd restart
+ntpq -p     # 確認
+```
+
 # プロセス
 
 ## ps
