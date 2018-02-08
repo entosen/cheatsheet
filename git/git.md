@@ -8,6 +8,9 @@ git config --global user.name "John Doe"
 git config --global user.email johndoe@example.com
 git config --global push.default simple
 
+# pagerの設定
+git config --global pager.branch false
+
 # windows でも今は(NTFSは)大文字小文字区別できるので、false にしておく。
 # true だと、ファイル名の大文字小文字を変更したときに git にうまく伝わらない。
 # global の方ではなく、リポジトリ毎の設定の方でこれが true にされているケースがある？
