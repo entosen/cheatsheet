@@ -107,7 +107,8 @@ build.sbt に追記したら(そのままではだめで)、
 	git config --global core.autocrlf false
 	```
 - File > Settings > Editor > File Encodings >
-    - IDE Encoding, Project Encoding, を UTF-8 に
+    - Global Encoding, Project Encoding, を UTF-8 に
+    - Default Encoding for properties files も UTF-8 に
 - File > Settings > Build,Execution,Deployment > Build Tools > SBT
     - VM parameters に `-Dfile.encoding=UTF-8` を追加
     - Use auto-import を OFF に
