@@ -31,3 +31,48 @@ curl http://www.example.com/
 ```
 
 
+## HTTP負荷テストツール
+
+### vegeta
+
+https://github.com/tsenart/vegeta
+
+インストール
+
+- https://github.com/tsenart/vegeta/releases から環境にあったバイナリをダウンロード
+- 解凍・展開
+- 必要なら PATH が通ったディレクトリなどに入れる
+
+
+使い方
+
+負荷をかける前の要チェックポイント
+
+- `ulimit -a`
+    - file descriptor数 (file descriptors) <--- 1プロセスあたりっぽい
+    - プロセス数 (processes) 
+
+コマンドの種類
+
+```
+# 負荷をかける (vegeta attack)
+echo "GET http://localhost/" | ./vegeta attack -rate=50 -duration=5s > result.bin
+
+# 結果をレポート (vegeta report)
+vegeta report < result.bin
+
+# 結果をダンプ (vegeta dump)
+vegeta dump < result.bin
+```
+
+詳細は、開発元のgithub見て。
+
+複数台で同時に負荷をかける方法
+
+- かけたいQPSを台数で割る
+- 各ホストで vegeta attack で上記QPSで負荷をかける。結果をファイルに保存
+- 各ホストから結果のファイルをscpしてくる
+- vegeta report で -inputs をカンマ区切りで全ホスト分指定
+
+
+
