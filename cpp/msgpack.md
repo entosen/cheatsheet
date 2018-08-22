@@ -239,7 +239,7 @@ void some_function(const char* buffer, std::size_t len) {
 
     while (off != len) {
         msgpack::unpacked result;
-        unpack(result, buffer, len, off);
+        msgpack::unpack(result, buffer, len, &off);  // off についてドキュメントは参照になっているがポインタが正解っぽい。
         msgpack::object obj(result.get());
         // Use obj
 	// object からの取り出し方は後述。
@@ -300,6 +300,13 @@ obj.via.array
     size
     ptr[0]
     ptr[1] 
+
+obj.via.map
+    size
+    ptr[0].key
+    ptr[0].val
+    ptr[1].key
+    ptr[1].val
 
 as とか
 ```
