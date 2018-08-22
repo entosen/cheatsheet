@@ -28,5 +28,29 @@ rpm -qf /bin/ls   # あるファイルがどのパッケージに含まれてい
 
 
 
+# yum
+
+書きかけ
+
+会社のデフォルトの状態では、epel リポジトリは登録されていないっぽい。
+以下で登録。
+```
+sudo yum install epel-release
+```
 
 
+```
+yum list installed   # インストールされているパッケージ一覧の表示
+
+
+yum install <package>
+yum groupinstall <package group>
+yum clean packages
+
+```
+
+
+```
+yum repolist all
+
+```
