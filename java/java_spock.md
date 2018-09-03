@@ -222,4 +222,114 @@ Extensions
 ## Mock
 
 
+```
+
+
+def "should send messages to all subscribers"() {
+    setup:
+    Subscriber subscriber = Mock()    // もしくは、 def subscriber = Mock(Subscriber)
+    Subscriber subscriber2 = Mock()   //            def subscriber2 = Mock(Subscriber)
+
+    when:
+    publisher.send("hello")
+
+    then:
+    1 * subscriber.receive("hello")
+    1 * subscriber2.receive("hello")
+}
+```
+
+デフォルトの動作は、戻り値の型に応じたデフォルト値(false, 0, nullなど)を返すだけ。
+ただし、Object.equals、Object.hashCode、Object.toStringメソッドは例外。
+いわゆる緩いモック。予期しないメソッド呼び出しをしても例外を投げない。
+
+
+多重度
+
+```
+1 * subscriber.receive("hello")      // exactly one call
+0 * subscriber.receive("hello")      // zero calls
+(1..3) * subscriber.receive("hello") // between one and three calls (inclusive)
+(1.._) * subscriber.receive("hello") // at least one call
+(_..3) * subscriber.receive("hello") // at most three calls
+_ * subscriber.receive("hello")      // any number of calls, including zero
+                                     // (rarely needed; see 'Strict Mocking')
+```
+
+対象制約
+
+```
+1 * subscriber.receive("hello") // a call to 'subscriber'
+1 * _.receive("hello")          // a call to any mock object
+```
+
+メソッド制約
+
+```
+1 * subscriber.receive("hello") // a method named 'receive'
+1 * subscriber./r.*e/("hello")  // a method whose name matches the given regular expression
+                                // (here: method name starts with 'r' and ends in 'e')
+
+1 * subscriber.status           // getterメソッドの代わりに、Groovy のプロパティ構文が使える
+1 * subscriber.setStatus("ok")  // setterの場合はそうはできないので、setterで書く
+```
+
+引数制約
+
+```
+1 * subscriber.receive("hello")     // an argument that is equal to the String "hello"
+1 * subscriber.receive(!"hello")    // an argument that is unequal to the String "hello"
+1 * subscriber.receive()            // the empty argument list (would never match in our example)
+1 * subscriber.receive(_)           // any single argument (including null)
+1 * subscriber.receive(*_)          // any argument list (including the empty argument list)
+1 * subscriber.receive(!null)       // any non-null argument
+1 * subscriber.receive(_ as String) // any non-null argument that is-a String
+1 * subscriber.receive({ it.size() > 3 }) // an argument that satisfies the given predicate
+                                          // (here: message length is greater than 3)
+
+複数の引数を持つメソッドでも一緒
+1 * process.invoke("ls", "-a", _, !null, { ["abcdefghiklmnopqrstuwx1"].contains(it) })
+
+その他いろいろなんでも系
+1 * subscriber._(*_)     // any method on subscriber, with any argument list
+1 * subscriber._         // shortcut for and preferred over the above
+1 * _._                  // any method call on any mock object
+1 * _                    // shortcut for and preferred over the above
+```
+
+スタビング(値を返す、副作用を発生させる)
+
+setup などモックインスタンスを作るときと同時に振る舞いを宣言してもいいし、
+最後の例の様に、持っキングと同時に宣言してもいい。
+ただし、同じメソッドについて行う場合は、1度でやる必要がある。
+```
+// `>>` を書く場合は左に多重度は必要ない
+subscriber.receive(_) >> "ok"   // いつも同じ値を返す
+
+subscriber.receive("message1") >> "ok"     // 引数に応じた値を返す
+subscriber.receive("message2") >> "fail"
+
+subscriber.receive(_) >>> ["ok", "error", "error", "ok"]   // 呼ばれるごとの返り値を指定
+
+// 動的に値を返す
+subscriber.receive(_) >> { args -> args[0].size() > 3 ? "ok" : "fail" }
+subscriber.receive(_) >> { String message -> message.size() > 3 ? "ok" : "fail" }   // 名前付きで受ける
+
+// 副作用の実行
+subscriber.receive(_) >> { throw new InternalError("ouch") }   // 例外を投げる
+
+// モッキングと同時に
+1 * subscriber.receive("message1") >> "ok"
+1 * subscriber.receive("message2") >> "fail"
+```
+
+Stub
+Spy, パーシャルモック
+
+
+
+## Tips
+
+Groovy の仕様なのか意図していない使い方なのか、
+Groovyでは java側で定義されたクラスの private なフィールドも触れるっぽい。
 
