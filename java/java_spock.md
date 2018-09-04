@@ -137,6 +137,12 @@ Feature Methods
     assert stack.empty
 ```
 
+ちなみに、Java では `==` が参照の一致、`a.equals(b)` が内容の一致のチェックだが、
+Groovy では `==` が内容の一致。参照の一致をチェックしたい場合は `a.is(b)` を使う。
+
+
+where で、データ駆動のテストが可能。
+
 ```
   def "computing the maximum of two numbers"() {
     expect:
@@ -236,6 +242,14 @@ def "should send messages to all subscribers"() {
     then:
     1 * subscriber.receive("hello")
     1 * subscriber2.receive("hello")
+
+    // もし変数宣言と一緒に書きたい場合は interaction{} で囲む。
+    // spockがmockのインタラクション定義をwhenの直前に移動することに起因。
+    then: 
+    interaction {
+      def message = "hello"
+      1 * subscriber.receive(message)
+    }
 }
 ```
 
