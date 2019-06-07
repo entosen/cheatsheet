@@ -25,7 +25,25 @@ deactivate
 ### パッケージ管理, pip
 
 ```
-pip freeze               // インストールされているパッケージ一覧を表示
-pip install パッケージ   // インストール
+pip 
+python -m pip
+py -m pip          # windwos の場合、これがおすすめ。どのバージョンのpythonにpipするかわかりやすい
+
+py -m php -V       # どのpythonバージョンのpipが起動するか確認
+
+
+py -m pip freeze               # インストールされているパッケージ一覧を表示
+py -m pip list                 # インストールされているパッケージ一覧を表示。微妙に違うらしい。
+
+// インストール
+py -m pip install パッケージ
+py -m pip install パッケージ==バージョン番号
+py -m pip install -r requirement.txt    # テキストファイルに書かれたパッケージを一括でインストール
+
+// アンインストール
+py -m pip uninstall パッケージ 
+
+// 検索
+py -m pip search 検索ワード
 ```
 
