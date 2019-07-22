@@ -21,9 +21,9 @@ py -2    # Python 2.x を実行
 
 確認
 ```
-py --list  もしくは  py -O
+py --list  もしくは  py -0
     # 使用可能な python バージョンを表示
-py --list-paths  もしくは py -Op
+py --list-paths  もしくは py -0p
     # 使用可能な python バージョンとパスを表示
     # '*' が付いているのがデフォルト
 
