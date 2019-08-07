@@ -172,6 +172,27 @@ git checkout other_branch
 
 自動で upstream は設定されたはず。(要確認)
 
+## github の PR のブランチをチェックアウトする
+
+github上の自分のリポジトリを誰かがforkしてPRを送ってきた場合、
+PRの動作確認をするためにそのブランチをチェックアウトしたいときがある。
+
+しかし、その場合、自分リポジトリ内ではないので、git fetch では取ってこれない。
+
+真面目にやると、remote設定して、fetchして、checkoutして、となるが、
+以下の方法で簡単にできる。
+
+- [Checking out pull requests locally - GitHub Help](https://help.github.com/en/articles/checking-out-pull-requests-locally)
+
+```
+git fetch origin pull/${ID}/head:${BRANCHNAME}
+git checkout ${BRANCHNAME}
+```
+
+- IDは、PRのID
+- BRANCHNAME は、ローカルのブランチになるので、お好みで。
+　PR-123 みたいな感じがいい。
+
 
 ## ローカルで新しいブランチを作る
 
