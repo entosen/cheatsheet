@@ -48,4 +48,22 @@ ni foo -itemType Directory
 New-Iterm foo -itemType Directory
 ```
 
+TODO
 
+
+```
+Path環境変数への追加
+$Env:Path += ";C:\Program Files\Internet Explorer\"   # 文字列連結。先頭の`;`は要素の区切りなので、必用に応じて付ける。
+Set-Item Env:Path "$Env:Path;C:\Program Files\Internet Explorer\"
+
+
+コメント
+# 一行単位のコメントです。
+
+<#
+  複数行で記述する
+  コメント表記です。
+#>
+
+
+```
