@@ -1,4 +1,39 @@
 
+## console_codes
+
+いわゆるエスケープシーケンス
+
+参考
+- [ANSI escape code - Wikipedia(en)](https://en.wikipedia.org/wiki/ANSI_escape_code)
+- man 4 console_codes
+- [console_codes - スペシャルファイル (デバイス)の説明 - Linux コマンド集 一覧表](https://kazmax.zpp.jp/cmd/c/console_codes.4.html)
+
+### ウィンドウタイトルを変更
+
+OSC というグループの機能でできる。
+ST のところは本来は、`ESC \` だが、xterm は BEL(`\a`, `\007`) でもいける。
+
+```
+ESC ] 0 ; txt ST 	アイコン名とウインドウタイトルを txt に セットする。
+ESC ] 1 ; txt ST 	アイコン名を txt にセットする。
+ESC ] 2 ; txt ST 	ウインドウタイトルを txt にセットする。
+```
+
+- ウインドウタイトル --- ウインドウが表示されているときのタイトル
+- アイコン名 --- ウインドウが最小化されているときのタイトル
+- putty の場合は、設定に Window ＞ Behaviour > Separate window and icon titles があり、
+    - off --- 最小化したときにもウインドウタイトルが使われる
+    - on  --- 最小化したときにはアイコン名が使われる
+
+ウィンドウタイトルを変更するシェルスクリプト
+```
+title="hogehoge"
+printf "\033]0;$title\a"
+```
+
+TODO 日本語は行ける？
+
+
 ## GNU screen と tmux
 
 ### 違い
