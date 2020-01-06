@@ -10,6 +10,8 @@ git config --global push.default simple
 
 # pagerの設定
 git config --global pager.branch false
+git config --global pager.stash false
+他にも pager.<cmd> の形で他コマンドについても指定できる
 
 # windows でも今は(NTFSは)大文字小文字区別できるので、false にしておく。
 # true だと、ファイル名の大文字小文字を変更したときに git にうまく伝わらない。
