@@ -31,6 +31,20 @@ curl http://www.example.com/
 ```
 
 
+## netstat
+
+現在のコネクションの状況確認
+
+```
+netstat
+
+        -n, --numeric              don't resolve names
+        --numeric-hosts            don't resolve host names
+        --numeric-ports            don't resolve port names
+        --numeric-users            don't resolve user names
+        -T, --notrim               stop trimming long addresses
+```
+
 ## HTTP負荷テストツール
 
 ### vegeta
