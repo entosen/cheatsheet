@@ -54,3 +54,17 @@ yum clean packages
 yum repolist all
 
 ```
+
+
+```
+依存を調べる
+yum deplist <pkg>
+
+古いバージョン(新しいのも？)含めて表示する
+yum --showduplicates list [<pkg>]
+
+yum repolist 
+
+
+yum makecache fast
+```
