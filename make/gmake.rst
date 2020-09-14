@@ -258,8 +258,11 @@ target名(普通は複数並べる)から prerequisites を自動構成するた
 - target-pattern は `%` を1つだけ含む。
 - `%` にマッチした部分を stem(語幹) と呼ぶ。
 - Static Pattern Rules の command では `$*` で stem を参照できる。
+
     - パターンルールと違い、ディレクトリ部分を除くような処理は発生しない。ディレクトリも含め単純にマッチ。
+
 - target-pattern にマッチしない target があった場合は警告を出す。cf. `$(filter %.o,$(files))`
+
     - 依存関係は全部なくなり、``$@``,``$*`` はターゲット全体、``@^``は空になるっぽい
 
 
