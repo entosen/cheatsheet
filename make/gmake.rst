@@ -5,9 +5,14 @@ gmake
 参考にさせてもらったサイト
 ==============================
 
+- https://www.gnu.org/software/make/manual/html_node/index.html
+
+    - 本家、英語
+
 - https://www.ecoop.net/coop/translated/GNUMake3.77/make_toc.jp.html
 
     - リファレンス的なもの。日本語。
+    - ちょっと古い。 conditional function とかが載っていない
 
 - `make を使いこなすためのメモ | まくまくいろいろノート <https://maku77.github.io/memo/tool/make.html>`__
 
@@ -919,6 +924,21 @@ ifdefは、変数の値が空でないこと(fooを定義していない or foo=
 
     $(sort list)
 
+    $(word n,text)
+        n番目の単語。1始まり。
+
+    $(wordlist s,e,text)
+        textの中のsからeまでの(その番号自身を含めた)単語のリストを返します。sとeの有効値は１から始まります。
+
+    $(words text)
+        単語数を返す
+
+    $(firstword names...)
+        最初の単語を返す
+
+    $(lastword names...)
+        最後の単語を返す
+
 
 ファイル名関数
 --------------------
@@ -946,20 +966,31 @@ ifdefは、変数の値が空でないこと(fooを定義していない or foo=
     $(join list1,list2)
         python の zip みたいな動作
 
-    $(word n,text)
-        n番目の単語。1始まり。
-
-    $(firstword names...)
-        最初の単語を返す
-
-    $(wordlist s,e,text)
-        textの中のsからeまでの(その番号自身を含めた)単語のリストを返します。sとeの有効値は１から始まります。
-
-    $(words text)
-        単語数を返す
-
     $(wildcard pattern)
         patternは(シェルファイル名で使う型と同じような)ワイルドカードを含むファイル名
+
+    $(realpath names...)
+        それぞれの絶対パスを返す。 . や .. は含まない。 / の繰り返しもない。
+        symlinkも解釈し、残らない。
+
+    $(abspath names...)
+        それぞれの絶対パスを返す。 . や .. は含まない。 / の繰り返しもない。
+        symlinkはたどらず、そのまま残る。
+
+
+条件関数
+--------------
+
+::
+
+    $(if condition,then-part[,else-part])
+        condition の前後の空白を削除したのちにそれを評価。
+        空文字列以外だったら true、空文字列だったら false。
+
+    $(or condition1[,condition2[,condition3…]])
+
+    $(and condition1[,condition2[,condition3…]])
+
 
 
 foreach関数
@@ -975,6 +1006,8 @@ foreach関数
     例
     files := $(foreach dir,$(dirs),$(wildcard $(dir)/*))
 
+
+
 shell関数
 -----------------
 
@@ -984,6 +1017,47 @@ shell関数
 
     contents := $(shell cat foo)
     files := $(shell echo *.c)    # これだとほぼ wildcard 関数と同じ
+
+
+その他関数
+-----------
+
+
+::
+    $(file op filename[,text])
+        ファイルを読み書きする
+        op は >,  >>,  <
+
+        $(file >$@.in,$^)
+
+
+    $(call variable,param,param,…)
+        自前の関数を呼び出す
+
+        reverse = $(2) $(1)
+        foo = $(call reverse,a,b)
+
+
+    $(value variable)
+        変数を展開せずに返す cf. $(variable)
+
+
+    $(eval content)
+        変数の値を Makefile の記述として取り込む
+
+    $(origin variable)
+        その変数がどこで定義されたかを返す。
+        undefined, default, environment, environment override,
+        command line, override, automatic, bletch
+
+    $(flavor variable)
+        変数のフレーバーを返す
+        undefined, recursive, simple
+
+    $(error text…)
+    $(warning text…)
+    $(info text…)
+
 
 
 
