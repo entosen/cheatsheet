@@ -39,20 +39,37 @@ sudo yum install epel-release
 ```
 
 
+一覧
+
 ```
-yum list installed   # インストールされているパッケージ一覧の表示
+yum list             # 利用可能とインストール済み
+yum list installed   # インストール済み
+yum list updates     # インストール済みでアップデート可能
+yum list available   # 利用可能
+yum list extras      # もう利用できないもの
+```
 
+```
+yum info <package_name>
+```
 
+```
 yum install <package>
 yum groupinstall <package group>
 yum clean packages
-
+yum remove <package_name>
 ```
 
+リポジトリ
 
 ```
-yum repolist all
+# 一覧、詳細
+yum repolist [{all|enabled|disabled}]  # デフォは enabled
+yum repolist -v [<リポジトリID>]
 
+# yum コマンド実行時だけリポジトリの有効／無効を切り替える
+yum --enablerepo=<リポジトリID> search,install,update等のコマンド 
+yum --disablerepo=<リポジトリID> search,install,update等のコマンド 
 ```
 
 
@@ -63,8 +80,8 @@ yum deplist <pkg>
 古いバージョン(新しいのも？)含めて表示する
 yum --showduplicates list [<pkg>]
 
-yum repolist 
-
 
 yum makecache fast
+
+
 ```
