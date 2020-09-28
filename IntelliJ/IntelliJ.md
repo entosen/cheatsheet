@@ -139,6 +139,12 @@ Right margin まわりの設定
 - Editor > General > Appearance > Show right margin にチェック
 - Editor > Code Style > Right margin (columns) を 80に。
 
+その他
+
+- ファイル末尾にかならず改行を入れる
+    - Editor > General > Other > Ensure line feed at file end on Save にチェック
+
+
 ## code style の設定
 
 > Copying Code Style Settings
