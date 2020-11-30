@@ -80,9 +80,11 @@ it は test の別名で、全く同じ。
 setup と Teardown
 ------------------------
 
+下記の関数を、ファイルグローバルや各describeに定義できる。
+
 ::
 
-    beforEach    // 各テスト前
+    beforeEach    // 各テスト前
     afterEach    // 各テスト後
     beforeAll    // ファイル(もしくはdescript)の最初
     afterAll     // ファイル(もしくはdescript)の最後
@@ -90,6 +92,12 @@ setup と Teardown
     beforeEach(() => {
       ...
     });
+
+{before,after}Eachが指すのは、"各test" 。
+子要素に describe があったとしても、"各describe" ではなく "各describeの中の各テスト" に対し呼ばれる。
+
+各テストに対して複数のレベルの beforeEach, afterEach が適用される場合、
+外側の beforeEach の方が先に呼ばれる (外側の afterEach の方が後に呼ばれる)。
 
 TODO ファイルスコープの変数は、複数のテストで共用されてしまうか？
 
