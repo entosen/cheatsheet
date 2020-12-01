@@ -432,7 +432,12 @@ git reset --soft HEAD^
 
 ```
 # スタックに隠す(積む)。ステージ(git add)されている変更も含まれる
-git stash
+git stash       # staged と unstaged がスタッシュされる。 unstacked ファイルはされない。
+
+git stash save <コメント>    # コメントをつけられる
+
+git stash -k    # unstaged ファイルのみをスタッシュ (--keep-index)
+git stash -u    # unstack ファイルも含めてスタッシュ (--include-untracked)
 
 # 一覧表示
 git stash list
@@ -445,7 +450,9 @@ git stash apply stash@{2}    # 指定
 git stash apply --index
 
 # スタックから削除
-git stash drop statsh@{0}
+git stash drp                 # 最近の
+git stash drop statsh@{0}     # 指定
+git stash clear               # 全部
 
 # スタック適用と削除を同時に
 git stash pop
