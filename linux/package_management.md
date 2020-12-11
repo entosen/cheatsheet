@@ -58,6 +58,10 @@ yum install <package>
 yum groupinstall <package group>
 yum clean packages
 yum remove <package_name>
+
+
+# ある package で入ったファイルの一覧
+rpm -ql <package-name>
 ```
 
 リポジトリ
