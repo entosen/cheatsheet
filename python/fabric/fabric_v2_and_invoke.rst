@@ -84,14 +84,19 @@ fab コマンドからの呼び出し方::
 詳細
 =======================
 
-http://docs.pyinvoke.org/en/stable/api/runners.html
+run()
+--------------------------------
+
+- http://docs.pyinvoke.org/en/stable/api/runners.html
+
 ::
 
     result = c.run(command, **kwargs)
 
         エラー時(終了コードが0以外)の挙動
             デフォルトでは、例外(UnexpectedExit)が投げられる。
-            warn=True を指定すると、例外を飛ばさなくなる。
+            warn=True を指定すると、上記例外を飛ばさなくなる。
+                それ以外の例外(ネットワークエラーとか認証エラーとか)は飛ぶ
 
         command の stdout, stderr は、デフォルトでは両方ともstreamに出力される
             hide='out' (or 'stdout') : stdoutを出力しない
@@ -101,8 +106,11 @@ http://docs.pyinvoke.org/en/stable/api/runners.html
             この指定にかかわらず、stdout,stderr は、Result に保存される
 
 
+run()の結果 Result
+------------------------------------
 
-http://docs.pyinvoke.org/en/stable/api/runners.html#invoke.runners.Result
+- http://docs.pyinvoke.org/en/stable/api/runners.html#invoke.runners.Result
+
 ::
 
     result.return_code: 終了コード
@@ -114,35 +122,98 @@ http://docs.pyinvoke.org/en/stable/api/runners.html#invoke.runners.Result
     result.tail('stdout', count=10) : ストリームの末尾を返す
 
         これらは改行付きなので、うまいことはずす
+        result.stdout.rstrip()
+        result.stdout.rstrip('\n').splitlines()
 
+
+
+sudo()
+------------------
+
+commandを sudo で実行する。パスワードは自動入力される。
+
+- http://docs.pyinvoke.org/en/stable/api/context.html#invoke.context.Context.sudo
 
 ::
 
-    c.sudo(command, **kwargs)
-
     c.sudo("command")
+    c.sudo("command", user='appuser')
+
+
+sudo()の認証の認証周りで失敗した場合には、 ``AuthFailure`` が投げられる。
+
+
+パスワードを指定するには
+
+- 何らかの方法で c.config.sudo.password をセット
+
+  - コマンドラインで ``--prompt-for-sudo-password`` を付けると、
+    実行に先立ちプロンプトが出て入力できる
+
+- sudoメソッドのpassword引数で指定::
+
+      c.sudo("command", password='hogehoge')
+
+
+Context と Config
+---------------------------
+
+いろいろな設定値の渡し方がある (設定ファイル、環境変数、コマンドライン、コード中) 。
+
+Context には、それら複数の箇所の記述を適切にマージした Config が含まれる。 ::
+
+    c.config
+
+- http://docs.pyinvoke.org/en/stable/concepts/configuration.html
 
 
 
 
+sudo するには
 
+
+
+コマンドライン
+=========================
+
+(invoke) task への引数の渡し方、かなりバリエーションがある。
+
+- http://docs.pyinvoke.org/en/stable/concepts/invoking-tasks.html
+
+
+関数名に ``_`` を含むものは、タスク名としては ``-`` に置換されたものになる。
+
+Fabric の機能
+==================
 
 TODO
 
 sshコネクションは 最初の run,sudo のタイミングで張られ、そのまま終了まで保持されるっぽい。
 
-(invoke) task への引数の渡し方、かなりバリエーションがある。
 
 
 TODO
 ホスト指定するには
+    # fabコマンドらいんで -H (もしくは --hosts)
+    fab -H host1,host2,host3 taskA taskB
+        Running taskA on host1!
+        Running taskA on host2!
+        Running taskA on host3!
+        Running taskB on host1!
+        Running taskB on host2!
+        Running taskB on host3!
+
+    # コード中で
+    from fabric import Connection
+    c = Connection('web1')
+    result = c.run('uname -s')
+
+    Connection(host='web1', user='deploy', port=2202)
+    Connection('deploy@web1:2202')
+
+
+
 ユーザー指定するには
-    fabコマンドライン -H <hostname>
-sudo するには
---prompt-for-sudo-password
-
-
-
 
 
 
