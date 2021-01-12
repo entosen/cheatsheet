@@ -147,8 +147,9 @@ sudo()の認証の認証周りで失敗した場合には、 ``AuthFailure`` が
 
 - 何らかの方法で c.config.sudo.password をセット
 
+  - 無理矢理 ``c.config.sudo.password = 'hogehoge'`` とする
   - コマンドラインで ``--prompt-for-sudo-password`` を付けると、
-    実行に先立ちプロンプトが出て入力できる
+    実行に先立ちプロンプトが出て入力でき、それがセットされる
 
 - sudoメソッドのpassword引数で指定::
 
@@ -183,18 +184,23 @@ sudo するには
 
 関数名に ``_`` を含むものは、タスク名としては ``-`` に置換されたものになる。
 
+タスクに引数を渡すには::
+
+    fab task1 --foo=bar --hoge=fuga
+        task1(conn, foo='bar', hoge='fuga') と呼ばれる
+
+
+
 Fabric の機能
 ==================
-
-TODO
 
 sshコネクションは 最初の run,sudo のタイミングで張られ、そのまま終了まで保持されるっぽい。
 
 
+https://docs.fabfile.org/en/2.5/api/connection.html
 
-TODO
 ホスト指定するには
-    # fabコマンドらいんで -H (もしくは --hosts)
+    # fabコマンドラインで -H (もしくは --hosts)
     fab -H host1,host2,host3 taskA taskB
         Running taskA on host1!
         Running taskA on host2!
@@ -202,6 +208,11 @@ TODO
         Running taskB on host1!
         Running taskB on host2!
         Running taskB on host3!
+
+    # @taskデコレータで (ただし、これより --hosts の方が強い)
+    @task(hosts=['host1', 'host2', 'host3'])
+    def taskA(c):
+        c.run('uname -s')
 
     # コード中で
     from fabric import Connection
@@ -213,8 +224,51 @@ TODO
 
 
 
-ユーザー指定するには
+ユーザー(SSHログイン時の)を指定するには
+    例 admin ユーザーを指定する場合
 
+    fabric の設定ファイル (/etc/fabric.yml, ~/.fabric.json など) 下記を書いておく
+        user: admin 
+    ssh の設定ファイル (~/.ssh/config) に下記を書いておく。(Host ヘッダと組み合わせるとか)
+        User admin 
+    ホスト名指定のところで、ユーザー名@ の指定をする (--hosts や Connection())
+        admin@myhost
+    Connectionを作る際に user で指定
+        Connection('myhost', user='admin')
+
+
+元の Connection からちょっと変えた Connection を作る::
+
+    # この4つをインスタンスに渡せば、同じものができるはず。
+    # 変えたい部分を変えればよい。
+    newConn = Connection(host=conn.host,
+                         port=conn.port,
+                         user=conn.user,
+                         config=conn.config)
+
+    # config を変える場合には、(参照なのでそのままいじると都合が悪いので、)
+    # 下記のようにしてコピーを作ってからいじったものを渡す
+    newConfig = conn.config.clone(into=Config)  # Connection.__init__ の中でもこうしている
+    newConfig.sudo.password = 'hogehgoe'
+
+    # config の一部の値は、コンストラクタ時に処理されているので、
+    # 既にある Connection の config を後から変更しない方がいい。
+
+    ただし、--hosts を指定せずに fab を起動した場合、
+    taskに渡されるのは fabric.Connection ではなく、invoke.Context になるっぽい。
+    そのため、 conn の host を取ろうとするとエラーになってしまうので注意。
+    (user と port は、 fabコマンドで作られた incoke.Context なら取れるみたい。 )
+    host がないと、fabric.Connection のコンストラクタも呼べないので、
+    Connection を作るのは host が確定したタイミング以降でする。
+
+コマンドにシェル解釈が必要な文字( ``&`` とか ``|`` とか ) が含まれている場合、
+``bash -c 'command'`` の様に実行されているっぽい。
+含まれていない場合、sshd から直接コマンドが実行されている (シェルの解釈されない)。
+
+run() や sudo() に ``shell=`` をつけても効かないっぽい。
+``shell=/bin/zsh`` としても、常に bash (ログインシェル？) で動いているっぽかった。
+``shell=`` が効くのは Invoke の方だけか？ あとは fabric の local() なら効くかも。
+    
 
 
 タスクランナーを作らずに、単にpythonのライブラリとして使う場合
