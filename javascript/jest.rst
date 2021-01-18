@@ -284,9 +284,13 @@ jestの実行環境はファイルごとに独立しているので、
 
 
 headless=false(＝ヘッドあり)で実行した場合に、
-テスト後もpageを開いたままにする方法。デバッグモードに入る方法。
+テスト後もpageを開いたままにする方法。デバッグモードに入る方法。::
 
-```
-await jestPuppeteer.debug();
-```
+    await jestPuppeteer.debug();
+
+これが一番楽って聞いた。TODO ::
+
+    # HEADLESS=false で
+    npx ndb jest --config ./jest-e2e.config.json --verbose hogehoge.test.ts
+
 
