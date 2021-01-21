@@ -81,6 +81,7 @@ pythonコードから実行する::
 
     runner = unittest.TextTestRunner()  # verbosity=2 をつけると verbose
     result = runner.run(suite)
+    sys.exit(not result.wasSuccessful())
 
 
 テストを指定する方法::
@@ -102,4 +103,9 @@ pythonコードから実行する::
     suite.addTest(testcase.test_b.TestB('test_b_1'))
     suite.addTest(testcase.test_b.TestB('test_b_2'))
 
+    # テストメソッド名はクラスから取り出すこともできる
+    for name in unittest.defaultTestLoader.getTestCaseNames(testcase.test_a.TestA):
+        suite.addTest(testcase.test_a.TestA(name))
+    for name in unittest.defaultTestLoader.getTestCaseNames(testcase.test_b.TestB):
+        suite.addTest(testcase.test_b.TestB(name))
 
