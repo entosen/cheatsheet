@@ -44,7 +44,6 @@ git config core.quotepath false
 #   新規add時、xビットはoffにして登録される
 # 通常は git clone 時に判定され適切にセットされる。
 git config core.filemode false
-
 ```
 
 
@@ -478,4 +477,14 @@ git diff HEAD..stash@{0}
 ```
 user:
 filename:
+```
+
+
+
+
+cygwinなど、パーミッションを適切に扱えない環境から、パーミッションを操作する
+
+```
+git update-index --chmod=-x path/to/file
+git update-index --chmod=+x path/to/file
 ```
