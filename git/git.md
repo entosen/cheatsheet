@@ -35,6 +35,16 @@ git config core.autocrlf false   # 上でしていれば不要
 
 # 日本語を含むファイル名を扱う場合、以下を入れないと git add などの表示で日本語が出ない
 git config core.quotepath false
+
+# 実行権限を正しく反映できないファイルシステムの場合は、false にする。
+# falseの場合
+#   checkout時、xビットはファイルシステムに反映しない。できない？
+#     (内部の情報としては、xビットはきちんと保持されている。 git ls-files -s)
+#   変更時、xビットの差分に関しては、差分とみなさない。
+#   新規add時、xビットはoffにして登録される
+# 通常は git clone 時に判定され適切にセットされる。
+git config core.filemode false
+
 ```
 
 
