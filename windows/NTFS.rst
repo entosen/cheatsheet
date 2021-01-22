@@ -22,7 +22,7 @@ NTFS の拡張属性とは
 - https://docs.microsoft.com/ja-jp/windows/wsl/file-permissions
 
 
-.. image:: ../img/NTFS_EA.png
+.. image:: img/NTFS_EA.png
 
 構造
 
