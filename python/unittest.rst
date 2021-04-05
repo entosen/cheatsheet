@@ -4,6 +4,46 @@ unittest
 
 
 
+独自TeseCaseクラスの追加
+========================
+
+基本＋assertメソッドの追加
+----------------------------
+
+参考
+
+- `pythonのunittestで自作のassertion methodを追加したときに、不要な行がスタックトレースに紛れ込まなくて良くなる方法について - podhmo's diary <https://pod.hatenablog.com/entry/2019/06/17/040620>`__
+
+参考、本家の ``assert*`` はどうなっているか。 unittest/case.py::
+
+    class TestCase(object):
+        ...
+        def assertTrue(self, expr, msg=None):
+            """Check that the expression is true."""
+            if not expr:
+                msg = self._formatMessage(msg, "%s is not true" % safe_repr(expr))
+                raise self.failureException(msg)
+                # raise self.fail(msg)  みたいになっているものもある
+
+なので、独自のassertを追加した MyTestCase は下記のような感じ::
+
+    __unittest = True  # これをやっていると失敗時の stack trace に無駄なものが出なくなる
+
+    class MyTestCase(unittest.TestCase):
+
+        def __init__(self, methodName='runTest'):
+            super().__init__(methodName)
+
+            # こう書いておくと、 assetEqual で型判定して呼び出してもらえる
+            self.addTypeEqualityFunc(myObj, 'assertMyObjEqual')
+
+        def assertMyObjEqual(self, first, second, msg=None):
+
+            if first != second:
+                standardMsg = '...'  # うまいこと差分を表現する
+                self.fail(self._formatMessage(msg, standardMsg))
+
+
 
 起動のさせ方
 ================
