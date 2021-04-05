@@ -449,7 +449,11 @@ git stash -k    # unstaged ファイルのみをスタッシュ (--keep-index)
 git stash -u    # unstack ファイルも含めてスタッシュ (--include-untracked)
 
 # 一覧表示
-git stash list
+git stash list [<options>]     # options には git log で使えるものが指定できる
+git stash list --stat          # ファイル名と変更行数(棒グラフみたいなので)
+git stash list --numstat       # ファイル名と変更行数(数値で)
+git stash list --name-status   # ファイル名とステータス (Mとか)
+git stash list -p              # diffも表示する
 
 # 戻す
 git stash apply              # 最近の
@@ -459,12 +463,16 @@ git stash apply stash@{2}    # 指定
 git stash apply --index
 
 # スタックから削除
-git stash drp                 # 最近の
+git stash drop                # 最近の
 git stash drop statsh@{0}     # 指定
 git stash clear               # 全部
 
 # スタック適用と削除を同時に
 git stash pop
+
+# 内容表示
+git stash show [<stash>]   # 変更したファイル名の表示。statsh 名を省略した場合は最新の。
+git stash show -p [<stash>]   # 変更内容のdiff表示。statsh 名を省略した場合は最新の。
 
 # 積んだ差分を確認する
 git diff HEAD..stash@{0}
