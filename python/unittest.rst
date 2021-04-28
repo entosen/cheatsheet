@@ -149,3 +149,12 @@ pythonコードから実行する::
     for name in unittest.defaultTestLoader.getTestCaseNames(testcase.test_b.TestB):
         suite.addTest(testcase.test_b.TestB(name))
 
+複数のディレクトリをそれぞれdicover で呼び出すのはうまくいかなかった::
+
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.defaultTestLoader.discover('testcase1'))
+    suite.addTest(unittest.defaultTestLoader.discover('testcase2'))
+
+    ↓
+
+    ImportError: Start directory is not importable: '/my/sourcecode/directory/testcase2'
