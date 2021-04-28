@@ -185,3 +185,51 @@ py -m pip uninstall パッケージ
 py -m pip search 検索ワード
 ```
 
+
+
+## デコレータ
+
+関数デコレータの場合で説明。メソッドも同じ。クラスの場合もほぼ同じ(関数をクラスに読み替える)
+
+参考
+- 8. 複合文 (compound statement) — Python 3.9.4 ドキュメント#関数
+https://docs.python.org/ja/3/reference/compound_stmts.html#function
+- Pythonのデコレータを理解するための12Step - Qiita
+https://qiita.com/_rdtr/items/d3bc1a8d4b7eb375c368
+
+
+デコレータ ＝ 関数をラップして、同名の関数名に入れたもの。
+
+デコレータの書き方には2種類ある
+```
+# ---------------------------------
+# 引数を取らないデコレータ
+# ---------------------------------
+@decorator1
+def func(a):
+    ...
+
+    ↓ これとほぼ同じ
+
+func = decorator1(func)
+
+この形のデコレーターは、関数を受け取って別の関数を返す関数
+例
+def decorator1(func):
+    def new_func(*args, **argv):
+	# なにかしら追加の処理
+	return func(*args, **argv)  
+    return new_func
+
+# ---------------------------------
+# 引数を取るデコレータ
+# ---------------------------------
+@decorator2("arg1", "arg2")
+def func(a)
+    ...
+    ↓ これとほぼ同じ
+
+func = decorator2("arg1", "arg2")(func)
+
+この形のデコレータは、呼び出した結果引数無しのデコレータを返す関数？？
+```
