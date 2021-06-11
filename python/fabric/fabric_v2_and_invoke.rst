@@ -150,6 +150,12 @@ sudo()の認証の認証周りで失敗した場合には、 ``AuthFailure`` が
   - 無理矢理 ``c.config.sudo.password = 'hogehoge'`` とする
   - コマンドラインで ``--prompt-for-sudo-password`` を付けると、
     実行に先立ちプロンプトが出て入力でき、それがセットされる
+  - fabfile.py と同じ場所に fabric.yaml を作り、下記の内容を記載::
+
+      ---
+      sudo:
+        password: 'wveF}bWNYp4Wsu6m'
+    
 
 - sudoメソッドのpassword引数で指定::
 
