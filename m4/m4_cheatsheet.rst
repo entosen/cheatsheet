@@ -455,6 +455,23 @@ n番目の引数を取り出すマクロ::
     changequote({,})dnl
     define({argn}, {ifelse($1, 1, {$2}, {argn(decr($1), shift(shift($@)))})})dnl
 
+関数定義をまとめてするときに、空行とかを出力しないようにする::
+
+    divert(-1)dnl 出力は捨てられる
+
+    関数定義など
+    空行いくら開けても良い。
+
+    divert(0)dnl 再度出力されるようになる。
+
+もしくは::
+
+    ifelse(dnl 出力抑制のため
+
+    関数定義など
+    空行いくら開けても良い。
+
+    )dnl
 
 その他有用なスクリプトが、
 `本家のマニュアル <https://www.gnu.org/software/m4/manual/>`__ の
