@@ -167,7 +167,7 @@ pip
 python -m pip
 py -m pip          # windwos の場合、これがおすすめ。どのバージョンのpythonにpipするかわかりやすい
 
-py -m php -V       # どのpythonバージョンのpipが起動するか確認
+py -m pip -V       # どのpythonバージョンのpipが起動するか確認
 
 
 py -m pip freeze               # インストールされているパッケージ一覧を表示
