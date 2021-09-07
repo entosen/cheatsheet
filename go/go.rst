@@ -29,6 +29,12 @@ TODO
 
 - errors.New(""), fmt.Errorf("xxxx")
 
+- 予約語
+https://golang.org/ref/spec#Keywords
+
+- init関数
+
+
 ========================
 基本
 ========================
@@ -41,6 +47,9 @@ TODO
 
 
 TODO リファレンスとか
+
+- https://github.com/golang/go/wiki/SliceTricks
+- https://golang.org/ref/spec#Slice_expressions
 
 
 -----------------
@@ -245,6 +254,16 @@ c.f. 右辺がリテラルだったらある程度型変換が効くっぽい。
     var u uint = uint(f)
 
 
+文字列
+---------------------
+
+::
+
+    "abcde\n"
+
+    // raw string literal (バックスラッシュを特殊解釈しない)
+    `ab"cde"\n`     
+
 ポインタ
 ---------------------
 
@@ -310,12 +329,15 @@ structの初期値・structリテラル::
 配列::
 
     // 配列
-    var a [2]string
+    var a [2]string    // この時点では配列の各要素はゼロ値
     a[0] = "Hello"
     a[1] = "World"
 
     // 配列の初期化・配列リテラル
     primes := [6]int{2, 3, 5, 7, 11, 13}
+    primes := [6]int{1: 3, 3: 7}  // インデックスと値を指定。指定が無い場合はゼロ値
+
+    primes := [...]int{2, 3, 5, 7, 11, 13}   // 配列の長さを推論
 
 スライス::
 
@@ -332,6 +354,7 @@ structの初期値・structリテラル::
     // スライスリテラル
     // 同様の(無名の？)配列を作成し、それを参照するスライスを作成する
     q := []int{2, 3, 5, 7, 11, 13}
+    q2 := []int{1: 3, 3: 7}  // インデックスと値を指定。指定されなかった箇所はゼロ値
     r := []bool{true, false, true, true, false, true}
     s := []struct {
         i int
@@ -394,10 +417,29 @@ structの初期値・structリテラル::
 - capを超えるような追加をした場合には、より大きいサイズの配列を割り当て直す。
   その場合、戻り値となるスライスは、新しい割当先を指す
 
+スライスの連結::
+
+    src1, src2 := []int{1, 2}, []int{3, 4, 5}
+    dst := append(src1, src2...)   // この ``...`` が重要。引数として展開？
+    // → [1, 2, 3, 4, 5]
+
+スライス操作::
+
+    // 要素を除く
+    src := []int{1, 2, 3, 4, 5}
+    i := 2
+    dst := append(src[:i], src[i+1:]...)   // [1, 2, 4, 5]
+
+    dst = src[:i+copy(src[i:], src[i+1:])]  // これでもいけるらしいが よくわからん
+
+TODO copy
 
 
 Map, マップ
 ------------------------------
+
+- キーの型には、比較演算子で比較ができるもの
+- 順序は保持されない
 
 ::
 
@@ -405,10 +447,15 @@ Map, マップ
     var m map[string]int    // map[キーの型]値の型
 
     // この状態では中身は nil 
-    // nilマップはキーを持っておらず、キーを追加することもできない
+    // nilマップはキーを持っておらず、キーを追加することもできない。
+    // (要素数の取得(0)、キーの存在チェック、キーの削除は可能らしい。)
 
-    // makeで初期化(キーを追加できる状態にする)
+    // 空で初期化
+    m = map[string]int{}
+
+    // makeで初期化(キーを追加できる状態にする) 要素数0。
     m = make(map[string]int)
+    m = make(map[string]int, 10)  // あらかじめ容量を確保した状態で初期化
 
     // マップリテラル
     var m = map[string]int{
@@ -421,6 +468,7 @@ mapの操作::
 
     // 要素の参照(のコピー)
     i := m["Three"]
+    // キーが存在しない場合は、要素型のゼロ値が返る
 
     // キーが存在するかどうか
     elem, ok := m["Five"]  // キーあり: elem=その値のコピー, ok=true
@@ -477,6 +525,11 @@ mapリテラルで、要素の型が単なる型名だった場合、リテラ�
 
 関数, Function
 ==========================
+
+TODO
+
+- 関数の中に関数を書けるか？
+
 
 関数定義::
 
@@ -802,7 +855,12 @@ for(スライスやmapの要素をループ)::
     for i := range pow
 
 - 1つ目の変数は、インデックス(もしくはキー)
-- 2つ目の変数は、値のコピー
+- 2つ目の変数は、値の **コピー**  (v は宣言されているし。)。
+  なので v を変更しても元のスライスの中身は変更されない。
+  vのポインタを返すようなケースも注意。
+- 2つ目の変数vは、ループの旅に定義されるのではなく、
+  ループに先立ち定義された1つが使い回される。
+  vの要素のポインタを返したりする場合、その中身がループで変わっていくので注意。
 
 if::
 
@@ -891,3 +949,196 @@ package, import
     import "fmt"
     import "math"
 
+
+
+エラー処理, error
+==========================
+
+参考
+--------
+
+- `Error handling and Go - The Go Blog <https://blog.golang.org/error-handling-and-go>`__
+
+error interface
+---------------------
+
+関数からエラーを返す場合は、下記のように、
+2つ目の返り値(もしくは値を返さない関数の場合は唯一の返り値)で、
+error型(interface)を返すのが標準っぽい。::
+
+    func Open(name string) (file *File, err error)
+
+呼び出し側でのエラー処理としては、err != nil で分岐するのが標準っぽい。::
+
+    f, err := os.Open("filename.ext")
+    if err != nil {
+        log.Fatal(err)
+    }
+    // do something with the open *File f
+
+error interface の定義。stringを返す Error() メソッドを持って入れば満たす。::
+
+    // cf. https://golang.org/pkg/builtin/#error
+    type error interface {
+      Error() string
+    }
+
+logとかfmt.Print系とかは、error型の表示の仕方を知っているのでそのまま渡せば良い
+(多分、内部で Error() を呼んでいる)
+
+::
+
+    log.Fatal(err)
+    fmt.Println(err)
+
+
+errorの作り方
+---------------------
+
+error interface を満たす値の作り方。
+
+errors.New()。(内部的には ``*errorString`` 型というのになっている) ::
+
+    errors.New("some message")
+
+    // 下記だと Printf の構文が使える
+    fmt.Errorf("math: square root of negative number %g", f)
+
+
+独自のエラー型を定義::
+
+    type SyntaxError struct {
+        msg    string // description of error
+        Offset int64  // error occurred after reading Offset bytes
+    }
+
+    func (e *SyntaxError) Error() string { return e.msg }
+
+
+error を内包した独自interfaceを定義して、そこから作るってこともある。::
+
+    // net.Error の例
+    type Error interface {
+        error
+        Timeout() bool   // Is the error a timeout?
+        Temporary() bool // Is the error temporary?
+    }
+
+
+エラー処理
+------------------------
+
+nil と比較::
+
+    f, err := os.Open("filename.ext")
+    if err != nil {
+        log.Fatal(err)
+        // return, 異常終了するなど。
+    }
+    // do something with the open *File f
+
+errorの実際の型によって処理を分ける::
+
+    if err := dec.Decode(&val); err != nil {
+        if serr, ok := err.(*json.SyntaxError); ok {
+            line, col := findLine(f, serr.Offset)
+            return fmt.Errorf("%s:%d:%d: %v", f.Name(), line, col, err)
+        }
+        return err
+    }
+
+TODO switch で分かれる例も。
+
+
+
+Wrapされたエラー
+-------------------------------
+
+Go 1.13 (17 October 2019) から、error の wrap という仕組みが入った。
+
+参考
+
+- `Working with Errors in Go 1.13 - The Go Blog <https://blog.golang.org/go1.13-errors>`__
+- `errors · pkg.go.dev <https://pkg.go.dev/errors#example-package>`__
+
+
+ある error を内包する error。 「Wrapしている」
+
+たとえば、ライブラリからエラーが返ってきた場合に、
+それに追加の情報(渡した引数とか)を付与した形で返したいときがある。
+そういうときに使う。
+
+数珠つなぎに何重にもwrapすることもできる。
+
+
+代表的な作り方 ``fmt.Error("%w", err)`` では下記のような形になっている::
+
+    type wrapError struct {
+            msg string
+            err error
+    }
+
+    func (e *wrapError) Error() string {
+            return e.msg
+    }
+
+    func (e *wrapError) Unwrap() error {
+            return e.err
+    }
+
+
+これ以外でも、下記の Unwrap() メソッドを持っていれば、別なerrorをwrapしているとみなされる::
+
+    Unwrap() error   // 内包するエラーを返す
+
+
+``errors.Is``   値との比較::
+
+    var ErrNotFound = errors.New("not found")
+
+    // 従来の書き方。 err が wrap されていると満たさない
+    if err == ErrNotFound {
+        // something wasn't found
+    }
+
+    // wrapに対応した新しい書き方
+    if errors.Is(err, ErrNotFound) {
+        // something wasn't found
+    }
+
+
+``errors.As``   型との比較::
+
+    // 従来の書き方。 err が wrap されていると満たさない
+    if e, ok := err.(*NotFoundError); ok {
+        // e.Name wasn't found
+    }
+
+    // wrapに対応した新しい書き方
+    var e *QueryError
+    if errors.As(err, &e) {
+        // err が QueryError もしくはそれをwrapしたものであれば成り立ち、
+        // e に値がセットされる
+    }
+
+
+``errors.Unwrap`` ::
+
+    w := errors.Unwrap(err)
+    // err を1段階wrapする。
+    // err が Unwrap() メソッドを持っていない場合は nil が返る
+
+
+wrapしたエラーの作り方::
+
+    fmt.Error("..... %w .....", errOrig)
+    // %w があると errOrig をwrapしたものが返る
+    // メッセージ (Error()で返る値は %w -> %v に読み替えてできるもの)
+
+
+
+
+
+
+TODO
+errors.Is, errors.As の動作を拡張する、Is,As メソッド
