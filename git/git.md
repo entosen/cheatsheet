@@ -281,11 +281,83 @@ git mv oldfile newfile   # ファイル名の変更
 
 # remote
 
+リモートリポジトリを管理する - GitHub Docs
+https://docs.github.com/ja/github/getting-started-with-github/getting-started-with-git/managing-remote-repositories
+
 複数の remote をあつかう。
 ```
 git remote -v   # 確認
 git remote add remoteName remoteUrl
 git remote -v   # 確認
+```
+
+remote の向き先を変えたくなった場合、
+(例えば、github の https プロトコルで clone/push していたものを、sshでのプロトコルに変更する)
+
+```
+git remote set-url origin git@github.com:USERNAME/REPOSITORY.git
+```
+
+
+プロトコル
+
+- Git - プロトコル
+https://git-scm.com/book/ja/v2/Git%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC-%E3%83%97%E3%83%AD%E3%83%88%E3%82%B3%E3%83%AB
+- 個人アクセストークンを使用する - GitHub Docs
+https://docs.github.com/ja/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token
+
+
+Localプロトコル(同じディスク上。ディレクトリのコピーみたいな感じ)
+```
+git clone /opt/git/project.git
+git clone file:///opt/git/project.git
+```
+HTTPプロトコル(認証が要求されるのは必要なときだけ。その場合アクセストークンでの認証。)
+```
+git clone https://example.com/gitproject.git
+```
+SSHプロトコル(接続のために認証が必要)
+```
+git clone ssh://user@server/project.git
+git clone user@server:project.git
+```
+gitプロトコル(9418番ポート。読み込みのみ？)
+```
+git://servername.com/hogerepo/repo.git
+```
+
+(Tips) github には、443番ポート(https用のポート)で、ssh プロトコルを待ち受けているホストがある。
+ssh.github.com 。
+ここを使えば、22番ポート(ssh用のポート)がファイアーウォールで閉じられている場合でも、
+443番ポートを通ってssh通信でclone/pushができる。
+
+ssh の config に下記のように設定
+```
+Host github.com
+  HostName ssh.github.com
+  User git
+  Port 443
+```
+
+HTTPS ポートを介して SSH を使用する - GitHub Docs
+https://docs.github.com/ja/github/authenticating-to-github/troubleshooting-ssh/using-ssh-over-the-https-port
+
+(Tips) sshポートをテストする
+```
+ssh -T git@github.com
+
+下記が返ってくればOK
+> Hi username! You've successfully authenticated, but GitHub does not
+> provide shell access.
+
+443番ポートなら通るかを確認する
+ssh -T -p 443 git@ssh.github.com
+```
+
+ssh用の秘密鍵/公開鍵の作り方例
+```
+ACCOUNT=自分のgitアカウントを入れる。
+ssh-keygen -t ed25519 -f ~/etc/key/${ACCOUNT}_github_com-$(date '+%Y-%m-%d') -C "${ACCOUNT}@github.com - $(date '+%Y-%m-%d')"
 ```
 
 # .gitignore
@@ -496,3 +568,7 @@ cygwinなど、パーミッションを適切に扱えない環境から、パ�
 git update-index --chmod=-x path/to/file
 git update-index --chmod=+x path/to/file
 ```
+
+# github 特有
+
+
