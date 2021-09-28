@@ -103,7 +103,11 @@ run()
             hide='err' (or 'stderr') : stderrを出力しない
             hide='both' (or True)    : 両方出力しない
             hide=None (default)      : 両方出力する
+            hide=False               : 両方出力する
             この指定にかかわらず、stdout,stderr は、Result に保存される
+
+        command 自体を表示する
+            echo=True
 
 
 run()の結果 Result
