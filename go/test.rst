@@ -134,26 +134,89 @@ interface を元にmockを作成しテストを実行する。
 参考
 
 - `golang/mock: GoMock is a mocking framework for the Go programming language. <https://github.com/golang/mock>`__
-
+- https://pkg.go.dev/github.com/golang/mock/gomock
 
 概要
 ==========
 
 インストール::
 
+    # この変の違いがまだよくわからん...。
+
+    go install github.com/golang/mock/mockgen@v1.6.0
+
     go get github.com/golang/mock/gomock
     go get github.com/golang/mock/mockgen
 
+
+go では基本的に interface しか mock化できないっぽい。
+
+本体コード::
+
+    type Foo interface {
+      Bar(x int) int
+    }
+
+    func SUT(f Foo) {
+     // ...
+    }
+
+テストコード::
+
+    func TestFoo(t *testing.T) {
+      ctrl := gomock.NewController(t)
+
+      // Assert that Bar() is invoked.  
+      // 指定回数モックが呼び出されたとこを検証するために呼び出す。
+      defer ctrl.Finish()
+
+      m := NewMockFoo(ctrl)   // mockgen によってこの関数が用意される
+
+      // Asserts that the first and only call to Bar() is passed 99.
+      // Anything else will fail.
+      m.
+        EXPECT().
+        Bar(gomock.Eq(99)).
+        Return(101)
+
+      SUT(m)
+    }
+
 mockの生成
+=====================
 
-- mock を固めて入れる mock ディレクトリを作っておくのがいい
+mock を固めて入れる mock ディレクトリを作っておくのがいい::
 
-::
+    cmd/
+    internal/
+        hoge/foo.go
+    mock/                  <-- ここ
+        hoge/foo.go        <--  mock/ 以下に同じパス・ファイル名で作るのがよさそう
 
-    mockgen -source=sample.go -destination mock/mock_sample.go
+    たいていは、別な mock ディレクトリ以下に、
+    本体と同じディレクトリ・ファイル名で格納するっぽい。
+
+生成
+
+自前でコマンド打つ場合。::
+
+    mockgen -source=hoge/foo.go -destination mock/hoge/foo.go
+    mockgen -source=hoge/foo.go -destination mock/foo.go
+
+ファイルにコメントに書いておいて、自前でやる場合::
+
+    該当ファイルにこんなコメントを書いておく。
+    -distination の指定は、そのファイルが置いてある場所基準に書けばよいっぽい。
+
+        //go:generate mockgen -source=$GOFILE -destination ../mock/foo.go
+
+    Makefileにこんな感じで入れておいて使う
+        mockgen:
+            go generate ./...
 
 
 mockを使ったテストの実装
+========================================
 
 ::
 
@@ -188,13 +251,161 @@ mockを使ったテストの実装
 
 testcase を作ってループさせる場合は、
 mockオブジェクトを受け取って、expectなどをセットする無名関数を
-testcase に含めるのがいいと思う。
+testcase に含めるのがいいと思う。::
+
+    testcases := []struct{
+        name string
+        setMock func(*mock.MockFoo)
+    }{
+        {
+            name: "test1",
+            setMock: func(m *mock.MockFoo) {
+                mc.EXPECT().SUT('aaa').Return("hoge", nil)
+            },
+        }
+    }
+
+
+MockやStubの指定の仕方, gomock
+====================================
+
+internal/hoge/foo.go::
+
+    package hoge
+
+    type Foo interface {
+         Bar(x int) int
+    }
+
+    func SUT(f Foo) {
+        // ...
+    }
+
+
+mock/hoge/foo.go (自動生成)::
+
+    package mock_hoge
+
+    func NewMockFoo(ctrl *gomock.Controller) *MockFoo {
+        ...
+    }
+
+- package 名は、もともとのものの前に ``mock_`` が付く
+- モックを生成する関数は interface 名の前に ``NewMock`` が付く
+
+
+モックを使う::
+
+    import (
+        "testing"
+
+        "github.com/golang/mock/gomock"
+
+        // 作ったモックをimport
+        mock_hoge "example.com/go-mock-sample/mock/hoge"
+    )
+
+    func TestSample(t *testing.T) {
+
+        ctrl := gomock.NewController(t)
+        // ↓これをやることで、モックが指定回数呼ばれたことをassertion
+        defer ctrl.Finish()
+     
+        m := mock_hoge.NewMockFoo(ctrl)
+
+        // Bar(99) が1回だけ呼ばれることをassert、それ以外は fail になる。
+        m.
+            EXPECT().
+            Bar(gomock.Eq(99)).
+            Return(101)
+
+        SUT(m)
+    }
+
+
+スタブ
+
+モックの場合とほぼほぼ同じ。
+
+最後に ``.AnyTimes()`` を呼んでおけば、何回呼ばれてもassertionにならない。
+(つまりスタブになる)
+
+::
+
+    m.
+      EXPECT().
+      Bar(gomock.Eq(99)).
+      DoAndReturn(func(_ int) int {
+        time.Sleep(1*time.Second)
+        return 101
+      }).
+      AnyTimes()
 
 
 
-MockやStubの指定の仕方
-============================
+
+
+モックの指定の仕方
+=============================
+
+
+Matcher
+--------------
+
+::
+
+    // mockのメソッドがどういう引数で呼ばれるか
+    m.EXPECT().Bar(gomock.Eq(99)).Return(101)
+               ^^^^^^^^^^^^^^^^^^
+
+	.Put("a", 1)                      // 期待する引数をそのまま書いてもよい
+	.Put("b", gomock.Eq(2))           // gomock.Eq() を使ってもよい
+
+        .Bar(gomock.Any())                // なんでもいい場合。
+
+
+return
+-----------------
+
+::
+
+    .Return(101)   // 単純に固定の値を返せばよいとき
+
+    // 渡された引数に応じた値を返したいとき
+    .DoAndReturn(func(s string, i int) int {
+            return (引数に応じた式など)
+        })
+
+
+呼ばれる回数
+-----------------
+
+デフォルトでは1回きっかり。
+
 
 ::
 
     TODO
+    .Times(2)     // 2回きっかり
+    .AnyTimes()   // 何回呼ばれてもよい。呼ばれなくてもよい。 (0回以上)
+
+呼ばれる順番
+-----------------
+
+デフォルトでは、呼ばれる順番は問わない。
+
+順序を指定する場合::
+
+    // InOrder を使う方法
+    gomock.InOrder(
+        mockObj.EXPECT().SomeMethod(1, "first"),
+        mockObj.EXPECT().SomeMethod(2, "second"),
+        mockObj.EXPECT().SomeMethod(3, "third"),
+    )
+
+    // After を使う方法
+    firstCall := mockObj.EXPECT().SomeMethod(1, "first")
+    secondCall := mockObj.EXPECT().SomeMethod(2, "second").After(firstCall)
+    mockObj.EXPECT().SomeMethod(3, "third").After(secondCall)
+
+
