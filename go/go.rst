@@ -642,6 +642,34 @@ TODO
 - c.f. 上記の解釈はレシーバーに限った話で、引数ではそうは解釈されない
   (ポインタにはポインタを渡す必要がある)
 
+どちらがいいのか。
+
+https://github.com/golang/go/wiki/CodeReviewComments#receiver-type
+
+- map, func, chan はポインタレシーバーを使うな
+- メソッドでresliceやreallocateしないスライスは、ポインタレシーバーを使うな
+- メソッドがレシーバーを変更する場合、ポインタレシーバーでなければならない
+- sync.Mutexなどの同期フィールドを持っているstructの場合、
+  コピーを避けるために、ポインタレシーバーでなければならない
+- 大きいstructやarrayの場合、ポインタレシーバーが効率的。どれぐらいの大きさかって？
+  それらを全てメソッドの引数で渡すと想定したときに、多いと感じるようであれば大きいと考える。
+- Can function or methods, either concurrently or when called from this method,
+  be mutating the receiver?
+  A value type creates a copy of the receiver when the method is invoked,
+  so outside updates will not be applied to this receiver.
+  If changes must be visible in the original receiver, the receiver must be a pointer.
+- レシーバーがstruct,array,sliceで、その要素に変更される何かへのポインタを持っている場合、
+  ポインタレシーバーが好ましい。(読み手に意図を伝えやすくする観点から)
+- レシーバーが自然な値型だけを含む小さいarrayやstructで、
+  かつ変更されるフィールドがなく、ポインタも含まない場合、
+  もしくは、単にstringやintなどの基本型の場合、
+  値レシーバーが意味を持つ。
+  値レシーバーはゴミの量を減らす可能性がある。ただし、まずプロファイリングをやってから選択しろ。
+- 1つの型にポインタレシーバーと値レシーバーを混ぜるな。どちらかに統一。
+- 最後に、迷っているなら、ポインタレシーバーを使っておけ
+
+
+
 
 struct型だけでなく、任意の型にメソッドが定義できる
 
