@@ -207,6 +207,16 @@ factordスタイル::
 
 数値の定数は、高精度な値。リテラルのまま扱っているようなもの？？？
 
+厳密に言うと、定数には
+
+- untyped なものと typed なものがある
+- デフォルト型というのを持っている
+
+詳しくは、下記を参照
+
+- https://golang.org/ref/spec#Constant_expressions
+- `Go の定数の話 - Qiita <https://qiita.com/hkurokawa/items/a4d402d3182dff387674>`__
+
 
 型
 ==========================
@@ -630,6 +640,121 @@ select::
     }
 
 ブロックしない。
+
+
+型についていろいろ
+================================
+
+TODO
+
+- type した場合、別な型ということになる。メソッドも引き継がれない
+
+
+
+type 構文
+--------------------
+
+type構文。Defined type ::
+
+    // type <defined type> <underlieing type>
+
+    type MyKey int
+
+    type UserData stuct {
+        Name string
+        Age  int
+    }
+
+- type構文によって作った型は、完全に別な型ということになる。メソッドも引き継がれない
+
+  - 元の型とも別な型
+  - 同じ元の型から作った2つの新しい型も、それぞれ別の型扱い
+
+- type構文によって作った型は defined type と呼ばれる。
+
+  - 実は int とか string も defined type らしい。TODO
+
+
+alias構文 (エイリアス構文) ::
+
+    type NewTypeName = OldTypeName
+
+- エイリアスの場合、別名で同じ型を表すだけなので、
+  同じ型として扱われるし、メソッドも同じように使える。
+- 主にリファクタリング目的。
+  型の名前を変えるようなリファクタリングを徐々にやりたい場合に、
+  一旦両方の名前で使えるようにするなど。
+
+参考
+
+- `go言語1.9で追加予定の新機能 型エイリアス - Qiita <https://qiita.com/weloan/items/8abbb4003cfa1031a9e9>`__
+
+
+
+
+Assignability (代入可能)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+参考
+
+- https://golang.org/ref/spec#Assignability
+- `Goの型同一性を理解する <https://zenn.dev/syumai/articles/77bc12aca9b654>`__
+
+x が T に Assignable (代入可能) とは、下記のどれか1つを満たす場合
+
+- x の型が T に等しい
+- xの型V と T が、同一の underlying types を持っており、かつ、少なくとも V か T が defined type でない。
+  
+  - defined type というのは ``type`` で定義した型ということ::
+
+        ``type [defined type] [underlying type]`` 
+
+  - 加えて、言語仕様上特別に(?)、int,floatなどの数値型、string型も defined type ということになっている
+
+- Tがinterface型で、xがTを implement している (そのinterfaceを満たしている＝必要なメソッドを持っている)
+- x が双方向チャネル値で、Tがチャネル型で、xの型V と T が同一の要素型を持っており、かつ、少なくとも V か T が defined type でない
+- x が nil で、Tが ポインタ、関数、スライス、マップ、チャネル、インターフェースのどれか
+- x が untyped constant で、Tの値によって表現可能(representable)
+
+
+Representability (定数がある型で表現可能)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+https://golang.org/ref/spec#Representability
+
+
+Comparable 比較可能, Ordered 順序可能, Equality 等価性
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+https://golang.org/ref/spec#Comparison_operators
+
+まず、比較するにあたっては、 x は yの型 に Assignable、もしくは、 y は xの型に Assignable でなければならない。
+(違ったら invalid operation でコンパイルエラー)
+
+用語
+
+- comparable 比較可能 ( ``==``, ``!=`` )
+- ordered 順序可能 ( ``<``, ``>``, ``<=``, ``>=``
+
+ルール
+
+- bool値同士は比較可能。true同士とfalse同士が等しいと判定される
+- 整数値(int, int64など)整数値同士は比較可能 かつ ordered 。
+- 浮動小数点値(float32, float64)同士は比較可能 かつ ordered 。
+- 複素数値同士は比較可能 であり、2つの複素数の実部と虚部が共に等しい場合に等しいと判定される
+- 文字列値同士は比較可能 かつ ordered 。byte-wiseの辞書順で。
+- ポインタ値同士は比較可能 であり、「どちらも同じ変数を指している場合」と「どちらもnilである場合」に等しいと判定される。
+  (中身が同じでも違う変数を指していれば、違うと判定される)
+- チャネル値同士は比較可能 であり、「どちらも同様のmake文から作られている場合」と「どちらもnilである場合」に等しいと判定される
+- インターフェース値同士 は比較可能 であり、「どちらも同じdynamic type・等しいdynamic valueを持つ場合」と「どちらもnilである場合」に等しいと判定される
+- 非インターフェース型の型Xの値xと、インターフェース型Tの値tは、
+  「型X(同士)が比較可能 であり、かつ、XがインターフェースTを実装している場合」に比較可能 である。
+  「tのdynamic type が X と同じであり、ｔのdynamic valueがx等しい場合」に等しいと判定される
+- 構造体型はすべてのフィールドが比較可能である場合にそれ自身も比較可能となり、それぞれの対応するnon-blankなフィールドの値が等しい場合に2つの構造体値が等しいと判定される
+- 配列型は、その配列の基底型が比較可能である場合にそれ自身も比較可能となり、全ての配列要素が等しい場合に2つの配列値は等しいと判定される
+- ポインタ、チャネル、インターフェースは nil とも比較可能
+- スライス、マップ、関数値は比較可能ではない。しかし特殊ケースとして、nil とは比較可能
+
 
 
 関数, Function
