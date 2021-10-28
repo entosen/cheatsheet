@@ -2,6 +2,17 @@
 context.Context
 ###################################
 
+Contextの基本
+=======================
+
+参考
+
+- `golang contextの使い方とか概念(contextとは)的な話 - Qiita <https://qiita.com/marnie_ms4/items/985d67c4c1b29e11fffc>`__
+- `Go Concurrency Patterns: Context - go.dev <https://go.dev/blog/context>`__
+- `context package - context - pkg.go.dev <https://pkg.go.dev/context@master>`__
+- `よくわかるcontextの使い方 <https://zenn.dev/hsaki/books/golang-context>`__
+
+
 Goルーチンに親子関係はない (c.f. プロセスのforkは親子関係がある)。
 親がキャンセルされた(タイムアウトとか、コネクションが閉じられたとか)場合、
 子孫のgoルーチンも止めたい。そういう場合の仕組み。
