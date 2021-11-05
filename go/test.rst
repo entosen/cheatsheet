@@ -88,6 +88,27 @@ DataProviderみたいなことは自前でやらないといけない::
         }
     }
 
+スライスではなく map でテストケースを持たせる場合::
+
+        tests := map[string]struct{
+            args args
+            want int
+        }{
+            "テスト名1": {
+                args: args{a:1, b:2},
+                want: 30,
+            },
+            "テスト名2": {
+                args: args{a:1, b:4
+                want: 40
+            },
+        }
+
+        for k, tc := range tests {
+            t.Run(k, func(t *testing.T) {
+                (省略)
+            })
+        }
 
 
 
@@ -123,6 +144,15 @@ testing には assertion は用意されていない。
 
     t.Fatalf, t.Errorf
 
+
+Tips
+============================
+
+Goは、単純なstruct同士なら、中身を比較してくれる。
+
+ただし、{slice, map, 関数}、それらをを含む struct は単純な ``!=`` では比較できない。
+
+その場合は ``reflect.DeepEqual(a, b)`` を使う。
 
 
 ********************
