@@ -197,3 +197,16 @@ yum makecache fast
 
 
 ```
+
+
+
+
+# apt (Debiun系)
+
+```
+apt list              # インストールできるすべてのパッケージ一覧
+apt list --installed  # インストール済のパッケージ一覧
+
+```
+
+
