@@ -14,7 +14,7 @@ nvm
 
 標準のインストール方法 (ただし後述の問題があるので、これはやらない) ::
 
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.0/install.sh | bash
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 
     .bashrc に以下のような記述が挿入される。
         export NVM_DIR="$HOME/.nvm"
@@ -27,7 +27,7 @@ nvm
 
 .bashrcなどをいじらない指定(PRFILE=/dev/null)をしてインストール::
 
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.0/install.sh | PROFILE=/dev/null bash
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | PROFILE=/dev/null bash
 
 .bashrc などに以下の記述を追加::
 
@@ -111,6 +111,53 @@ nvm
     npm --version
     echo $PATH
     printenv | grep NVM
+
+
+普通は、node と npm がセットで入る(例えば、 node-v14系 と npm-6系 がセットで入る)。
+もし、npmだけそれよりも新しいものを使いたい場合、下記どちらかで ::
+
+    # 現在のnode環境の npmを、その環境をサポートしている最新の npm にアップグレードする
+    nvm install-latest-npm
+
+    # インストール時に --latest-npm を付けると、インストール作業後に npm を最新にする
+    nvm install <version> --latest-npm
+
+※上記 ``nvm install-latest-npm`` が WSL1 の環境だと下記のようになり、
+うまくいかなかった。::
+
+    Attempting to upgrade to the latest working version of npm...
+    * Installing latest `npm`; if this does not work on your node version, please report a bug!
+    npm ERR! code EACCES
+    npm ERR! syscall rename
+    npm ERR! path /home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/npm-6e367097/node_modules/string-width
+    npm ERR! dest /home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/string-width-fb5376b2
+    npm ERR! errno -13
+    npm ERR! Error: EACCES: permission denied, rename '/home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/npm-6e367097/node_modules/string-width' -> '/home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/string-width-fb5376b2'
+    npm ERR!  [OperationalError: EACCES: permission denied, rename '/home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/npm-6e367097/node_modules/string-width' -> '/home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/string-width-fb5376b2'] {
+    npm ERR!   cause: [Error: EACCES: permission denied, rename '/home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/npm-6e367097/node_modules/string-width' -> '/home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/string-width-fb5376b2'] {
+    npm ERR!     errno: -13,
+    npm ERR!     code: 'EACCES',
+    npm ERR!     syscall: 'rename',
+    npm ERR!     path: '/home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/npm-6e367097/node_modules/string-width',
+    npm ERR!     dest: '/home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/string-width-fb5376b2'
+    npm ERR!   },
+    npm ERR!   errno: -13,
+    npm ERR!   code: 'EACCES',
+    npm ERR!   syscall: 'rename',
+    npm ERR!   path: '/home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/npm-6e367097/node_modules/string-width',
+    npm ERR!   dest: '/home/<username>/.nvm/versions/node/v14.18.2/lib/node_modules/.staging/string-width-fb5376b2'
+    npm ERR! }
+    npm ERR! 
+    npm ERR! The operation was rejected by your operating system.
+    npm ERR! It is likely you do not have the permissions to access this file as the current user
+    npm ERR! 
+    npm ERR! If you believe this might be a permissions issue, please double-check the
+    npm ERR! permissions of the file and its containing directories, or try running
+    npm ERR! the command again as root/Administrator.
+
+    npm ERR! A complete log of this run can be found in:
+    npm ERR!     /home/<username>/.npm/_logs/2021-12-01T04_29_17_648Z-debug.log
+
 
 
 仕組み
