@@ -120,7 +120,7 @@ nvm
     nvm install-latest-npm
 
     # インストール時に --latest-npm を付けると、インストール作業後に npm を最新にする
-    nvm install <version> --latest-npm
+    nvm install --latest-npm <version>
 
 ※上記 ``nvm install-latest-npm`` が WSL1 の環境だと下記のようになり、
 うまくいかなかった。::
