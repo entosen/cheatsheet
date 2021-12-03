@@ -26,6 +26,8 @@ testing
 
 サンプルコード ::
 
+    package hoge  // 普通は本体コードと同じにする
+
     import (
         "testing"
     )
@@ -439,3 +441,45 @@ return
     mockObj.EXPECT().SomeMethod(3, "third").After(secondCall)
 
 
+
+********************
+testify
+********************
+
+golang でテストをより記述しやすくするためのパッケージ。
+
+- assert 系の関数が用意されている
+
+
+aseert
+=================
+
+https://pkg.go.dev/github.com/stretchr/testify/assert
+
+::
+
+    import (
+      // ... 他の必要なパッケージ
+      "github.com/stretchr/testify/assert"
+    )
+
+    func TestSomething(t *testing.T) {
+      var a string = "Hello"
+      var b string = "Hello"
+      assert.Equal(t, a, b, "The two words should be the same.")
+    }
+
+    // assert に t をいちいち渡すのが面倒な場合
+    func TestSomething(t *testing.T) {
+      assert := assert.New(t)    # <-- 注目
+      var a string = "Hello"
+      var b string = "Hello"
+      assert.Equal(a, b, "The two words should be the same.")
+    }
+
+
+::
+
+    assert.Equal(t, expented, actual)
+
+    assert.Panics(t, func(){ GoCrazy() })
