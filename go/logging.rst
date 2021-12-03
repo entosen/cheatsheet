@@ -266,3 +266,50 @@ Entry, Fields::
       }
 
       ↑では MyLogger と書いたけど、 log という名前で扱うのが推奨らしい。
+
+
+Hook, フック
+---------------------
+
+ロギングの際に、追加の処理を行わせたい場合、Hookを追加することで可能。
+
+- https://github.com/sirupsen/logrus#hooks
+- https://github.com/sirupsen/logrus/blob/master/hooks.go
+
+::
+
+    type Hook interface {
+        Levels() []Level     // 自分のFireを読んで欲しいログレベルを指定する
+        Fire(*Entry) error   // このFireが呼ばれるので、実際の処理を実装する
+    }
+
+
+例) WarnとError以上のログを出力した回数をカウントアップするフック::
+
+    type countUpHook struct{}
+
+    func (hook countUpHook) Fire(e *logrus.Entry) error {
+        if e.Level == logrus.WarnLevel {
+            metrics.WarnLogCounter.Inc()
+        } else {
+            metrics.ErrorLogCounter.Inc()
+        }
+        return nil
+    }
+
+    func (hook countUpHook) Levels() []logrus.Level {
+        return []logrus.Level{
+            logrus.WarnLevel,
+            logrus.ErrorLevel,
+            logrus.FatalLevel,
+            logrus.PanicLevel,
+        }
+    }
+
+    // --- 登録
+    func init() {
+      hook := countUpHook{}
+      logrus.AddHook(hook)
+    }
+
+
