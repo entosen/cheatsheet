@@ -1048,6 +1048,25 @@ Goだと、interface型の型名に -er って付けるのが一般的？ Abser,
 インターフェース型の値は (値, 型) ようなもの。
 型がわかっているので、その型のメソッドが呼ばれる
 
+
+interface定義の中に、別のinterfaceを埋め込むことができる::
+
+    type BaseInterface interface {
+        func1()
+        func2()
+    }
+
+    type SecondInterface interface {
+        BaseInterface
+        func3()
+    }
+
+    // SecondInterface を満たすには、
+    // func1(), func2(), func3() を持っていないといけない。
+
+
+
+
 nilの変数をinterfaceに代入した場合::
 
     var p *Vertex    // *Vertex型だけど初期化されていないので nil 
