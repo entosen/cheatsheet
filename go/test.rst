@@ -19,9 +19,12 @@ testing
 
 ファイルの置き場
 
-- 本体コードと同じディレクトリ、同じパッケージで、 foo.go というファイル名にする 
+- 本体コードと同じディレクトリ、同じパッケージで、 ``foo_test.go`` というファイル名にする 
 
   - それにより、プライベート(小文字始まり)のメンバ・関数にもアクセス可能になる。
+
+パッケージ内で関数名がぶつかったりする可能性があるので、
+後述の testify/suite パッケージを利用するのもいい。
 
 
 サンプルコード ::
@@ -32,6 +35,7 @@ testing
         "testing"
     )
 
+    // テストコードは Test 始まり
     func TestAbs(t *testing.T) {
         got := Abs(-1)
         if got != 1 {
@@ -483,3 +487,68 @@ https://pkg.go.dev/github.com/stretchr/testify/assert
     assert.Equal(t, expented, actual)
 
     assert.Panics(t, func(){ GoCrazy() })
+
+
+
+
+suite
+================
+
+https://github.com/stretchr/testify#suite-package
+
+
+go test は、関数ベースでできている。(ファイル内のTest始まりの関数をどんどん呼んでいく)。
+
+suite は、他の言語のテストフレームワークのように、テストクラスみたいな考え方。
+
+SetUp/TearDown的なことも可能になる。
+
+::
+
+    import (
+        "testing"
+        "github.com/stretchr/testify/suite"
+    )
+
+    // Suite を1つ用意する
+    type ExampleTestSuite struct {
+        suite.Suite         // お約束
+    }
+
+    // お約束。go test からのcallをSuiteにつなげるためにこれが必要。
+    func TestExampleTestSuite(t *testing.T) {
+        suite.Run(t, new(ExampleTestSuite))
+    }
+
+    // 各テストは、Suite のメソッドとして実装する
+    // receiver変数名、パッケージ名とかぶりそうだけど、こうするのが定番らしい。
+    func (suite *ExampleTestSuite) TestExample() {
+        assert.Equal(suite.T(), 2, 1+1)
+    }
+
+
+アサーションのやり方::
+
+    // suite.T() で *testing.T が取れるので、下記のように assert パッケージを使う
+    assert.Equal(suite.T(), 2, 1+1)
+
+    // suiteで用意されている各assertion関数が、suiteのメソッドとしているのでそれを使う。
+    // しかも T を指定する必要も無い
+    suite.Equal(2, 1+1)
+
+
+suite の中でさらにサブテストをするとき::
+
+    for name, tc := range testcases {
+
+        suite.Run(name, func() {...})
+
+        // cf. Tの場合。
+        t.Run(name, func(t *tesing.T) {...})
+    }
+
+
+
+
+``suite.Suite`` を埋め込んだ struct に、なんらかのメンバ変数を持たせることも可能。
+
