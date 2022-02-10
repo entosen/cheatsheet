@@ -491,6 +491,27 @@ https://pkg.go.dev/github.com/stretchr/testify/assert
 
 
 
+
+    // assert.NoError, assert.Error
+    // これは単に nil interface かそうでないかを判定 cf. assert.Nil, NotNil より狭い)
+    // エラー判定の場合、一般的に interface error を != nil で判定するので、
+    // エラーかどうかの判定をする場合にはこちらを使った方がよい。
+    actualObj, err := SomeFunction()
+    if assert.NoError(t, err) {
+        assert.Equal(t, expectedObj, actualObj)
+    }
+    actualObj, err := SomeFunction()
+    if assert.Error(t, err) {
+        assert.Equal(t, expectedError, err)
+    }
+
+    // こちらは、error型以外の、一般的な値が nil である/でない ことをチェックする場合に使う。
+    assert.Nil(t, obj)
+    assert.NotNil(t, obj)
+        (nil interface か、
+         objが{pointer, function, map, slice, channel, interface} の何らかの型でその中身がnil)
+
+
 suite
 ================
 
@@ -551,4 +572,426 @@ suite の中でさらにサブテストをするとき::
 
 
 ``suite.Suite`` を埋め込んだ struct に、なんらかのメンバ変数を持たせることも可能。
+
+
+
+
+*************************
+httptest
+*************************
+
+- https://pkg.go.dev/net/http/httptest
+
+goで書かれた http serverのコードをテストする
+( ``ServeHTTP(w ResponseWriter, r *Request)`` の挙動をテストする)
+ためのユーティリティ。
+
+::
+
+    import "net/http/httptest"
+
+
+サーバを立ち上げずにテスト
+==================================
+
+::
+
+    myHandler := NewMyHandler()  // テストしたいHandler
+
+    // テストの入力。戻り値は *http.Request
+    req := httptest.NewRequest("GET", "/hello", nil)
+
+    // いろいろ記憶することができる http.ResponseWriter の実装
+    rec := httptest.NewRecorder()
+
+    // テスト対象のHandlerをコール
+    myHandler.ServeHTTP(rec, req)
+
+    assert.Equal(t, http.StatusOK, rec.Code)
+    assert.Equal(t, "body期待値", rec.Body.String())
+
+    // 上記以外の項目は rec.Result() で *http.Response を取得して比較する
+    resp := rec.Result()
+    assert.Equal(t, "application/json", resp.Header.Get("Content-Type"))
+
+
+- httptest.NewRequest は http.NewRequest で作るのとどう違うのか？
+
+  - そもそも http.NewRequest は、httpクライアントとしてリクエストを投げるときに使うものだから、
+    サーバが受ける Request を生成するものではない？ という使い分けだと思う。
+  - 多分 http.NewReqeust で作ってしまうと、いろいろ足りないものがありそう。
+
+    - 送信元IPとか
+    - Content-Length とか？？
+
+
+
+サーバを立ち上げてテスト
+==================================
+
+指定した Handler をローカルにサーバを起動する。
+
+やろうと思えば ``http.HandleFunc("/", h); http.ListenAndServe(":8080", nil)`` 
+みたいにやればできなくはないが、ポートが空いていなかったらとか、
+起動前に通信をしてしまうとテストが失敗してしまうとか、終了はどうするかとか、いろいろめんどう。
+そこを楽にしてくれる。
+
+ただ、上の「サーバを立ち上げずにテスト」で足りるような気はする。
+
+::
+
+    myHandler := NewMyHandler()  // テストしたいHandler
+
+    // ローカルにサーバを起動。ローカルの空いている適当なポートで起動する。
+    testServer := httptest.NewServer(myHandler)
+    defer testServer.Close()
+
+    // 実際に起動したサーバにhttpリクエストを投げ、結果を受け取る。
+    // testServer.URL で、起動している Method, host名, ポート番号 を含んだ文字列が返る。
+    req, _ := http.NewRequest("GET", testServer.URL+"/hello", nil)
+    resp, _ := client.Do(req)
+    respBody, _ := ioutil.ReadAll(resp.Body)
+
+    assert.Equal(t, http.StatusOK, resp.StatusCode)
+    assert.Equal(t, helloMessage, string(respBody))
+
+- ``httptest.NewTLSServer(myHandler)`` とすれば https で起動する
+
+
+スタブサーバを立ち上げて、httpクライアント部分のテスト
+==========================================================
+
+上の「サーバを立ち上げてテスト」の応用で、スタブサーバを立ち上げて、
+httpクライアント部分のテストをすることもできるが、
+この用途だと正直、httpmock とかの方がやりやすいと思う。
+
+::
+
+  h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintln(w, "Hello, client")
+  })
+
+  ts := httptest.NewServer(h)
+  defer ts.Close()
+
+  // テスト対象のコード(http client になっている)の実行。
+  // 向き先はなんとかして上で立てたサーバに向くようにする必要がある。
+
+  // 結果のアサーション
+
+  // 想定どおりにリクエストが飛んだかの確認は、このやり方だと難しそう
+
+
+*************************
+httpmock
+*************************
+
+httpクライアントになっている部分のテストのための、スタブサーバを用意するためのライブラリ。
+本体コードが使う、外部のリソースをシミュレーションする。
+
+httpmock は、標準のhttp通信ライブラリを差し替えて(横取りして)、レスポンスを返す。
+
+横取りするので、http通信を行っている本体コードの方を書き換える必要がない。
+(interface化して差し替えたり、向き先を変えたりする必要がない。)
+
+実際にサーバが起動/Listenしているわけではないっぽい。おそらくだが、別goルーチンも動いていないのでは？
+
+"mock" と言いつつ、呼ばれたことの assertion はできない。いわゆるスタブに近い。
+
+- https://github.com/jarcoal/httpmock
+- https://pkg.go.dev/github.com/jarcoal/httpmock
+
+インストール::
+
+    go get github.com/jarcoal/httpmock
+
+簡単な使い方::
+
+    import "github.com/jarcoal/httpmock"
+
+    func TestFetchArticles(t *testing.T) {
+
+      // Activate を呼ぶことで、http通信ライブラリが差し替えられる
+      httpmock.Activate()
+      defer httpmock.DeactivateAndReset()
+
+      // Exact URL match
+      httpmock.RegisterResponder("GET", "https://api.mybiz.com/articles",
+        httpmock.NewStringResponder(200, `[{"id": 1, "name": "My Great Article"}]`))
+
+      // Regexp match (could use httpmock.RegisterRegexpResponder instead)
+      httpmock.RegisterResponder("GET", `=~^https://api\.mybiz\.com/articles/id/\d+\z`,
+        httpmock.NewStringResponder(200, `{"id": 1, "name": "My Great Article"}`))
+
+      // do stuff that makes a request to articles
+
+      // get count info
+      httpmock.GetTotalCallCount()
+
+      // get the amount of calls for the registered responder
+      info := httpmock.GetCallCountInfo()
+      info["GET https://api.mybiz.com/articles"]             // number of GET calls made to https://api.mybiz.com/articles
+      info["GET https://api.mybiz.com/articles/id/12"]       // number of GET calls made to https://api.mybiz.com/articles/id/12
+      info[`GET =~^https://api\.mybiz\.com/articles/id/\d+\z`] // number of GET calls made to https://api.mybiz.com/articles/id/<any-number>
+    }
+
+サーバの準備(実際にはライブラリの差し替え
+===============================================
+
+::
+
+    httpmock.Activate()
+    defer httpmock.DeactivateAndReset()
+
+    // もし、本体コードが、標準のhttp通信ライブラリ (http.DefaultClient) ではなく
+    // 別のものを使っている場合は下記のように明示的に指定して差し替える。
+    httpmock.ActivateNonDefault(someHTTPClient)
+    defer httpmock.DeactivateAndReset()
+
+
+httpmock.RegisterResponder で、URL に Responder を紐付ける
+==============================================================
+
+::
+
+    func RegisterResponder(method, url string, responder Responder)
+
+        // 普通のURL、もしくはパス
+        //     クエリパラメタ(?以降)が含まれている場合は、その順番は保持される(区別される)
+
+        httpmock.RegisterResponder("GET", "http://example.com/",
+          httpmock.NewStringResponder(200, "hello world"))
+
+        httpmock.RegisterResponder("GET", "/path/only",
+          httpmock.NewStringResponder("any host hello world", 200))
+
+        // =~で始まれば正規表現
+        httpmock.RegisterResponder("GET", `=~^/item/id/\d+\z`,
+          httpmock.NewStringResponder("any item get", 200))
+
+    
+    func RegisterRegexpResponder(method string, urlRegexp *regexp.Regexp, responder Responder)
+        // regexp.Regexp で指定
+
+
+    func RegisterResponderWithQuery(method, path string, query interface{}, responder Responder)
+        // RegisterResponder と違って、クエリの順序を問わずにマッチする
+
+        path の部分を ``=~`` 始まりにすることはできない。
+        query として取りうるのは、
+        - url.Values
+        - map[string]string
+        - string, a query string like "a=12&a=13&b=z&c" (see net/url.ParseQuery function)
+
+        例
+          expectedQuery := net.Values{
+            "a": []string{"3", "1", "8"},
+            "b": []string{"4", "2"},
+          }
+          httpmock.RegisterResponderWithQueryValues(
+            "GET", "http://example.com/", expectedQuery,
+            httpmock.NewStringResponder("hello world", 200))
+
+          // requests to http://example.com?a=1&a=3&a=8&b=2&b=4
+          //      and to http://example.com?b=4&a=3&b=2&a=8&a=1
+
+
+    func RegisterNoResponder(responder Responder)
+        // 他のルールにマッチしない場合の Responder を指定する。
+        // デフォルトは、httpmock.ConnectionFailure がセットされている。
+
+
+
+マッチのアルゴリズム
+
+- https://pkg.go.dev/github.com/jarcoal/httpmock#readme-algorithm
+
+下記の順で探しにいく::
+
+    http://example.tld/some/path?b=12&a=foo&a=bar (original URL)
+    http://example.tld/some/path?a=bar&a=foo&b=12 (sorted query params)
+    http://example.tld/some/path (without query params)
+    /some/path?b=12&a=foo&a=bar (original URL without scheme and host)
+    /some/path?a=bar&a=foo&b=12 (same, but sorted query params)
+    /some/path (path only)
+
+
+Responder
+===================
+
+Responder はこういう形::
+
+    type Responder func(*http.Request) (*http.Response, error)
+
+
+基本的には、下記の ``New*Responser`` などを利用する::
+
+    func NewStringResponder(status int, body string) Responder
+        httpmock.NewStringResponser(200, `Some Response`)
+        httpmock.NewStringResponder(200, httpmock.File("body.txt").String())
+        Content-Typeはセットされない
+
+
+    func NewBytesResponder(status int, body []byte) Responder
+        httpmock.NewBytesResponder(200, httpmock.File("body.raw").Bytes())
+        Content-Typeはセットされない
+
+
+    func NewErrorResponder(err error) Responder
+        エラーを返すResponder。 (nil, err)を返す。
+        httpのエラーレスポンスではなく、そもそも通信がうまく行かなかった系の挙動に相当。
+
+
+    func NewJsonResponder(status int, body interface{}) (Responder, error)
+    func NewJsonResponderOrPanic(status int, body interface{}) Responder
+        body にはJSON Marshal(encode)可能なオブジェクトや構造体を渡す。
+        Content-Typeは "application/json" にセットされる
+
+        httpmock.NewJSONResponderOrPanic(200, &MyBody)
+        httpmock.NewJsonResponderOrPanic(200, httpmock.File("body.json"))
+            // httpmock.File は Marshall() メソッドをごまかしてくれるので、
+            // JSON 文字列をファイルに書いておけば、それをそのまま送信してくれる
+        httpmock.NewJsonResponderOrPanic(200, `{"a": 1, "b": 2}`)
+            // これはうまく行かないらしい。さらにJSON Marshalがかかるため。
+            // NewStringResponce で作って、そこに Content-Type を足す、独自のResponderを作るのがいい。
+
+
+    func NewXmlResponder(status int, body interface{}) (Responder, error)
+    func NewXmlResponderOrPanic(status int, body interface{}) Responder
+        Content-Type は "application/xml" にセットされる
+
+        httpmock.NewXmlResponderOrPanic(200, &MyBody)
+        httpmock.NewXmlResponder(200, httpmock.File("body.xml"))
+            // httpmock.File は Marshall() メソッドをごまかしてくれるので、
+            // JSON 文字列をファイルに書いておけば、それをそのまま送信してくれる
+        httpmock.NewJsonResponderOrPanic(200, `<data><item>a</item></data>`)
+            // これはうまく行かないらしい。さらにXML Marshalがかかるため。
+            // NewStringResponce で作って、そこに Content-Type を足す、独自のResponderを作るのがいい。
+
+
+    func NewNotFoundResponder(fn func(...interface{})) Responder
+        // 一般的には RegisterNoResponder() と組み合わせて、
+        // マッチするルールが無かった場合に、処理をさせる場合に使う。
+
+        // fn の引数は、マッチしなかったルート情報が渡る。
+        // fn は t.Fatal や t.Log を渡すことを意図しているっぽい。
+        // ログする必要がなければ fn は nil でもいい。
+        // fn が panic せずに return した場合、リクエスト側には
+        // (nil, "Responder not found for GET http://foo.bar/path") ようなものが返る。
+        // (使いどころが分からん。デバッグ用？)
+
+
+    httpmock.InitialTransport.RoundTrip
+        // これを指定すると、もともとの http client にパスバックし、本当にhttp通信を行う。
+        httpmock.RegisterNoResponder(httpmock.InitialTransport.RoundTrip)
+
+
+    httpmock.ConnectionFailure
+        常に (nil, NoResponderFound) を返す Responder。
+            NoResponderFound は変数で、デフォルトでは errors.New("no responder found") になっている。
+        マッチするものがなかった場合に使われる
+
+
+    func ResponderFromResponse(resp *http.Response) Responder
+        常に固定の http.Response を返す Responder を作る。
+        
+    func ResponderFromMultipleResponses(responses []*http.Response, fn ...func(...interface{})) Responder
+        呼ばれるごとに返すものを変えていくResponder。
+        呼ばれるごとにリストの順で返していく。
+        リストの長さ以上に呼ばれた場合は、fn が呼ばれ、その後エラーが返る。
+
+          httpmock.RegisterResponder("GET", "/foo/bar",
+            httpmock.ResponderFromMultipleResponses(
+              []*http.Response{
+                httpmock.NewStringResponse(200, `{"name":"bar"}`),
+                httpmock.NewStringResponse(404, `{"mesg":"Not found"}`),
+              },
+              t.Log),
+          )
+
+
+注意: resp.body は、繰り返し読まれても大丈夫なようにしないといけない。(下記のどれかをやる)
+
+- resp を NewStringResponse, NewBytesResponse で作る
+- resp.body を NewRespBodyFromString, NewRespBodyFromBytes で作る
+
+
+独自のレスポンダーを書く場合::
+
+    httpmock.RegisterResponder("GET", url,
+        func(req *http.Request) (*http.Response, error) {
+            resp, err := httpmock.NewJsonResponse(200, mockedResponse)
+            if err != nil {
+                return httpmock.NewStringResponse(500, ""), nil
+            }
+            return resp, nil
+        },
+    )
+
+    中では、下記の New*Response 関数を使うと楽。
+    (New*Responder と対応しているので、動作・使い方はそちらを参照)
+        func NewStringResponse(status int, body string) *http.Response
+        func NewBytesResponse(status int, body []byte) *http.Response
+        func NewJsonResponse(status int, body interface{}) (*http.Response, error)
+        func NewXmlResponse(status int, body interface{}) (*http.Response, error)
+
+    上記を使わずに独自で http.Response を組み立てる場合、
+    body は、下記の関数で作らないといけない。
+
+        func NewRespBodyFromBytes(body []byte) io.ReadCloser
+            httpmock.NewRespBodyFromBytes(httpmock.File("body.txt").Bytes())
+
+        func NewRespBodyFromString(body string) io.ReadCloser
+            httpmock.NewRespBodyFromString(httpmock.File("body.txt").String())
+
+
+正規表現のプレイスホルダーの部分を取り出して、使うこともできる::
+
+    httpmock.RegisterResponder("GET", `=~^https://api\.mybiz\.com/articles/id/(\d+)\z`,
+      func(req *http.Request) (*http.Response, error) {
+        // Get ID from request
+        id := httpmock.MustGetSubmatchAsUint(req, 1) // 1=first regexp submatch
+        return httpmock.NewJsonResponse(200, map[string]interface{}{
+          "id":   id,
+          "name": "My Great Article",
+        })
+      },
+    )
+
+    func GetSubmatch(req *http.Request, n int) (string, error)
+    func GetSubmatchAsFloat(req *http.Request, n int) (float64, error)
+    func GetSubmatchAsInt(req *http.Request, n int) (int64, error)
+    func GetSubmatchAsUint(req *http.Request, n int) (uint64, error)
+    func MustGetSubmatch(req *http.Request, n int) string
+    func MustGetSubmatchAsFloat(req *http.Request, n int) float64
+    func MustGetSubmatchAsInt(req *http.Request, n int) int64
+    func MustGetSubmatchAsUint(req *http.Request, n int) uint64
+
+
+メソッドチェーンでResponderを修飾::
+
+    func (r Responder) Delay(d time.Duration) Responder
+        dだけ待ってから r を呼び出すようににする
+        httpmock.NewStringResponder(200, "{}").Delay(100*time.Millisecond)
+
+    func (r Responder) Once(fn ...func(...interface{})) Responder
+        1回だけ呼び出し可能にする
+        それ以上呼ばれたときは fn を呼んで、その後エラーを返す。
+        httpmock.NewStringResponder(200, "{}").Once(t.Log)
+
+    func (r Responder) Times(n int, fn ...func(...interface{})) Responder
+        n回だけ呼び出し可能にする
+        それ以上呼ばれたときは fn を呼んで、その後エラーを返す。
+        httpmock.NewStringResponder(200, "{}").Times(3, t.Log)
+
+    func (r Responder) Then(next Responder) (x Responder)
+        呼ばれるごとに、順にResponderが呼ばれるようにする。
+        A := httpmock.NewStringResponder(200, "A")
+        B := httpmock.NewStringResponder(200, "B")
+        C := httpmock.NewStringResponder(200, "C")
+        httpmock.RegisterResponder("GET", "/pipo", A.Then(B).Then(C))
+
+    func (r Responder) Trace(fn func(...interface{})) Responder
+        呼び出される度にログ出力するようにする
+        httpmock.NewStringResponder(200, "{}").Trace(t.Log)
 
