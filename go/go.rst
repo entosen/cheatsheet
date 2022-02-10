@@ -298,15 +298,75 @@ c.f. 右辺がリテラルだったらある程度型変換が効くっぽい。
     var u uint = uint(f)
 
 
-文字列
----------------------
+文字列 string と []rune と []byte
+--------------------------------------
 
-::
+string型は文字列を表す。イミュータブル。
+
+string型は基本バイト列(utf-8)。lenやインデックスはバイト単位。特に日本語を扱う場合に注意。
+
+string型のリテラル::
 
     "abcde\n"
+    "日本語"
+    "\x41"         // "A"
+    "\u0041"       // "A"
+    "\U00000041"   // "A"
 
     // raw string literal (バックスラッシュを特殊解釈しない)
     `ab"cde"\n`     
+
+
+rune型は1つの文字を表す。日本語のようなマルチバイトの文字も1つと扱う。
+
+正確には「Unicodeコードポイントを表す特殊な整数型」。 32bit符号付き整数と同じ。
+
+rune型のリテラル::
+
+    'a'
+    '日'
+
+
+byte型は1バイトを表す。
+
+
+
+操作::
+
+    str := "あいうえお"
+    bytes := []byte("あいうえお")   // string → []byte
+    runes := []rune("あいうえお")   // string → []rune
+
+    str := string(runes)            // []rune → string
+    str := string(bytes)            // []rune → string
+
+    len(s)                       // stringのバイト数
+    utf8.RuneCountInString(s)    // stringの文字数
+    len(bytes)                     // []byteの長さ、つまりバイト数
+    utf8.RuneCount(bytes)          // []byteをruneとして解釈した文字数
+    len(runes)                   // []runeの長さ、つまり文字数数
+
+    s[1]    // byte型
+    s[1:3]  // 文字列型? []byte型？ 開始位置(含む)、終了位置(含まない)
+
+    // string型に range をした場合は、byteごとではなくruneごとで取れる
+    for pos, runeValue := range s {
+        ...
+    }
+
+    sNew := s1 + s2  // 文字列の連結
+    sNew += s3
+    
+    // string.Builder で構築
+    inport "strings"
+    var builder strings.Builder
+    builder.Grow(n)                   // あらかじめ n byte分確保
+    builder.WriteString("ignition")   // string型を追加
+    builder.Write(bytes)   // []byte型を追加
+    builder.WriteByte(b)   // 1byte追加
+    builder.WriteRune(r)   // 1rune追加
+    builder.String()  // → string型を返す
+
 
 ポインタ
 ---------------------
