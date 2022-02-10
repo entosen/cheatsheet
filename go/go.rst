@@ -1407,7 +1407,7 @@ error interface
 
 関数からエラーを返す場合は、下記のように、
 2つ目の返り値(もしくは値を返さない関数の場合は唯一の返り値)で、
-error型(interface)を返すのが標準っぽい。::
+error型(interface)を返すのが標準っぽい。(※1) ::
 
     func Open(name string) (file *File, err error)
 
@@ -1433,6 +1433,52 @@ logとかfmt.Print系とかは、error型の表示の仕方を知っているの
 
     log.Fatal(err)
     fmt.Println(err)
+
+
+
+関数が独自エラーを返す場合でも、戻り型は error 型にすること！
+----------------------------------------------------------------
+
+(※1) 関数が独自エラーを返す場合でも、戻り型は error 型にすること！
+(独自エラー型にしてはダメ。バグのもと)。
+
+戻り型以外でも、エラー値を一時的な変数に入れる場合なども、
+独自エラー型ではなく error 型に入れること！
+
+
+- `Goのnilについて - Carpe Diem <https://christina04.hatenablog.com/entry/2017/06/07/231030>`__
+
+  - nilは型を持つ
+  - interfaceの場合のみ、型もnilでないと ``xxx == nil`` はfalse
+
+
+独自型の nil を interface 型に入れると nil 判定がうまくされないから。
+
+::
+
+    type MyError struct{}
+
+    func (e MyError) Error() string {
+        return "some error"
+    }
+
+    func MyErrorFunc() *MyError {   // <---- これダメ！！！
+        return nil  // nilリテラルを返す。*MyError 型の nil になってしまう
+    }
+
+    func Wrapper() error {
+        return MyErrorFunc()  // nilを返している（ただし型は*MyError）
+    }
+
+    func main() {
+        err := Wrapper()  // interface型（error）のnilだけど、nil内部の型は*MyError
+        fmt.Println(reflect.ValueOf(err))  // <nil>
+        fmt.Println(reflect.TypeOf(err))  // *main.MyError
+
+        if err == nil {
+            fmt.Println("no error")  // 通らない
+        }
+    }
 
 
 errorの作り方
