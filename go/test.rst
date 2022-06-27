@@ -145,10 +145,32 @@ testing には assertion は用意されていない。
 
 ::
 
-    t.Fatal    # その時点でその(単一の)テストは中止される
-    t.Error    # これが呼ばれても、テストは実行される
+    // テストを失敗させる
+    t.Fail()     # テスト失敗。テストは継続
+    t.FailNow()  # テスト失敗。その時点でその(単一の)テストは中止される
 
-    t.Fatalf, t.Errorf
+    // メッセージを出力する
+    t.Log(args ...any)                  # 引数それぞれを出力
+    t.Logf(format string, args ...any)   # 引数を Sprintf的に解釈して出力
+
+    // 複合
+    t.Error, t.Errorf   # Log,Logf を呼んで、Fail
+    t.Fatal, t.Faitalf  # Log,Logf を呼んで、FailNow   
+
+これだといろいろ不便なので、 testify/assert を使うことが多い。
+
+
+Helper()
+--------------
+
+テスト結果には、デフォルトで、アサーション関数(t.Failとか)を呼んだ位置が出力される。
+
+各テストの共通処理を関数にくくり出したり、
+アサーション関数を自作した場合は、
+t.Fail() をした場所ではなく、その関数の呼び出し元の位置を表示したい。
+
+その場合、共通関数の方の冒頭で、t.Helper() を呼べばよい。
+
 
 
 Tips
@@ -482,6 +504,7 @@ https://pkg.go.dev/github.com/stretchr/testify/assert
     }
 
 
+
 ::
 
     assert.Equal(t, expented, actual)
@@ -510,6 +533,167 @@ https://pkg.go.dev/github.com/stretchr/testify/assert
     assert.NotNil(t, obj)
         (nil interface か、
          objが{pointer, function, map, slice, channel, interface} の何らかの型でその中身がnil)
+
+
+出力されるメッセージ
+--------------------------
+
+例::
+
+    === RUN   Test_Sample
+        sample_test.go:1039:
+                    Error Trace:    sample_test.go:1039
+                    Error:          これはFailのfailureMessageです。
+                    Test:           Test_Sample
+                    Messages:       これはFailのmsgAndArgsです。
+        sample_test.go:1042:
+                    Error Trace:    sample_test.go:1042
+                    Error:          Not equal:
+                                    expected: 1
+                                    actual  : 2
+                    Test:           Test_Sample
+                    Messages:       これはEqualのmsgAndArgsです。
+    --- FAIL: Test_Sample (0.00s)
+    FAIL
+
+
+assert が出力する文言は2つ。Error と Messages 。
+
+
+- Error (FailureMessage)
+
+  - 通常は、失敗した理由(どういう比較をしたかがわかるようなもの)、および、渡された値を表示する。(ref. 後述)
+
+- Messages (msgAndArgs)
+
+  - テストコードから渡されたものがそのまま表示される。
+  - FailureMessage の方には、値しか出ない(変数名は出ない) ので、それを補足するようなものがよさそう。
+
+
+他の言語のテストライブラリだと、渡した変数名なんかも出してくれたりするけど、
+その辺 Go は不親切な感じがする。
+
+
+Fail と FailNow
+^^^^^^^^^^^^^^^^^
+
+一番プリミティブなものは、Fail と FailNow。 ::
+
+    // Fail はテスト失敗を通知する。テストは継続
+    func Fail(t TestingT, failureMessage string, msgAndArgs ...interface{}) bool
+
+    // FailNow はテスト失敗を通知し、そこでテストは中止
+    func FailNow(t TestingT, failureMessage string, msgAndArgs ...interface{}) bool
+
+これらは
+
+- 比較はせずにテストを失敗させるだけ。
+- failureMessage → 結果の Error のところになる
+- msgAndArgs → 結果の Messages のところになる
+
+
+
+それ以外のいろいろな比較関数
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+比較関数と、失敗した場合の failureMessage::
+
+    func Equal(t TestingT, expected, actual interface{}, msgAndArgs ...interface{}) bool
+
+            // 数値を比較した場合
+            Not equal:
+            expected: 1
+            actual  : 2
+        
+            // 文字列を比較した場合 Diff も出してくれる。複数行の文字列の場合に便利
+            Not equal:
+            expected: "02jsn2keav9p9"
+            actual  : "dg5env7tq49ad"
+
+            Diff:
+            --- Expected
+            +++ Actual
+            @@ -1 +1 @@
+            -02jsn2keav9p9
+            +dg5env7tq49ad
+
+    func Greater(t TestingT, e1 interface{}, e2 interface{}, msgAndArgs ...interface{}) bool
+
+            "1" is not greater than "2"
+
+    func True(t TestingT, value bool, msgAndArgs ...interface{}) bool
+
+            Should be true
+
+
+
+
+
+
+これらは、
+
+- 比較・判定をし、満たしていない場合は中でFailを呼ぶ
+- failuerMessage  は自動で作成してくれる
+
+  - たいていは expected と actual の中身を表示してくれる
+
+- msgAndArgs は渡されたものがそのままFailに渡る
+
+
+msgAndArgs
+^^^^^^^^^^^^^^^
+
+assert の各関数は、追加の引数として、msgAndArgs を取れる。
+
+標準の testing と違い、assert の msgAndArgs は個数によって下記のように動作する
+
+- 0個 → 表示なし
+- 1つ → そのオブジェクトを表示
+- 2つ以上 → Sprintf 的に解釈して表示
+
+なので、 ``Equal`` と ``Equalf`` のように2つずつ関数が用意されているが、
+実質的な違いはない。
+
+
+assert関数の自作
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+assert のコードを真似して作ればよいと思う。
+
+- https://github.com/stretchr/testify/blob/v1.7.4/assert/assertions.go
+
+基本的には、
+
+- t.Hepler() を呼ぶ
+
+  - エラーがあった箇所の表示を、
+    Failを呼んだ行ではなく、この関数の呼び出し元にしたい場合、
+    t.Helper() を呼べばよい。
+
+- 比較して、満たしていなかったら assert.Fail を呼ぶ。
+
+    - もしくは 既存のassert関数を利用してもよい。 failuerMessage の内容が分かりやすいかは気をつける。
+    - FailNow()を呼ぶことはないはず。そのテストを途中で終わるかどうかは呼び出し側の判断。関数内の以降の判定をしない場合は return すればよい。
+
+- 成功した場合は true、失敗した場合は false を return する
+
+::
+
+    func NearlyEqual(t *testing.T, expected, actual int, msgAndArgs ...interface{}) bool {
+
+        t.Helper()
+
+        diff := actual - expected
+        if diff <= -3 || diff >= 3 {
+            return assert.Fail(
+                t,
+                Sprintf("Not nealy equal, expected: %v, actual: %v", expected, actual),
+                msgAndArgs...)
+        }
+
+        return true
+    }
+
 
 
 suite
