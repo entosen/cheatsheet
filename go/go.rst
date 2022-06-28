@@ -52,6 +52,10 @@ TODO リファレンスとか
 - https://golang.org/ref/spec#Slice_expressions
 
 
+スタイルガイド
+
+- `Uber Go Style Guide <https://github.com/uber-go/guide/blob/master/style.md>`_
+
 -----------------
 Hello, World
 -----------------

@@ -94,7 +94,7 @@ DataProviderみたいなことは自前でやらないといけない::
         }
     }
 
-スライスではなく map でテストケースを持たせる場合::
+スライスではなく map でテストケースを持たせる場合(順序がランダムになるのでお勧めしない)::
 
         tests := map[string]struct{
             args args
@@ -120,7 +120,7 @@ DataProviderみたいなことは自前でやらないといけない::
 
 実行方法::
 
-    got test -v 
+    go test -v 
 
 
     TODO
@@ -129,6 +129,7 @@ DataProviderみたいなことは自前でやらないといけない::
 
 名前::
 
+    入力値 give
     実際値 got
     期待値 want
 
@@ -446,6 +447,8 @@ return
     TODO
     .Times(2)     // 2回きっかり
     .AnyTimes()   // 何回呼ばれてもよい。呼ばれなくてもよい。 (0回以上)
+    .MaxTimes(10)  // (0回)～10回
+    .MinTimes(3)   // 3回～ (無限)
 
 呼ばれる順番
 -----------------
