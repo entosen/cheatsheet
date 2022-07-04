@@ -94,27 +94,70 @@ DataProviderみたいなことは自前でやらないといけない::
         }
     }
 
-スライスではなく map でテストケースを持たせる場合(順序がランダムになるのでお勧めしない)::
+スライスではなく map でテストケースを持たせる方法もあるが、順序がランダムになるのでお勧めしない。
 
-        tests := map[string]struct{
+
+正常になる場合と、エラーになる場合を、1つのテストケース型で表現する場合::
+
+    func TestAdd(t *testing.T) {
+        tests := []struct{
+            name string
             args args
-            want int
+            want int        // 期待値
+            wantErr error   // エラーを期待する場合の期待エラー
         }{
-            "テスト名1": {
-                args: args{a:1, b:2},
-                want: 30,
-            },
-            "テスト名2": {
-                args: args{a:1, b:4
-                want: 40
-            },
+            ...
+            ...
         }
 
-        for k, tc := range tests {
-            t.Run(k, func(t *testing.T) {
-                (省略)
+        for _, tt := range tests {
+            t.Run(tt.name, func(t *testing.T) {
+
+                got, err := SomeTest(args)
+
+                if tt.wantErr != nil {
+                    // エラーを返すことを期待するケース
+
+                    if err != wantErr {
+                        t.log(想定と異なるエラーが発生: wantErr=???, err=???)
+                        t.FailNow()
+                    }
+
+                    // 想定どおりのエラーなので、問題なし
+                    return
+                }
+
+                // 以下、正常(エラーが発生しないこと)を期待するケース
+
+                // エラーが発生していないことを確認
+                if err != nill {
+                    // 正常になるはずなのに、エラーが返ってきている！
+                    t.Log(想定外にエラーが発生: err=???)
+                    t.FailNow()
+                }
+
+                // 返却値が期待値どおりか確認
+                if got != want {
+                    t.Log(不一致 want=??? got=???)
+                    t.Fail()
+                }
+
+                // 想定どおりのgotなので、問題なし
             })
         }
+    }
+
+
+ネットで検索すると
+
+- wantErr を bool 型にして、nilかどうかだけチェックしているもの
+- wantErr を error型にして、同値性をチェックしているもの
+
+があった。
+
+想定どおりのエラーかどうかについては、Wrapを考慮したり、同値性か/同型なのか など、
+結構複雑なので、場合によってはチェック用の関数を指定するようにしてもいいかも。
+型アサーションで分岐すればなんとかなりそう。
 
 
 
@@ -132,6 +175,7 @@ DataProviderみたいなことは自前でやらないといけない::
     入力値 give
     実際値 got
     期待値 want
+    エラーが発生することを期待 wantErr  (bool だったり、error型で同値性を調べたり)
 
     複数テストケースをループさせるとき
         テストケースのリスト  tests
@@ -271,6 +315,7 @@ mock を固めて入れる mock ディレクトリを作っておくのがいい
 
     Makefileにこんな感じで入れておいて使う
         mockgen:
+            rm -rf mock/*      # ← ソースファイルが消えていた場合にmockも消えるように
             go generate ./...
 
 
