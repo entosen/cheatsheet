@@ -1530,7 +1530,40 @@ nil と比較::
     }
     // do something with the open *File f
 
+エラーの同値性::
+
+    こういう風に定義されているエラーがある場合は、エラーの同値性を調べる
+
+        // 例 io/io.go
+        var EOF = errors.New("EOF")
+        var ErrClosedPipe = errors.New("io: read/write on closed pipe")
+        var ErrNoProgress = errors.New("multiple Read calls return no data or error")
+        var ErrShortBuffer = errors.New("short buffer")
+        var ErrShortWrite = errors.New("short write")
+        var ErrUnexpectedEOF = errors.New("unexpected EOF")
+
+    if err == io.EOF { ... }
+
+    if errors.Is(err, io.EOF) { ...  }   // Go 1.13 からのエラーのWrapを考えると、こちらが推奨
+
+
 errorの実際の型によって処理を分ける::
+
+    エラーごとに専用型が用意されている場合、型でエラーの種類が分かって、中身は追加の情報という感じ。
+
+    === json の Decode の例 ===
+    type SyntaxError struct {
+            Offset int64 // error occurred after reading Offset bytes
+            // contains filtered or unexported fields
+    }
+
+    type UnmarshalTypeError struct {
+	Value  string       // description of JSON value - "bool", "array", "number -5"
+	Type   reflect.Type // type of Go value it could not be assigned to
+	Offset int64        // error occurred after reading Offset bytes
+	Struct string       // name of the struct type containing the field
+	Field  string       // the full path from root node to the field
+    }
 
     if err := dec.Decode(&val); err != nil {
         if serr, ok := err.(*json.SyntaxError); ok {
@@ -1540,7 +1573,45 @@ errorの実際の型によって処理を分ける::
         return err
     }
 
-TODO switch で分かれる例も。
+
+    === os.Open の例 ===
+    type PathError struct {
+        Op   string
+        Path string
+        Err  error
+    }
+
+    switch e := err.(type) {
+    case *os.PathError:
+        if errno, ok := e.Err.(syscall.Errno); ok {
+            switch errno {
+            case syscall.ENOENT:
+                fmt.Fprintln(os.Stderr, "ファイルが存在しない")
+            case syscall.ENOTDIR:
+                fmt.Fprintln(os.Stderr, "ディレクトリが存在しない")
+            default:
+                fmt.Fprintln(os.Stderr, "Errno =", errno)
+            }
+        } else {
+            fmt.Fprintln(os.Stderr, "その他の PathError")
+        }
+    default:
+        fmt.Fprintln(os.Stderr, "その他のエラー")
+    }
+
+
+    // Go 1.13 からのエラーのWrapを考えると、こちらが推奨
+    var perr *os.PathError
+    if errors.As(err, &perr) {
+        fmt.Fprintf(os.Stderr, "file is \"%v\"\n", perr.Path)
+    }
+
+
+Error() メソッドの返り値（文字列）を解析する::
+
+    バッドノウハウっぽい。最後の手段
+
+
 
 
 
