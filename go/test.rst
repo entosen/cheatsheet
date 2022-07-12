@@ -858,6 +858,20 @@ goで書かれた http serverのコードをテストする
 
 
 
+(注) go の http server が受け取る ``r *http.Request`` での Host 関連のフィールドについて。
+
+- Host名(http通信上の ``Host:`` ヘッダ)は、r.Host に入り、r.Header には入らない(除かれる)
+- r.URL は、http通信の1行目 ``GET /hoge/fuga?foo=bar HTTP/1.0`` みたいな部分をパースしたものなので、
+  r.URL.Host は空になっている
+
+なので、その想定に合わせて、httptest のリクエストも作らないといけない。
+
+httptest.NewRequest は、 ``r.Host`` が ``example.com`` で作られるので、
+変更する場合は、 ``r.Host = "hoge.com"`` などとしないといけない。
+( ``r.Header.Set("Host", "hoge.com")`` は間違い )
+
+
+
 サーバを立ち上げてテスト
 ==================================
 
