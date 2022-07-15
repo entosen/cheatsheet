@@ -35,7 +35,7 @@ testing
         "testing"
     )
 
-    // テストコードは Test 始まり
+    // テストコードは Test 始まり (TestHoge, Test_hoge はよいが、Testhoge はだめ)
     func TestAbs(t *testing.T) {
         got := Abs(-1)
         if got != 1 {

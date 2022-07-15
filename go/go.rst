@@ -1494,8 +1494,15 @@ errors.New()。(内部的には ``*errorString`` 型というのになってい�
 
     errors.New("some message")
 
+
+fmt.Errorf ::
+
     // 下記だと Printf の構文が使える
     fmt.Errorf("math: square root of negative number %g", f)
+
+    // %w を使うと、errorをWrapしたerror (Wrapped Error) を作れる
+    fmt.Errorf("funcHoge returns Error: %w", err)
+
 
 
 独自のエラー型を定義::
@@ -1508,13 +1515,32 @@ errors.New()。(内部的には ``*errorString`` 型というのになってい�
     func (e *SyntaxError) Error() string { return e.msg }
 
 
-error を内包した独自interfaceを定義して、そこから作るってこともある。::
+error を埋め込んだ独自interfaceを定義して、そこに合うように作るってこともある。::
 
     // net.Error の例
     type Error interface {
         error
         Timeout() bool   // Is the error a timeout?
         Temporary() bool // Is the error temporary?
+    }
+
+errorをWrapしたerror (Wrapped Error) を独自定義::
+
+    // Error() string に加えて、
+    // Unwrap() error を実装する
+
+    // fmt.Errorf が返す wrapError 構造体の定義
+    type wrapError struct {
+            msg string
+            err error
+    }
+     
+    func (e *wrapError) Error() string {
+            return e.msg
+    }
+     
+    func (e *wrapError) Unwrap() error {
+            return e.err
     }
 
 
@@ -1635,7 +1661,7 @@ Go 1.13 (17 October 2019) から、error の wrap という仕組みが入った
 数珠つなぎに何重にもwrapすることもできる。
 
 
-代表的な作り方 ``fmt.Error("%w", err)`` では下記のような形になっている::
+代表的な作り方 ``fmt.Errorf("%w", err)`` では下記のような形になっている::
 
     type wrapError struct {
             msg string
