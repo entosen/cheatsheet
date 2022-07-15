@@ -99,53 +99,56 @@ DataProviderみたいなことは自前でやらないといけない::
 
 正常になる場合と、エラーになる場合を、1つのテストケース型で表現する場合::
 
-    func TestAdd(t *testing.T) {
-        tests := []struct{
-            name string
-            args args
-            want int        // 期待値
-            wantErr error   // エラーを期待する場合の期待エラー
-        }{
-            ...
-            ...
-        }
+    func TestHoge(t *testing.T) {
 
-        for _, tt := range tests {
-            t.Run(tt.name, func(t *testing.T) {
+            tests := []struct {
+                    give    string
+                    want    int64
+                    wantErr interface{}
+            }{
+                    // nil, false を指定した場合は、エラーは発生しないこと期待
+                    {"100", 100, nil},
+                    {"100", 100, false},
+                    // true を指定した場合は、なにかしらのエラーが発生(!=nil)を期待
+                    {"xyz", 0, true},
+                    // error型の値を指定した場合は、errors.Is で比較
+                    {"xyz", 0, strconv.ErrSyntax},
+                    {"128", 0, strconv.ErrRange},
+                    // 関数を指定した場合は、その関数を使ってassertされる
+                    {"xyz", 0, func(t *testing.T, gotErr error) {
+                            var errNumError *strconv.NumError
+                            assert.ErrorAs(t, gotErr, &errNumError)
+                    }},
+            }
 
-                got, err := SomeTest(args)
+            for _, tt := range tests {
+                    t.Run(fmt.Sprintf(`give="%s"`, tt.give), func(t *testing.T) {
 
-                if tt.wantErr != nil {
-                    // エラーを返すことを期待するケース
+                            got, err := strconv.ParseInt(tt.give, 10, 8)
 
-                    if err != wantErr {
-                        t.log(想定と異なるエラーが発生: wantErr=???, err=???)
-                        t.FailNow()
-                    }
+                            wantErrBool, ok := tt.wantErr.(bool)
+                            if tt.wantErr != nil && !(ok && wantErrBool == false) {
+                                    // エラーが返ってくることを期待するケース
+                                    switch wantErr := tt.wantErr.(type) {
+                                    case bool:
+                                            assert.Error(t, err)
+                                    case error:
+                                            assert.ErrorIs(t, err, wantErr)
+                                    case func(*testing.T, error):
+                                            wantErr(t, err)
+                                    default:
+                                            t.Fatalf(`wantErrの指定が想定外: type=%T`, tt.wantErr)
+                                    }
+                            } else {
+                                    // 正常(エラーが返ってこないことを期待するケース)
+                                    assert.NoError(t, err, `ParseIntが想定外のエラーを返した`)
 
-                    // 想定どおりのエラーなので、問題なし
-                    return
-                }
-
-                // 以下、正常(エラーが発生しないこと)を期待するケース
-
-                // エラーが発生していないことを確認
-                if err != nill {
-                    // 正常になるはずなのに、エラーが返ってきている！
-                    t.Log(想定外にエラーが発生: err=???)
-                    t.FailNow()
-                }
-
-                // 返却値が期待値どおりか確認
-                if got != want {
-                    t.Log(不一致 want=??? got=???)
-                    t.Fail()
-                }
-
-                // 想定どおりのgotなので、問題なし
-            })
-        }
+                                    assert.Equal(t, tt.want, got)
+                            }
+                    })
+            }
     }
+
 
 
 ネットで検索すると
@@ -155,9 +158,9 @@ DataProviderみたいなことは自前でやらないといけない::
 
 があった。
 
-想定どおりのエラーかどうかについては、Wrapを考慮したり、同値性か/同型なのか など、
-結構複雑なので、場合によってはチェック用の関数を指定するようにしてもいいかも。
-型アサーションで分岐すればなんとかなりそう。
+想定どおりのエラーかどうかについては、Wrapを考慮したり、同値性か/同型なのか など、 結構複雑。
+
+上のコードでとりあえず遭遇しそうなケースは対応できそう。
 
 
 
@@ -639,6 +642,10 @@ Fail と FailNow
 - failureMessage → 結果の Error のところになる
 - msgAndArgs → 結果の Messages のところになる
 
+
+assert には testing.Log に相当する、ただメッセージを出すだけの関数は用意されていない。
+
+ただ、メッセージを出したいだけの場合は、 t.Log, T.Logf を使う。
 
 
 それ以外のいろいろな比較関数
