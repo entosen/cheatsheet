@@ -1044,6 +1044,7 @@ shell関数
 
 
 ::
+
     $(file op filename[,text])
         ファイルを読み書きする
         op は >,  >>,  <
