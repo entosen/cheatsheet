@@ -851,6 +851,45 @@ define で改行も含め一字一句そのまま代入できる::
 分岐
 ====================
 
+``conditional-directive`` は後述の ``ifdef`` や ``ifeq`` など。
+
+::
+
+    conditional-directive
+      text-if-true
+    endif
+
+
+    conditional-directive
+      text-if-true
+    else
+      text-if-false
+    endif
+
+
+    # GNU make version 3.81以降だと、 else if 的なものが使える
+    conditional-directive-one
+      text-if-one-is-true
+    else conditional-directive-two
+      text-if-two-is-true
+    else
+      text-if-one-and-two-are-false
+    endif
+
+    # それ以前でどうようなことをやる場合。(非常に見づらい)
+    conditional-directive-one
+      text-if-one-is-true
+    else 
+      conditional-directive-two
+        text-if-two-is-true
+      else
+        text-if-one-and-two-are-false
+      endif
+    endif
+
+
+
+
 コマンド行だとこんな感じ::
 
     all:
@@ -868,6 +907,9 @@ define で改行も含め一字一句そのまま代入できる::
     else
       LIBS = $(LIBS_FOR_RELEASE)
     endif
+
+
+
 
 ::
 
@@ -910,7 +952,9 @@ ifdefは、変数の値が空でないこと(fooを定義していない or foo=
     $(関数 引数,引数,...)
     ${関数 引数,引数,...}
 
-引数はカンマで区切る。空白はつけられない。引数の一部になってしまう。
+
+- 引数はカンマで区切る。空白はつけられない。引数の一部になってしまう
+- ダブルクオートなども評価されず、そのまま引数の一部になる
 
 
 文字列関数
@@ -931,8 +975,10 @@ ifdefは、変数の値が空でないこと(fooを定義していない or foo=
         文字列の内部にある一つ以上の空白文字を一文字のスペースに置換
 
     $(findstring find,in)
-        $(findstring a,a b c)
-        見つかれば `find`、見つからなければ空文字列
+        $(findstring a,a b c)    # → a
+        $(findstring foo,hogefoobar)    # → foo
+        文字列探索。in文字列中に find文字列 が出現すれば true扱い。
+        見つかればその値、見つからなければ空文字列
 
     $(filter pattern...,text)
         リストの中からパターン(複数可,どれか)に合うものだけを抽出
@@ -1001,15 +1047,31 @@ ifdefは、変数の値が空でないこと(fooを定義していない or foo=
 条件関数
 --------------
 
+- condition は、空文字列なら false 扱い、それ以外なら true 扱い
+
 ::
 
     $(if condition,then-part[,else-part])
         condition の前後の空白を削除したのちにそれを評価。
-        空文字列以外だったら true、空文字列だったら false。
+        非空文字列(true扱い)だったら then-part 、
+        空文字列(false扱い)だったら else-part (else-partが指定されてなかったら空文字列)。
 
     $(or condition1[,condition2[,condition3…]])
+        順に見ていって、非空文字列(true扱い)の引数が出てきたら、それを返す(true扱い)。
+        全ての引数が、空文字列(false扱い)だった場合、空文字列を返す(false扱い)。
 
     $(and condition1[,condition2[,condition3…]])
+        順に見ていって、空文字列(false扱い)の引数が出てきたら、空文字列を返す(false扱い)。
+        全ての引数が、非空文字列(true扱い)だった場合、 最後の引数を返す(true扱い)。
+
+
+``$(eq)`` がないので使いづらい。代わりに
+
+- ``$(filter Linux,$(OS))`` を使う。( ``%`` と空白を含まない前提) (わかりにくい)
+- ``$(filterstring Linux,$(OS))`` を使う。 (厳密にやるなら逆向きも) 
+
+
+``$(not)`` もない。 ``$(if)`` 使って無理矢理逆にやるか。
 
 
 
