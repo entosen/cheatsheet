@@ -137,6 +137,81 @@ bytes型に対しても、str型が持っているようなテキスト処理が
 b.split(b'\n')
 ```
 
+## 例外処理
+
+- `8. エラーと例外 <https://docs.python.org/ja/3/tutorial/errors.html>`__
+- `組み込み例外#例外のクラス階層 <https://docs.python.org/ja/3/library/exceptions.html#exception-hierarchy>`__
+
+
+### 例外をキャッチする
+
+```
+try:
+    処理
+
+except ZeroDivisionError:
+    // ある型の例外をキャッチしたい場合
+
+except EOFError as e:
+    // 中で例外の値を使いたい場合は、 as 変数名 で受け取る
+
+except (BufferError, ValueError) as e:
+    // 複数書く場合はこう
+
+except:
+    // 上記except以外の例外のときに入る
+    // except as e:  って書けるか？
+
+else:
+    (elseって名前が分かりづらい)
+    ここには、例外が発生しなかった場合(正常終了の場合)に入る (しか入らない)
+    cf. 発生した例外にマッチするexceptがなかった場合、
+        elseには入らず、上位(呼び出し側)に例外が伝播する。
+
+finally:
+    例外が発生していても、発生していなくても、常に入る
+```
+
+`except:` がない場合、例外がどの except にもマッチしなかったら、
+上位(呼び出し側)に例外が伝播する。
+
+
+
+### 例外を投げる raise
+
+```
+raise NameError('HiThere')
+```
+
+ただのraise
+
+```
+try:
+    ...
+except:
+    raise    # キャッチしたエラーをそのまま上に上げる
+```
+
+### 例外の連鎖。
+
+ラップするみたいなもの？
+
+```
+    def func():
+        raise ConnectionError
+   
+    try:
+        func()
+    except ConnectionError as exc:
+        raise RuntimeError('Failed to open database') from exc
+   
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+  File "<stdin>", line 2, in func
+ConnectionError
+```
+
+
 ## パッケージ管理、環境
 
 ### virtualenv
