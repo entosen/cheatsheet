@@ -121,15 +121,15 @@ log パッケージの関数も呼べる。
 
 ::
 
-    Panic(args) / Panicln(args) / Panicf(format, args...)
+    Panic(args...) / Panicln(args...) / Panicf(format, args...)
         → Panic() を呼び出す。 defer された処理は動く
-    Fatal(args) / Fatalln(args) / Fatalf(format, args...)
+    Fatal(args...) / Fatalln(args...) / Fatalf(format, args...)
         → os.Exit(1) を呼び出す。 defer された処理も動かない
-    Error(args) / Errorln(args) / Errorf(format, args...)
-    Warn(args)  / Warnln(args)  / Warnf(format, args...)
-    Info(args)  / Infoln(args)  / Infof(format, args...)
-    Debug(args) / Debugln(args) / Debugf(format, args...)
-    Trace(args) / Traceln(args) / Tracef(format, args...)
+    Error(args...) / Errorln(args...) / Errorf(format, args...)
+    Warn(args...)  / Warnln(args...)  / Warnf(format, args...)
+    Info(args...)  / Infoln(args...)  / Infof(format, args...)
+    Debug(args...) / Debugln(args...) / Debugf(format, args...)
+    Trace(args...) / Traceln(args...) / Tracef(format, args...)
 
 
     ログレベルのデフォルトは Info 。
@@ -139,6 +139,27 @@ log パッケージの関数も呼べる。
     // こんな風に Fields を足すこともできる。
     log.WithFields(log.Fields{"animal": "walrus",})
       .Info("A walrus appears")
+
+
+WarnFn みたいなのもある。
+
+関数名の Warn/Warnln/Wranf は、下記のように違いがある。
+また、logrus の関数は、エントリーごとなので、どの関数を使っても改行する。
+
+- Warn 系は fmt.Print() と同じような動作
+
+  - 各引数を文字列に直して、空白なしで連結して、最後改行。
+  - (cf. fmt.Print() は、改行しないが、logrus はする。)
+
+- Warnln系は fmt.Println() と同じような動作
+
+  - 下記引数を文字列に直して、空白ありで連結して、最後改行。
+
+- Warnf系は fmt.Printf() と同じような動作
+
+  - 第1引数のフォーマット指定に従って出力する。最後改行。
+  - (cf. fmt.Printf() は、改行しないが、logrus はする。)
+
 
 
 

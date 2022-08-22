@@ -134,9 +134,14 @@ main() 関数から始まる。
 
 表示::
 
+    fmt.Print(i, j, c, python, java)
+        // 各引数を文字列に直して、空白なしで連結して出力。最後改行しない。
+
     fmt.Println(i, j, c, python, java)
+        // 各引数を文字列に直して、空白ありで連結して出力。最後改行する。
 
     fmt.Printf("Type: %T Value: %v\n", ToBe, ToBe)
+        // 第1引数のフォーマット指定に従って出力する。最後改行しない。
         %T ???
         %v ???
 
