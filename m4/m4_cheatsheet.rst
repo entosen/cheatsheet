@@ -260,6 +260,7 @@ TODO
 ::
 
     ifdef(NAME,IF-CASE,ELSE-CASE)
+
     ifelse(比較対象Ａ,比較対象Ｂ,一致時に展開[,不一致時に展開])
 
     5引数以上だと
