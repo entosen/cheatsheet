@@ -20,6 +20,10 @@ TODO
     console.warn(mesg)
     console.error(mesg)
 
+    console.dir
+    console.time
+    console.timeEnd
+
     log(obj1)
     log(obj1, /* …, */ objN)
     log(msg)
@@ -44,6 +48,8 @@ TODO
 
     const --- 初期化後に値を変更できない。
 
+
+    TODO var と let の違いの理解があやしい。for(let i=0;...) とした場合とか。
 
 
     識別子
@@ -215,6 +221,16 @@ MapとSet
 ******************************************
 非同期プログラミング
 ******************************************
+
+- callback
+- Promiseオブジェクト
+
+    - メソッド (then, catch)
+    - async/await    Promiseオブジェクトによる非同期処理を同期的に記述できる(ES2017～)
+
+      - → サンプルコードあったけど、むずいな。。。
+
+TODO Reactorパターン
 
 ******************************************
 日時
