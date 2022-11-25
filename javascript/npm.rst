@@ -17,8 +17,26 @@ npm
     npm ls <package>       # そのパッケージに到る依存関係のみをツリー状に表示
 
 
+    // インストール系
+    npm install <package>         # パッケージをアプリにインストールする
+    npm install <package> -g      # パッケージをグローバルにインストールする
+    npm install <package> -D      # devDependecies としてパッケージをアプリにインストールする
+
+    // run系
+    npm run コマンド名            # package.json に登録したコマンドを実行する。
+                                  # start や test など一部のコマンド名は run キーワードを省略可能
+
+    npm audit                     # パッケージの脆弱性を確認する
+
+    npm publish                   # レポジトリにパッケージを公開する
+
+    npm init                      # package.json を初期化する
+
+
 package.json
 =======================
+
+TODO サンプル
 
 package.json のバージョン指定
 -------------------------------
