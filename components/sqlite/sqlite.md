@@ -41,3 +41,13 @@ quote   SQLリテラルで出力 (3.16.0 以降 (多分))
     - blob は16進数表記 x'abcd' 
     - NULL は "NULL"
 ```
+
+
+
+
+### サンプル
+
+```
+.tables               # table一覧
+.schema [<table名>]   # tableのschema表示
+```
