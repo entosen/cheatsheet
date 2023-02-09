@@ -572,3 +572,90 @@ git update-index --chmod=+x path/to/file
 # github 特有
 
 
+
+
+
+
+# git LFS
+
+gitが苦手な大きなバイナリファイルを扱うための仕組み。
+
+git は、分散SCMなので、cloneすると全履歴のスナップショットを取得する。
+大きなバイナリファイルをgit管理にしておくと clone の際に大量のファイルのダウンロードが必要になってしまう。
+
+それを解決するために git LFS では、LFSで管理することにしたファイルは、下記のように扱われる。
+
+- ファイルの実体は別のサーバ(LFSサーバ)に上げる
+- git では、ファイルへのポインタとハッシュ値だけを管理する
+- git clone・git pullのときではなく、git checkoutのタイミングで必要な分だけダウンロードされる
+
+
+参考
+
+- [Git Large File Storage](https://git-lfs.com/)
+
+
+
+
+
+インストール
+
+```
+# mac
+brew update
+brew install git-lfs
+
+git lfs install 
+    → ユーザーグローバルの ~/.gitconfig に設定が追加される
+    → (リポジトリ内でやった場合) リポジトリに pre-push hook を追加する
+```
+
+以下は、各リポジトリで。
+
+
+すでにLFS管理になっているリポジトリをcloneしてくる場合
+```
+git clone <リポジトリ>     # 普通にcloneすればOK。
+```
+
+自分が新規に作る場合
+```
+# 普通にリポジトリを準備
+git init                 # 新規リポジトリを作成する場合
+git clone <リポジトリ>   # LFS未管理のリポジトリをcloneする場合
+
+git lfs install
+    → これで .git/hooks/ 以下にいくつかのフックが追加される
+```
+
+
+
+追跡ファイルパターン
+
+これはリポジトリの .gitattributes に保存される。 .gitattributesファイルはgit管理する。
+
+```
+git lfs track     # 追跡ファイルパターンのリスト
+
+git lfs track [<パターン>...]   # 追跡パターンの追加
+
+    --lockable
+
+
+git lfs untrack [<パターン>...]   # 追跡パターンの削除
+```
+
+
+LFS管理ファイルの上げ先のサーバ。 これは、.lfsconfig に記載される。このファイルもgit管理する。
+```
+git config -f .lfsconfig --list    # 確認
+
+git config -f .lfsconfig lfs.url https://foo.backlog.com/git/BAR/baz.git/info/lfs   # セット例
+```
+
+
+```
+git lfs lock foo/bar/example.png
+git lfs locks      # ロック中のファイル一覧
+git lfs unlock foo/bar/example.png
+```
