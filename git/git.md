@@ -574,6 +574,20 @@ git update-index --chmod=+x path/to/file
 
 
 
+# submodule
+
+
+```
+git submodule add <リポジトリ>
+```
+
+- submoduleの情報は .gitmodule ファイルに格納される。 このファイルも git 管理下に入ります。
+- sbumoduleのディレクトリも git 管理下に入ります。
+
+参考
+- Git - サブモジュール
+https://git-scm.com/book/ja/v2/Git-%E3%81%AE%E3%81%95%E3%81%BE%E3%81%96%E3%81%BE%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB-%E3%82%B5%E3%83%96%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB
+
 
 
 # git LFS
