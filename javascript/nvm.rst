@@ -16,10 +16,13 @@ nvm
 
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 
-    .bashrc に以下のような記述が挿入される。
+    (SHELL環境変数に応じて) .bashrc, .zshrc どちらかに以下のような記述が挿入される。
         export NVM_DIR="$HOME/.nvm"
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
     この記述があることで、nvm コマンドが使えるのと、現在有効になっているnpmへパスが通る
+
 
 ただし、この nvm.sh が WSL1 環境だとやたら重い(10秒ほど)。
 
