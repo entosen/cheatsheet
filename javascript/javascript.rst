@@ -137,6 +137,167 @@ TODO
 
 
 
+オブジェクト
+===========================
+
+オブジェクトはプロパティの集合。プロパティは名前(キー)と値(バリュー)が対になったもの。
+
+- キーは、文字列または Symbol。
+
+  - それ以外、数値とかを入れると暗黙的に文字列に変換される
+  - cf. Map はオブジェクトをキーとして扱える
+
+- 値は、任意のデータ型
+
+オブジェクト型は、変数には参照が入る。オブジェクト型は Mutable。 
+なので、const 変数に入れても参照を変えられないだけで、オブジェクトの中身を変更することは可能。
+変更させたくない場合は ``Object.freeze`` を使う。
+
+作成::
+
+    // オブジェクトリテラル
+    const obj = {             
+        "key1": "value1",     // キーを文字列で指定
+
+        key2: value2,         // 識別子として許される名前であれば、クオートを省略できる。
+                              // "key2": value2 と同義。 
+                              // (注)キーは変数展開されない。
+                              //     もし既に key2 という変数があったとしてもそれとは別個。
+                              // cf. 値は変数展開される。式として評価される。
+
+        [key3]: "value3",     // こうも書けるらしい。(ES2015〜) Computed property names 。
+                              // この場合 [] の中は式として評価される。変数展開される。
+
+        value3,               // "value3": value3 と同じ意味。(ES2015〜)
+
+
+        // TODO Symbol
+
+        123: 456,             // キーは暗黙的に文字列に変換され "123": 456
+
+        func1() {             // TODO 関数型の値をセットする場合の特殊な書き方
+            ...
+        }
+
+        ...otherObj           // spread構文 (ES2018〜)。 他のオブジェクトの各 key:value をこの位置に展開。
+                              // もし名前が重複したら、後ろ優先
+
+        // ECMASCript 5 から末尾カンマ可
+    };
+    
+    
+    {};               // 空オブジェクト
+    new Object():     // 空オブジェクト。
+                      // Objectのインスタンスオブジェクトを作っているらしい。？？？まだ意味わからん
+
+
+プロパティの参照::
+
+    obj.key           // キーが命名規則を満たしている場合、ドット記法で書ける。 obj["key"] と同義。
+
+    obj["key"]        // ブラケット記法
+    obj[myLang]       // []の中は任意の式が書ける。この場合、myLangの中身の文字列を名前として参照する。
+    obj[123]          // キーは暗黙的に文字列に変換される。 obj["123"]
+
+
+    存在しないプロパティへのアクセスは、 undefined が返る (例外にはならない)
+    cf. undefined をさらにドットアクセスしたら例外になる
+        (例) TypeError: widget.window is undefined
+
+    obj?.a?.b
+        Optional chaining、オプショナル・チェイニング、 ?.  (ES2020〜)
+        左辺が nullish (null または undefined) の場合は、それ以上評価せずに undefined を返す。
+        それ以外は、ドットアクセスした結果を返す
+        (例)
+            widget?.window?.title ?? "未定義"
+
+    obj?.[myKey1]?.[myKey2]
+        Optional chaining ブラケット記法版。[]の中は式として評価される。
+
+
+
+
+プロパティの存在確認::
+
+    if (obj.key !== undefined) {...}   // これが成り立つのは、下記2つのケースがある
+                                       //   - キー"key"がない場合
+                                       //   - キー"key"があり、値が undefined 値の場合
+
+    if ("key" in obj) {...}               // キーが存在すれば True
+    if (Object.hasOwn(obj, "key") {...}   // キーが存在すれば True (ES2022〜)
+    if (obj.hasOwnProperty("key")) {...}  // キーが存在すれば True   (欠点があるらしい)
+                                          // この辺はプロトタイプオブジェクトまわりで微妙に違うらしい
+
+
+プロパティの追加・変更::
+
+    obj.key = "value"
+    obj["key"] = "value"   // []内は式として評価される
+
+プロパティの削除::
+
+    delete obj.key1;
+
+    // TODO もっと深い階層も書けるんだろうか？
+
+
+ループ::
+
+    const obj = {"one": 1, "two": 2, "three": 3};
+
+    Object.keys(obj);     // => ["one", "two", "three"]
+    Object.values(obj);   // => [1, 2, 3]
+    Object.entries(obj);  // => [["one", 1], ["two", 2], ["three", 3]];
+
+キーの順序は保証されないと思っておくこと。(条件によっては特定の順番になることもある)
+(cf. Map型は挿入順で保証される)
+
+- `[JavaScript] オブジェクト/Mapのキーの列挙順は保証されるのか - Qiita <https://qiita.com/anqooqie/items/ab3fed5d269d278cdd2b>`__
+
+
+マージと複製::
+
+    ただの代入は、参照だけのコピー。同じオブジェクトを指している。
+
+    下記の方法は、浅いコピー。別なオブジェクトになるが、値がオブジェクトの箇所は同じ参照を指すまま。
+
+    Object.assign(target, ...sources);
+        第1引数のオブジェクトに、第2引数以降のオブジェクトの内容をマージする。
+        (つまり第1引数には副作用がある)
+        返り値は、第1引数のオブジェクトを返す。
+
+        名前が重複した場合は、後ろ優先。
+
+    const objectA = { a: "a" };
+    const objectB = { b: "b" };  
+    const merged = Object.assign({}, objectA, objectB);  // 副作用させたくない場合は{}を指定すればよい
+        // => {a: "a", b: "b"}
+
+
+    // オブジェクトリテラル内のspread構文 (ES2018〜)
+    const objectA = { a: "a" };
+    const objectB = { b: "b" };
+    const merged = {
+        ...objectA,
+        ...objectB
+    };
+        // => { a: "a", b: "b" }
+        // この場合も名前が重複した場合は、後ろ優先。
+
+
+    複製 (浅い複製)
+    const obj2 = Object.assign({}, obj)
+
+
+
+分割代入 (ES2015〜)
+
+
+
+
+
+TODO オブジェクトの比較は？
+
 
 
 
@@ -151,6 +312,9 @@ TODO
     list.forEach(cb)
     list.filter(cb)
 
+
+- 三項演算子
+- Nullish coalescing演算子 (``??``)
 
 
 ******************************************
