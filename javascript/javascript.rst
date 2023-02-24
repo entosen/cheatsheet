@@ -289,14 +289,86 @@ TODO
     const obj2 = Object.assign({}, obj)
 
 
-
-分割代入 (ES2015〜)
-
-
-
-
-
 TODO オブジェクトの比較は？
+
+オブジェクトの分割代入 (ES2015〜)
+-----------------------------------------
+
+分割代入 (Destructuring assignment)
+
+オブジェクトからプロパティを取り出して別個の変数に代入する。
+
+::
+
+    const obj = {id: 42, isVerified: true};
+
+    // 宣言と同時に代入する場合
+    const {id, isVerified} = obj;    // const id = obj.id
+                                     // const isVerified = obj.isVerified
+
+    // 宣言を別でやる場合
+    // 丸かっこで囲む必要がある。ブロックではなく式として認識させるため。
+    // ( ... ) の式の前にセミコロンが必要。じゃないと、前の行の関数呼び出しになる可能性
+    const id, isVerified;
+    ({id, isVerified} = obj);
+
+左辺はオブジェクトリテラルに似ているが、微妙に違う::
+
+    key: var
+
+- キー部分は、オブジェクトのどのキーを取ってくるかを指定する。オブジェクトリテラルと同じっぽい。
+- 値部分は、代入先を指定する。また規定値の指定も可能。
+
+キー部分::
+
+    {
+        "key1": var1,     // var1 = obj["key1"] 
+        key2: var2,       // var2 = obj["key2"]。キーが識別子として有効な形ならクオート不要。
+        [式]: var3,       // 計算されたプロパティ名。[]内は式として評価される
+        key4,             // "key4": key4 と同義。つまり key4 = obj["key4"]。よく登場する。
+
+        ...rest           // 残余プロパティ (まだ提案中)
+                          // 分割パターンによってすでに取り出されていない、残りの列挙可能なプロパティが
+                          // オブジェクトの形で代入される。
+    } = obj
+
+
+規定値
+
+オブジェクトから取り出した値が undefined (キーなしも含む)だったときの、規定値を指定できる::
+
+    {
+        "key1": var1 = 10,
+        key2: var2 = 10,
+        key3 = 10,
+    }
+
+規定値なしで、objにキーがなかった場合、変数は undefined になる。
+
+
+深い階層。入れ子。 ::
+
+    const user = {
+      id: 42,
+      displayName: 'jdoe',
+      fullName: {
+        firstName: 'John',
+        lastName: 'Doe'
+      }
+    };
+
+    const {displayName, fullName: {firstName: name}} = user;
+        // displayName = 'jdoe'
+        // firstName = 'John'
+
+
+使いどころ
+
+- 関数の引数
+- イテレーターの一時変数
+
+
+
 
 
 
