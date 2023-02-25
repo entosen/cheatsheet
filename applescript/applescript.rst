@@ -234,3 +234,144 @@ open::
 
 
 tell
+
+
+====================================
+自作コマンド (利用者定義命令)
+====================================
+
+::
+
+    on 利用者定義命令の名前()
+            処理する内容
+    end 利用者定義命令の名前
+
+
+引数の取り方にいくつか種類がある。
+
+位置渡しの利用者定義命令。丸かっこで書く。
+
+::
+
+    命令の名前(値, ...)
+
+    on 命令の名前(変数名, ...)
+            処理する内容
+    end 命令の名前
+
+
+ラベル渡しの利用者定義命令(1)。 ``given`` を書く。
+
+::
+
+    命令の名前 given ラベル:値,...
+
+    on 命令の名前 given ラベル:変数名,...
+            処理する内容
+    end 命令の名前
+
+
+ラベル渡しの利用者定義命令(2)。 定義済みのラベルを書く。
+
+::
+
+    命令の名前 ラベル 値  ラベル 値  ...
+
+    on 命令の名前 ラベル 変数名  ラベル 変数名  ...
+            処理する内容
+    end 命令の名前
+
+(注1)定義されているラベル(前置詞)。::
+
+    about / above / against / apart from / around / aside from / at 
+    / blow / beneath / beside / between / by / for / from 
+    / insted of / into / on / onto / out of / over / since 
+    / through(thru) / to / under
+
+
+
+注意
+
+tellブロック中から自作コマンドを呼び出すときは、 ``my`` か ``of me`` をつけないといけない。
+
+- ``my`` をつけないと、tell で指定したモノに属するコマンドを探しに行ってしまう
+- ``my`` をつけることで、ファイルグローバルのコマンドを探しに行く
+
+::
+
+    tell application "Finder"
+        x() of me
+        -- my x()   -- もしくは my 
+    end tell
+     
+    on x()
+        display dialog "ハンドラX"
+    end x
+
+====================================
+よく使うコマンド
+====================================
+
+クリップボード(変数)::
+
+    set the clipboard to "hoge"
+
+
+キー入力::
+
+    -- まず、キーを送りたいアプリを前面に出しておく
+    tell application "ATOK Customizer"
+        activate
+    and tell
+
+    tell application "System Events"
+        key code 49    --- キーコードを送信する。49 は Space
+
+        set the clipboard to "日本語"
+        keystroke "v" using {command down}   -- cmd+V で貼り付け
+        delay 0.5  -- ※1
+
+    end tell
+
+IMEがONになっているとうまくいかない。
+
+日本語は keystroke では入らないので、クリップボード経由で貼り付ける。
+
+key code や keystroke は、非同期っぽい。
+おそらくキー入力のキューに入れた時点でコマンドが戻ってくる。
+なので、実際にキーが処理されるのにはタイムラグがある。
+特に、クリップボードから貼り付ける場合、cmd+v を送信して、直後にクリップボードを書き換えるとそれが入力されてしまうことがある。
+なので、 cmd+v の後は 0.5秒ぐらい delay するとよい。
+
+キーコード一覧
+
+- https://eastmanreference.com/complete-list-of-applescript-key-codes
+
+        
+
+
+
+====================================
+ソースコードの文字コード
+====================================
+
+スクリプトエディタ.app は、テキスト形式で保存できる (``.applescript`` ファイル) 。
+
+それの文字コードが微妙。
+
+スクリプトエディタで新規作成しテキスト形式へ保存すると...
+
+  - 日本語が混ざらない場合、ASCII ？ になる。
+  - 日本語が混ざる場合、Shift-JIS になる。
+  - Shift-JISで保存できない日本語が混ざる場合、UTF-16 になる。
+  - ちなみに、一度 Shift-JIS や UTF-16 で作成したファイル中の日本語を取り除いて、
+    上書き保存しても文字コードは変わらない。
+
+
+スクリプトエディタで開く分には、utf-8 でも読めるっぽいが、
+一度実行すると？勝手にそれをSJISで保存し直してしまう。。。
+
+
+参考
+
+- `https://github.com/stymyuko/applescript#セットで公開する理由 <https://github.com/stymyuko/applescript#%E3%82%BB%E3%83%83%E3%83%88%E3%81%A7%E5%85%AC%E9%96%8B%E3%81%99%E3%82%8B%E7%90%86%E7%94%B1>`__
