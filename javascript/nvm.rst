@@ -76,8 +76,13 @@ nvm
     # node.js のバージョンの 一覧を確認 (時間がかかるので LTS のみにしている)
     nvm ls-remote --lts
 
-    # node.js の特定のバージョンをインストール
-    nvm install v10.22.1
+    # node.js の特定のバージョンをインストール、それを use 
+    nvm install [<version>]
+    nvm install v18.14.1
+    nvm install 18        # メジャーバージョンだけでもはいる。それの最新版？
+    nvm install --lts     # 最新のlts版
+    nvm install node      # 最新版
+    nvm install           # そのプロジェクトの .nvmrc に記載のバージョン
 
     # インストールされているものとaliasを確認
     nvm ls
@@ -101,10 +106,14 @@ nvm
     nvm alias [<pattern>]        # 表示
     nvm alias <name> <version>   # alias を張る
 
-    nvm use <version>              # PATH環境変数を切り替える
+    nvm use [<version>]          # PATH環境変数を切り替える
+    nvm use v18.14.1             # そのバージョンに切り替える
+    nvm use 18                   # そのメジャーバージョンの最新？
+    nvm use                      # そのプロジェクトの .nvmrc に記載のバージョンに切り替える
+    nvm use system               # (nvmではなく)システムでインストールものに切り替える
+
     nvm exec <version> <command>   # PATH環境変数をセットした環境でコマンドを実行
     nvm run <version> [<args>]     # PATH環境変数をセットした環境で node コマンドを実行
-
 
     # 今使われる node のバージョンなどを確認
     nvm current
@@ -115,6 +124,9 @@ nvm
     npm --version
     echo $PATH
     printenv | grep NVM
+
+    # アンインストール
+    nvm uninstall <version>
 
 
 普通は、node と npm がセットで入る(例えば、 node-v14系 と npm-6系 がセットで入る)。
