@@ -132,6 +132,7 @@ test.each(table)(name, fn, timeout)
 - table は通常2次元配列
 
 ::
+
     test.each([
       [1, 1, 2],     // 1つ目のテスト
       [1, 2, 3],     // 2つ目のテスト
@@ -228,6 +229,7 @@ https://jestjs.io/docs/ja/expect
 一部のファイルだけ実行する
 
 ::
+
     # ファイル名やパスで実行するファイルを限定する
     jest my-test ...
     jest path/to/my-test.js ...
@@ -241,6 +243,7 @@ https://jestjs.io/docs/ja/expect
 test を test.only にすると、そのファイルの中ではそのテストだけが実行されるようになる。
 
 ::
+
     test.only('this will be the only test that runs', () => {
         expect(true).toBe(false);
     });
@@ -255,6 +258,60 @@ TOOD -t オプション
 Jestに非同期処理が終了したことを知らせる必要がある。
 
 TODO JavaScript の非同期処理をもうちょっとちゃんと分かってからまとめる。
+
+
+
+
+グローバル変数の ``window`` や ``document`` を参照しているコードのテスト方法
+================================================================================
+
+ブラウザで動くJavaScriptのテストなど、 
+グローバル変数の ``window`` や ``document`` を参照しているコードのテスト方法。
+
+jsdom を使う。
+
+- https://github.com/jsdom/jsdom
+
+::
+
+    const jsdom = require('jsdom');
+    const { JSDOM } = jsdom;
+
+    // グローバルの window, document を一時保存。テスト後戻す。
+    let orig;
+    beforeEach(() => {
+      orig = { window, document };
+    });
+    afterEach(() => {
+      ({ window, document } = orig);
+    });
+
+    test('some test', () => {
+      const dom = new JSDOM(
+        `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>あああ</title>
+          </head>
+          <body>
+            <div>あああ</div>
+          </body>
+        </html>
+        `, {
+          url: 'https://example.com/url',
+          referrer: 'https://example.com/ref',
+          contentType: 'text/html',
+        }
+      );
+
+      window = dom.window;
+      document = dom.window.docuemnt;
+
+      // window や document を参照するコードのテスト
+      expect(getRefererHost()).toEqual('example.com')
+    });
+
 
 
 
