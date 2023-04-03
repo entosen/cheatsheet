@@ -1,6 +1,31 @@
 
 
 ================================
+Unix の python
+================================
+
+distoによるが、たいていは ``python`` で2系、 ``python3`` で3系が起動するようになっている。
+
+::
+
+    /usr/bin/python -> python2*
+    /usr/bin/python2 -> python2.7*
+    /usr/bin/python2.7*
+    /usr/bin/python3 -> python3.6*
+    /usr/bin/python3-config -> python3.6-config*
+    /usr/bin/python3.6*
+    /usr/bin/python3.6-config -> python3.6m-config*
+    /usr/bin/python3.6m*
+    /usr/bin/python3.6m-config*
+    /usr/bin/python3.6m-x86_64-config*
+
+    /usr/bin/pip-3 -> ./pip-3.6*
+    /usr/bin/pip-3.6 -> ./pip3.6*
+    /usr/bin/pip3*
+    /usr/bin/pip3.6*
+
+
+================================
 Windows の py.exe
 ================================
 
