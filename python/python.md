@@ -137,6 +137,38 @@ bytes型に対しても、str型が持っているようなテキスト処理が
 b.split(b'\n')
 ```
 
+
+## 関数
+
+### デフォルト引数
+
+注意点
+
+https://docs.python.org/ja/3/reference/compound_stmts.html#function-definitions
+
+> デフォルト引数値は関数定義が実行されるときに左から右へ評価されます。 
+> これは、デフォルト引数の式は関数が定義されるときにただ一度だけ評価され、
+> 同じ "計算済みの" 値が呼び出しのたびに使用されることを意味します。
+>
+> この仕様を理解しておくことは特に、デフォルト引数値がリストや辞書のような
+> ミュータブルなオブジェクトであるときに重要です: 
+> 関数がこのオブジェクトを変更 (例えばリストに要素を追加) すると、
+> このデフォルト引数値が変更の影響を受けてしまします。
+> 一般には、これは意図しない動作です。
+> このような動作を避けるには、デフォルト値として None を使い、
+> この値を関数本体の中で明示的にテストします。例えば以下のようにします:
+
+```
+def whats_on_the_telly(penguin=None):
+    if penguin is None:
+        penguin = []
+    penguin.append("property of the zoo")
+    return penguin
+```
+
+
+
+
 ## 例外処理
 
 - `8. エラーと例外 <https://docs.python.org/ja/3/tutorial/errors.html>`__
