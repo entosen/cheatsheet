@@ -1206,6 +1206,18 @@ interface の型スイッチ::
 上の型アサーション、型switch を使ってできそう。
 
 
+お作法として、interface は
+
+GoのInterfaceの作法 "Accept Interfaces, Return structs" - y-zumiの日記
+https://y-zumi.hatenablog.com/entry/2019/07/28/035632
+
+> 「一般的にGoのInterfaceは、構造体などの値を実装するpackageではなく値を使用するpackageに属します。
+> 値を実装しているpackageは、通常はポインターや構造体型を返す必要があります。
+
+
+
+
+
 Stringer
 
 fmt.Println などで表示させたい場合
