@@ -1750,3 +1750,19 @@ wrapしたエラーの作り方::
 
 TODO
 errors.Is, errors.As の動作を拡張する、Is,As メソッド
+
+
+
+
+
+mod
+=====================
+
+下記のエラーがでたとき::
+
+    fatal: 'origin' does not appear to be a git repository
+
+下記で直る::
+
+    go clean -modcache
+    go get -u
