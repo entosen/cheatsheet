@@ -194,16 +194,31 @@ testing には assertion は用意されていない。
 ::
 
     // テストを失敗させる
-    t.Fail()     # テスト失敗。テストは継続
-    t.FailNow()  # テスト失敗。その時点でその(単一の)テストは中止される
+    t.Fail()     # テスト失敗報告。テストは継続
+    t.FailNow()  # テスト失敗報告。その時点でその(単一の)テストは中止される
 
     // メッセージを出力する
-    t.Log(args ...any)                  # 引数それぞれを出力
+    t.Log(args ...any)                   # 引数それぞれを出力
     t.Logf(format string, args ...any)   # 引数を Sprintf的に解釈して出力
+
+    // テストをスキップ報告。その時点でその(単一の)テストは中止
+    t.SkipNow()
+
 
     // 複合
     t.Error, t.Errorf   # Log,Logf を呼んで、Fail
+        t.Error(args ...any)
+        t.Errorf(format string, args ...any)
+
     t.Fatal, t.Faitalf  # Log,Logf を呼んで、FailNow   
+        t.Fatal(args ...any)
+        t.Fatalf(format string, args ...any)
+
+    t.Skip, t.Skipf     # Log,Logf を呼んで、SkipNow
+        t.Skip(args ...any)
+        t.Skipf(format string, args ...any)
+
+
 
 これだといろいろ不便なので、 testify/assert を使うことが多い。
 
