@@ -546,7 +546,9 @@ structの初期値・structリテラル::
 
     dst = src[:i+copy(src[i:], src[i+1:])]  // これでもいけるらしいが よくわからん
 
-TODO copy
+スライスのコピー::
+
+    copyed := append([]int{}, src...)    // 空のスライスにsrcの全要素をappend
 
 
 Map, マップ
