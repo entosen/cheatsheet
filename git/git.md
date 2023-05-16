@@ -271,6 +271,102 @@ git fetch -p
 ```
 
 
+## rebase
+
+今いるブランチの変更点を、新しいポイントから生やし直す、みたいな感じ。
+
+```
+git rebase [--onto 接続先] [切り取り開始点 [切り取り終了点]]
+git rebase [--onto <newbase>] [<upstream> [<branch>]]
+```
+
+- 対象ブランチ、切り取り終了点 branch --- rebase で生やし直すブランチ。省略した場合はカレントブランチ。
+- 切り取り開始点 upstream --- 切り取りの開始点となるブランチ。 省略時は branch の上流ブランチ。
+- 接続先 newbase --- 新しくブランチを生やす起点。省略した場合は upstream 。
+
+
+差分コミット(便宜上)
+
+- 切り取り終了点の履歴に含まれているが、切り取り開始点の履歴に含まれていないコミット群
+
+
+ながれ。
+
+- (カレントブランチを対象ブランチにスイッチ)
+- 差分コミットを求め覚えておく
+- 対象ブランチを一旦破棄、接続先から新たに分岐
+- 差分コミットを1つずつ順番にコミットしてブランチを伸ばしていく
+
+```
+      A---B---C topic
+     /
+D---E---F---G master
+
+              A'--B'--C' topic
+             /
+D---E---F---G master
+
+git rebase master
+git rebase master topic
+git rebase --onto master master topic
+```
+
+```
+o---o---o---o---o  master
+     \
+      o---o---o---o---o  next
+                       \
+                        o---o---o  topic
+
+
+o---o---o---o---o  master
+    |            \
+    |             o'--o'--o'  topic
+     \
+      o---o---o---o---o  next
+
+
+git rebase --onto master next topic
+
+---
+                        H---I---J topicB
+                       /
+              E---F---G  topicA
+             /
+A---B---C---D  master
+
+             H'--I'--J'  topicB
+            /
+            | E---F---G  topicA
+            |/
+A---B---C---D  master
+
+git rebase --onto master topicA topicB
+```
+
+ある特定のコミットを消すようにも使える。
+```
+E---F---G---H---I---J  topicA
+
+E---H'---I'---J'  topicA
+
+git rebase --onto topicA~5 topicA~3 topicA
+```
+
+
+
+
+
+
+
+参考
+
+- [Git - git-rebase Documentation](https://git-scm.com/docs/git-rebase)
+- [git-rebase – Git コマンドリファレンス（日本語版）](https://tracpath.com/docs/git-rebase/)
+- [git rebase の動作を --onto 指定も含めて正しく理解する - Qiita](https://qiita.com/hkuno/items/ef639b75efc156cf37d7)
+
+
+
 
 # ファイル名の変更・移動
 
