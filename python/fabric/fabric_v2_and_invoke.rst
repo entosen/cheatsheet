@@ -190,15 +190,117 @@ sudo するには
 (invoke) task への引数の渡し方、かなりバリエーションがある。
 
 - http://docs.pyinvoke.org/en/stable/concepts/invoking-tasks.html
+- `タスクランナーInvokeを使ってみよう - Qiita <https://qiita.com/iisaka51/items/c4888e726356c5474dc4>`__
 
+
+定義::
+
+    $ inv [--core-opts] task1 [--task1-opts] ... taskN [--taskN-opts]
+
+``invoke`` もしくは省略形の  ``inv`` 。
+
+
+特に指定しないと、 ``tasks.py`` が読み込まれる。
+
+それ以外の python を指定したい場合は ``inv -c hoge.py`` のようにする。
+
+
+
+- ``inv -h`` もしくは ``inv --help`` でヘルプ (呼び出し可能なタスクとオプションの一覧が表示される)
+
+  - ``inv --help タスク名`` で、そのタスクに関して、より詳しい説明
+
+- ``inv -l`` もしくは ``inv --list`` というのもある。TODO 違いは？
+
+タスクについて
+----------------------
+
+ソースコードで ``@task`` を付けて定義したpython関数を、コマンドラインから呼び出すことができる。
 
 関数名に ``_`` を含むものは、タスク名としては ``-`` に置換されたものになる。
-タスクの引数も同様に ``-`` に置換されたオプションになる。
 
-タスクに引数を渡すには::
+例::
 
-    fab task1 --foo=bar --hoge=fuga
-        task1(conn, foo='bar', hoge='fuga') と呼ばれる
+    @task
+    def build(c):        # inv build  のように呼ぶ
+        ... 
+
+    @task
+    def copy_hoge(c):    # inv copy-hoge のように呼ぶ
+        ...
+
+
+タスクの引数
+---------------------
+
+タスクの引数名も同様に ``_`` が ``-`` に置換されたオプションになる。
+
+python関数の引数定義から自動的に short option と long option が作られる。::
+
+    @task
+    def hello(c, name):
+
+        ↓
+
+    -n STRING, --name=STRING
+
+下記のような指定が可能。(イコールが入る/入らない、空白が入る/入らない)::
+
+    # パラメタを取るオプション
+        --name=Jack
+        --name Jack
+        -n=Jack
+        -n Jack
+        -nJack
+
+    # パラメタを取らないオプション (フラグ型オプション)
+        -p -v 
+        -pv
+
+オプションを取らない引数(位置引数, いわゆるargs)は指定できない。
+
+
+型変換
+^^^^^^^^^
+
+コマンドライン上の指定は当然全て文字列だが、それだと不便なので、自動で型変換してpython関数の引数に渡してくれる。
+
+関数定義にデフォルト引数を付けておくとそれで自動的に型変換してくれる::
+
+    # デフォルト引数が数値
+    def task1(c, count=1):     # --count=5  数値型にキャスト
+
+    # デフォルト引数が文字列
+        TODO 多分文字列のまま
+
+    # デフォルト引数が None
+    def task2(c, name=None):   # キャストされない。結果として文字列
+
+    # デフォルト引数が False
+    def task3(c, flag=False):  # True を指定するためのフラグ型の -f, --flag が提供される
+                               # False にするための --no-flag は提供されない (オプションを付けないことでFalseを表す)
+
+    # デフォルト引数が True
+    def task4(c, flag=True):  # True にするためのフラグ型の -f, --flag が使える
+                              # False にするための --no-flag が提供される
+
+
+更なる機能
+^^^^^^^^^^^^^^^^^
+
+::
+
+    @task(iterable=['my_list'])   複数の値を取れる引数  
+    --my-list aaa --my-list bbb --my-list ccc 
+        => ['aaa', 'bbb', 'ccc']
+
+    @task(incrementable=['verbose'])   指定された回数、インクリメント型
+    -vvv
+
+    @task(optional=['log'])     引数を取らない指定も、取る指定もできるようにする
+    --log                  ログを有効にする。出力先はデフォルト。
+    --log=myoutout.log     ログを有効にする。出力先は指定のファイル。
+                           指定しなければ、ログは出力されない。  みたいな
 
 
 
