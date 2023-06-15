@@ -170,6 +170,15 @@ DataProviderみたいなことは自前でやらないといけない::
 
 
     TODO
+    テストを指定する場合 (ディレクトリを指定 ＋ -runで正規表現指定)
+        go test -run ^TestHoge$ ./internal/hogedir/... 
+                     テスト関数名(正規表現)
+
+        (suiteの中の1テストを指定する場合)
+        go test -run '^TestFooSuite$' -testify.m '^(TestDesignPrefetcherImpl_Prefetch)$' ./internal/hogedir/... 
+                                                  テストメソッド名(正規表現)
+                      suite.Runをしている関数名(正規表現)
+
 
 
 
@@ -304,7 +313,29 @@ go では基本的に interface しか mock化できないっぽい。
     }
 
 mockの生成
-=====================
+=========================================
+
+案1 同じディレクトリにmockファイルを作る
+-------------------------------------------------
+
+うちのチームではこっちを採用することになった。
+
+ディレクトリ構成::
+
+    cmd/
+    internal/
+        hoge/
+            foo.go
+            mock_foo.go        <--  mock/ 以下に同じパス・ファイル名で作るのがよさそう
+
+::
+
+    //go:generate mockgen -source=$GOFILE -destination=mock_$GOFILE -package=$GOPACKAGE
+
+
+
+案2 大きくmockディレクトリを作る
+----------------------------------------
 
 mock を固めて入れる mock ディレクトリを作っておくのがいい::
 
@@ -377,15 +408,20 @@ testcase に含めるのがいいと思う。::
 
     testcases := []struct{
         name string
-        setMock func(*mock.MockFoo)
+        mockSetupper func(*mock.MockFoo, *mock.MockBar)
     }{
         {
             name: "test1",
-            setMock: func(m *mock.MockFoo) {
-                mc.EXPECT().SUT('aaa').Return("hoge", nil)
+            mockSetupper: func(mockFoo *mock.MockFoo, mockBar *mock.MockBar) {
+                mFoo.EXPECT().SUT('aaa').Return("hoge", nil)
+                mBar.EXPECT().BAR(1).Return("hoge", nil)
             },
         }
     }
+
+
+モックの返り値に別のモックを渡すようなケースもあるので、
+mockSetupper は、全てのモックを受け取って一度に設定するような感じの方がよさそう。
 
 
 MockやStubの指定の仕方, gomock
@@ -470,6 +506,17 @@ mock/hoge/foo.go (自動生成)::
 モックの指定の仕方
 =============================
 
+参考
+
+- `【Go言語】 gomock モックメソッドの指定方法まとめ | ramble - ランブル - <https://ramble.impl.co.jp/3235/>`__
+
+
+基本
+-----------------
+
+::
+
+    MockObject.EXPECT().期待するメソッド(引数1, 引数2, ...).Return(戻り値1, 戻り値2, ...)
 
 Matcher
 --------------
@@ -486,7 +533,30 @@ Matcher
         .Bar(gomock.Any())                // なんでもいい場合。
 
 
-return
+::
+
+    gomock.Any()   // なんでもいい
+    gomock.Eq(x)   // 一致(equalityをチェック)
+    gomock.Len(i)  // その引数が特定のlenを持っていたらマッチ
+    gomock.Nil()   // == nil であればマッチ
+
+    gomock.InAnyOrder([]int{1, 2, 3})   // スライスが順不同で一致していればマッチ
+
+    gomock.AssignableToTypeOf(s)   // ある型に代入可能可能であればマッチ
+        var s fmt.Stringer = &bytes.Buffer{}
+        AssignableToTypeOf(s).Matches(time.Second) // returns true
+        AssignableToTypeOf(s).Matches(99) // returns false
+
+
+Matcherの否定/ 組み合わせ ::
+
+    gomock.Not     Not(Eq(5))
+    gomock.All     All(Not(Eq(3), Not(Eq(5)))
+
+
+
+
+アクション
 -----------------
 
 ::
@@ -498,6 +568,45 @@ return
             return (引数に応じた式など)
         })
 
+.Do
+
+DoAndReturn の、「戻り値」が不要な場合に使う。 
+
+::
+
+    // - クロージャーにしておいて、変数をセットする。 (他のモックの返り値や判定で使う)
+    calledString := ""
+    mockIndex.EXPECT().Put(gomock.Any(), gomock.Any()).Do(func(key string, _ interface{}) {
+            calledString = key
+    })
+
+    // - テストをその場で失敗させる
+    mockIndex.EXPECT().Put("nil-key", gomock.Any()).Do(func(key string, value interface{}) {
+        if value != nil {
+            t.Errorf("Put did not pass through nil; got %v", value)
+        }
+    })
+
+
+.SetArg 。 ポインタ引数に代入したい場合
+
+::
+
+    mockIndex.EXPECT().Ptr(gomock.Any()).SetArg(0, 7)
+        0番目の引数(*int型) の中身を 7 に変える
+
+
+TODO これ .Do でも同じことできそうな気がするがどうなんだろうか。
+
+- .SetArg の実装コードを見ると、ポインタだけでなく、引数がスライスやマップでも動くっぽい。
+- メソッドの引数が多い場合だと、.Do でやると無名関数の記述が大変になるかも。
+
+
+
+
+TODO
+
+- .NillableRet()
 
 呼ばれる回数
 -----------------
@@ -532,6 +641,16 @@ return
     secondCall := mockObj.EXPECT().SomeMethod(2, "second").After(firstCall)
     mockObj.EXPECT().SomeMethod(3, "third").After(secondCall)
 
+
+独自Macher (TODO)
+-----------------------
+
+- 独自Matcher
+- 他のMatcherに委譲する独自マッチャー
+
+
+WantFormatter
+GotFormatter
 
 
 ********************
