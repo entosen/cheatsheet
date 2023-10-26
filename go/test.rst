@@ -299,7 +299,7 @@ go では基本的に interface しか mock化できないっぽい。
       // Assert that Bar() is invoked.  
       // 指定回数モックが呼び出されたとこを検証するために呼び出す。
       // Go version of 1.14+, a mockgen version of 1.5.0+ では Finish() は不要。
-      // (gomoke.NewController(t) を仕掛けた t の cleanup のときに暗黙的に実行されるとのこと)
+      // (gomock.NewController(t) を仕掛けた t の cleanup のときに暗黙的に実行されるとのこと)
       defer ctrl.Finish()
 
       m := NewMockFoo(ctrl)   // mockgen によってこの関数が用意される
@@ -391,7 +391,7 @@ mockを使ったテストの実装
       // Assert that Bar() is invoked.  
       // 指定回数モックが呼び出されたとこを検証するために呼び出す。
       // Go version of 1.14+, a mockgen version of 1.5.0+ では Finish() は不要。
-      // (gomoke.NewController(t) を仕掛けた t の cleanup のときに暗黙的に実行されるとのこと)
+      // (gomock.NewController(t) を仕掛けた t の cleanup のときに暗黙的に実行されるとのこと)
       defer ctrl.Finish()
 
       m := NewMockFoo(ctrl)   // mockgen によってこの関数が用意される
@@ -472,7 +472,7 @@ mock/hoge/foo.go (自動生成)::
         ctrl := gomock.NewController(t)
         // ↓これをやることで、モックが指定回数呼ばれたことをassertion
         // Go version of 1.14+, a mockgen version of 1.5.0+ では Finish() は不要。
-        // (gomoke.NewController(t) を仕掛けた t の cleanup のときに暗黙的に実行されるとのこと)
+        // (gomock.NewController(t) を仕掛けた t の cleanup のときに暗黙的に実行されるとのこと)
         defer ctrl.Finish()
      
         m := mock_hoge.NewMockFoo(ctrl)
