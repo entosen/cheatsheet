@@ -14,7 +14,7 @@ nvm
 
 標準のインストール方法 (ただし後述の問題があるので、これはやらない) ::
 
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
     (SHELL環境変数に応じて) .bashrc, .zshrc どちらかに以下のような記述が挿入される。
         export NVM_DIR="$HOME/.nvm"
@@ -30,7 +30,7 @@ nvm
 
 .bashrcなどをいじらない指定(PRFILE=/dev/null)をしてインストール::
 
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | PROFILE=/dev/null bash
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | PROFILE=/dev/null bash
 
 .bashrc などに以下の記述を追加::
 
