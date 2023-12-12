@@ -179,6 +179,13 @@ nvm
 仕組み
 ------------------
 
+nvm は環境変数をうまくセットすることで、node.js を切り替えている。
+
+環境変数PATHの先頭に指定したnode.jsのbinが差し込まれるので、
+呼び出される node, npm, npx コマンドは、各バージョンでインストールされた本物が呼ばれる。
+
+なので、環境変数を引き継がないとうまく切り替えができない。特にVSCodeをスタートメニューから起動したりした場合は注意。
+
 nvmは、$HOME/.nvm 以下にインストールされる。
 
 nvm install した各バージョンの node.js は、$HOME/.nvm/versions/node/ 以下に格納される。
@@ -191,6 +198,7 @@ nvm.sh でやっていることは
 nvm use をやると
 
 - 環境変数PATHに 指定バージョンの node.js の bin を追加or差し替えする
+- NVM_BIN, NVM_INC を指定バージョンの node.js に向けるようにセットする
 
 PATH以外にもいいくつかの環境変数をいじるらしい::
 
@@ -200,3 +208,33 @@ PATH以外にもいいくつかの環境変数をいじるらしい::
 
     MANPATH
     NODE_PATH
+
+
+シェルを起動して、nvm.sh のロードの時点(nvm use を特にまだやっていない状態)では、
+nvm alias で default に指定されているバージョンに向いている。
+
+
+例::
+
+    // 下記のように nvm install と nvm alias がされている場合。
+    // % nvm ls
+    // ->     v18.13.0
+    //        v18.18.2
+    // default -> v18.13.0
+
+    シェル起動直後。 nvm.sh をまだロードしていない状態
+        PATH には nvm 関係は入っていない
+        NVM_BIN 未セット
+        NVM_INC 未セット
+
+    nvm.sh をロードし、未use状態 (default が指すバージョンに向いている)
+        PATH=/home/<username>/.nvm/versions/node/v18.13.0/bin:...
+        NVM_BIN=/home/<username>/.nvm/versions/node/v18.13.0/bin
+        NVM_INC=/home/<username>/.nvm/versions/node/v18.13.0/include/node
+
+    nvm use 18.18.2 したあと
+        PATH=/home/<username>/.nvm/versions/node/v18.18.2/bin:...
+        NVM_BIN=/home/<username>/.nvm/versions/node/v18.18.2/bin
+        NVM_INC=/home/<username>/.nvm/versions/node/v18.18.2/include/node
+
+
