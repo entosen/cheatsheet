@@ -1,0 +1,73 @@
+==============
+nodenv
+==============
+
+https://github.com/nodenv/nodenv
+
+複数の nodejs をインストールして、切り替えながら使えるツール。
+
+
+
+インストール
+===========================
+
+mac::
+
+    brew install nodenv
+    (updateするときはこれ) brew upgrade nodenv node-build
+
+    /usr/local/bin/nodenv に入る
+
+最初の設定。
+
+下記を .zshrc に書くらしい::
+
+    eval "$(nodenv init -)"
+
+個人的には、非インタラクティブシェル用に、PATHの設定だけは .zprofile に書いておいた方がいいと思う。::
+
+    // .zprofile の末尾の方
+    export PATH="$HOME/.nodenv/shims:${PATH}"
+
+    // .zshrc の末尾の方
+    eval "$(nodenv init -)"
+
+
+
+チートシート
+======================
+
+::
+
+    nodenv install -l          # インストール可能なバージョン一覧
+    nodenv install <version>   # インストール
+
+    nodenv shell <version>   # (優先度1) 指定したバージョンで、環境変数 ``NODENV_VERSION`` をセットする
+    nodenv shell             # どのバージョンが使われるか表示
+
+    nodenv local <version>   # (優先度2) 指定したバージョンで、 カレントディレクトリに ``.node-version`` ファイルを作る
+    nodenv local --unset     # カレントディレクトリに .node-version ファイルがあれば削除
+    nodenv local             # どのバージョンが使われるか表示
+
+    nodenv global <version>  # (優先度3) 指定したバージョンで ``~/.nodenv/version`` を作る
+    nodenv global            # どのバージョンが使われるか表示
+
+    nodenv versions          # インストールしているversion一覧と、どのバージョンが使われるか
+    nodenv version           # どのバージョンが使われるか
+
+    nodenv rehash            # nodeのバージョンをインストールしたらやれ
+
+    nodenv which npm         # activeバージョンのパスを表示する
+    nodenv whence npm        # そのコマンドがインストールされているバージョン一覧
+
+優先度
+===========
+
+https://github.com/nodenv/nodenv#choosing-the-node-version
+
+- (優先度1) ``NODENV_VERSION`` 環境変数で指定されたもの (ref. nodenv shell)
+- (優先度2-1) 実行しようとしたスクリプトのディレクトリから上にたどって見つかった ``.node-version``  (ref. nodenv local)
+- (優先度2-2) カレントディレクトリから上にたどって見つかった ``.node-version``  (ref. nodenv local)
+- (優先度3) ``~/.nodenv/version`` (ref. nodenv global)
+- (優先度4) システムにインストールされているバージョン。もっと後ろのPATHを探すらしい。
+
