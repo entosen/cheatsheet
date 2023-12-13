@@ -71,3 +71,25 @@ https://github.com/nodenv/nodenv#choosing-the-node-version
 - (優先度3) ``~/.nodenv/version`` (ref. nodenv global)
 - (優先度4) システムにインストールされているバージョン。もっと後ろのPATHを探すらしい。
 
+
+仕組み
+===========
+
+https://github.com/nodenv/nodenv#how-it-works
+
+PATH環境変数の先頭に ``~/.nodenv/shims`` を追加することで、
+node, npm, npx, corepack コマンドを一旦nodenvのものが受け取る。
+
+それは、優先度に従い、どのバージョンのnodejsに向けるかを決定し、
+そのバージョンの正式なコマンドに受け渡す。
+
+つまり、コマンド実行ごとに、向き先を決めるということをしている。
+
+
+
+利点
+
+- PATH環境変数の記述は固定でよいので、.zshrcなどに固定で書いておけばよい。
+
+
+環境変数を変えたり持ち回ったりしないので、シェル以外から起動するVSCodeなどとも相性がよい。
