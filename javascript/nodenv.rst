@@ -93,3 +93,30 @@ node, npm, npx, corepack コマンドを一旦nodenvのものが受け取る。
 
 
 環境変数を変えたり持ち回ったりしないので、シェル以外から起動するVSCodeなどとも相性がよい。
+
+nodenv init - でやっていること
+=======================================
+
+::
+
+    export PATH="/Users/hogehoge/.nodenv/shims:${PATH}"
+    export NODENV_SHELL=zsh
+    source '/usr/local/Cellar/nodenv/1.4.1/libexec/../completions/nodenv.zsh'
+    command nodenv rehash 2>/dev/null
+    nodenv() {
+      local command
+      command="${1:-}"
+      if [ "$#" -gt 0 ]; then
+        shift
+      fi
+      case "$command" in
+      rehash|shell)
+        eval "$(nodenv "sh-$command" "$@")";;
+      *)
+        command nodenv "$command" "$@";;
+      esac
+    }
+
+
+- ``nodenv() {...}`` のところは、nodenv rehash と shell は、そのシェルに対して影響を与える必要があり、
+  execではなくて eval する必要があるので、そのための仕組み。
