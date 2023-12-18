@@ -11,7 +11,10 @@ https://github.com/nodenv/nodenv
 インストール
 ===========================
 
-mac::
+mac
+--------
+
+::
 
     brew install nodenv
     (updateするときはこれ) brew upgrade nodenv node-build
@@ -32,6 +35,35 @@ mac::
     // .zshrc の末尾の方
     eval "$(nodenv init -)"
 
+
+GitHubから入れる
+------------------------
+
+参考 https://github.com/nodenv/nodenv#basic-github-checkout
+
+※ homebrew の場合は nodenv 本体と node-build の両方が入っているらしい。
+
+この手順ではそれぞれいれないといけないので注意。
+忘れると nodenv install ができない。
+
+
+::
+
+    git clone https://github.com/nodenv/nodenv.git ~/.nodenv
+    (~/.nodenv に入る。)
+
+    mkdir ~/.nodenv/plugins
+    git clone https://github.com/nodenv/node-build.git ~/.nodenv/plugins/node-build
+    git clone https://github.com/nodenv/nodenv-aliases.git ~/.nodenv/plugins/nodenv-aliases
+
+::
+
+    // .zprofile の末尾の方
+    export PATH="$HOME/.nodenv/bin:$PATH"
+    export PATH="$HOME/.nodenv/shims:${PATH}"
+
+    // .zshrc の末尾の方
+    eval "$(nodenv init -)"
 
 
 チートシート
