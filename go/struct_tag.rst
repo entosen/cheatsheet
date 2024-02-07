@@ -136,7 +136,20 @@ StructTag型。 Structの中の1つのフィールドのタグ文字列を表す
 json
 ================
 
-TOOD
+詳細は json.rst を見て。
+
+::
+
+    Field int                            // タグなしの場合のキー名はフィールド名と同じ
+    Field int `json:"myName"`            // "myName" というキーで出力
+    Field int `json:"myName,omitempty"`  
+    Field int `json:",omitempty"`        // キー名はフィールド名と同じでよい、かつ、omitemptyを指定したい場合
+
+    Field int `json:"-"`     // そのフィールドは出力されない
+    Field int `json:"-,"`    // "-" というキーで出力したい場合
+
+
+
 
 
 validator
