@@ -57,6 +57,36 @@ json.Unmarshal の例::
 - 大文字始まりのフィールドがMarshalで出力される
 
 
+
+スライスとマップが null になるか []{} になるか::
+
+    nilスライス (宣言だけした状態, nilを代入しているケース)
+         → null
+    長さ0のスライス ([]string{} みたいな感じ)
+         → [] 
+
+    nilマップ (宣言だけした状態、nilを代入しているケース)
+         → null
+    要素数の0のマップ (map[string]string{} みたいな感じ)
+         → {}
+
+    サンプル
+        type AAA struct {
+            L1 []string
+            L2 []string
+            M1 map[string]string
+            M2 map[string]string
+        }
+        a := AAA{
+            L1: nil,
+            L2: []string{},
+            M1: nil,
+            M2: map[string]string{},
+        }
+        b, _ := json.Marshal(a)
+        fmt.Println(string(b))
+        →  {"L1":null,"L2":[],"M1":null,"M2":{}}
+
 omitempty について
 ========================
 
@@ -73,13 +103,16 @@ omitempty を付けたときにキーごと除かれるもの
   - nil interface → 省略される
   - interface の中身が型付きのnil → 省略されない。キーが出力され、値はその型の MarshalJSON() による
 
-    - interface の中身が構造体ポインタ型でnil であれば、値として ``null`` が出力される
+    - interface の実体が構造体ポインタ型でnil であれば、値として ``null`` が出力される
 
 - 長さ0の配列 ([0]int みたいなもの)
 
   - cf. 長さ0以外の配列 (例えば ``[3]int`` ) は省略されない。キーが出力され、値は ``{0,0,0}`` が出力される
 
 - 空のスライス (nil、長さ0のスライス)
+
+  - cf. 長さ0以外のスライス (例えば ``[]int{0,0,0}`` ) は省略されない。キーが出力され、値は ``{0,0,0}`` が出力される
+
 - 空のmap (nil、要素数0のmap)
 
 - cf. 中身が全部ゼロ値の構造体 → 省略されない。キーが出力され、値はその型の MarshalJSON() による
