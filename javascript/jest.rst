@@ -220,6 +220,46 @@ https://jestjs.io/docs/ja/expect
 
     await expect( async関数  ).resolves.toBe(  )   # 頭にも await つけないといけない。
 
+::
+
+    toBe(v)      // Object.is。 厳密な等価性
+    toEqual(v)   // 中身の一致。オブジェクトまたは配列の全てのフィールドを再帰的にチェック
+
+    toBeNull()       は null のみ一致します
+    toBeUndefined()  は undefined のみ一致します
+    toBeDefined()    は toBeUndefined の反対です
+    toBeTruthy()     は if ステートメントが真であるとみなすものに一致します
+    toBeFalsy()      は if ステートメントが偽であるとみなすものに一致します
+
+    // 数値用
+    toBeGreaterThan(3);
+    toBeGreaterThanOrEqual(3.5);
+    toBeLessThan(5);
+    toBeLessThanOrEqual(4.5);
+    toBeCloseTo(0.3)       // デフォルトだと、差の絶対値が 0.005 以内。閾値を変えることもできる。
+    toBeNaN()
+
+    // 文字列用
+    toMatch(/pattern/)   正規表現マッチ
+
+    // 配列とIterable
+    toContain(item)       配列中にそのアイテムを含むか (===)
+    toContainEqual(item)  配列中にそのアイテムを含むか (中身の等価性)
+
+    // 例外
+    expect(() => compileAndroidCode()).toThrow();        // なんかしらの throw
+    expect(() => compileAndroidCode()).toThrow(Error);   // この型を throw
+    expect(() => compileAndroidCode()).toThrow('you are using the wrong JDK');  // エラーメッセージに含まれる文字列
+    expect(() => compileAndroidCode()).toThrow(/JDK/);   // エラーメッセージの正規表現
+    expect(() => compileAndroidCode()).toThrow(/^you are using the wrong JDK!$/);  // エラーメッセージ完全マッチ
+
+
+    // 型
+    expect(new A()).toBeInstanceOf(A);
+
+
+    expect(hoge).not.toBe('foo')
+
 
 
 一部のテストだけ実行する
