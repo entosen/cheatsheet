@@ -17,7 +17,6 @@ mac
 ::
 
     brew install nodenv
-    (updateするときはこれ) brew upgrade nodenv node-build
 
     /usr/local/bin/nodenv に入る
 
@@ -55,6 +54,8 @@ GitHubから入れる
     mkdir ~/.nodenv/plugins
     git clone https://github.com/nodenv/node-build.git ~/.nodenv/plugins/node-build
     git clone https://github.com/nodenv/nodenv-aliases.git ~/.nodenv/plugins/nodenv-aliases
+    (これも入れておくとupdateが楽)
+    git clone https://github.com/nodenv/nodenv-update.git ~/.nodenv/plugins/nodenv-update
 
 ::
 
@@ -66,12 +67,31 @@ GitHubから入れる
     eval "$(nodenv init -)"
 
 
+アップデート
+===========================
+
+新しい node.js のバージョンが見えない場合は、
+
+homebrewで入れている場合::
+
+    brew upgrade nodenv node-build
+
+GiHubから入れている場合::
+
+    (nodenv-update plugin が入っている場合)
+    nodenv udpate 
+
+    (そうでない場合)
+    cd ~/.nodenv/plugins/node-build
+    git pull
+
+
 チートシート
 ======================
 
 ::
 
-    nodenv install -l          # インストール可能なバージョン一覧
+    nodenv install -l          # インストール可能なバージョン一覧 (--list でも可)
     nodenv install <version>   # インストール
 
     nodenv shell <version>   # (優先度1) 指定したバージョンで、環境変数 ``NODENV_VERSION`` をセットする
