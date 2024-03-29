@@ -67,6 +67,15 @@ GitHubから入れる
     eval "$(nodenv init -)"
 
 
+global につかうnodeを1つ指定しておく
+---------------------------------------
+
+ディレクトリに ``.node-version`` が置いてなかった場合に動くnodeバージョンを1つ指定しておく::
+
+    nodenv global 20.12.0
+
+
+
 アップデート
 ===========================
 
@@ -107,7 +116,7 @@ GiHubから入れている場合::
     nodenv versions          # インストールしているversion一覧と、どのバージョンが使われるか
     nodenv version           # どのバージョンが使われるか
 
-    nodenv rehash            # nodeのバージョンをインストールしたらやれ
+    nodenv rehash            # shimsを作成しなおす (後述)
 
     nodenv which npm         # activeバージョンのパスを表示する
     nodenv whence npm        # そのコマンドがインストールされているバージョン一覧
@@ -145,6 +154,18 @@ node, npm, npx, corepack コマンドを一旦nodenvのものが受け取る。
 
 
 環境変数を変えたり持ち回ったりしないので、シェル以外から起動するVSCodeなどとも相性がよい。
+
+
+shims
+-------------------
+
+shimsで横取りするコマンドは、各nodejsバージョンの bin 以下に存在するコマンド。
+
+``nodenv rehash`` は、手元に取得済みのnodejs全バージョンについて、bin 以下にあるコマンドを調べて、
+それと同名のshimsを作成しなおす。
+
+
+
 
 nodenv init - でやっていること
 =======================================
