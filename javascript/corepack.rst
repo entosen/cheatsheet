@@ -122,8 +122,9 @@ nodenv で Node.js (最近のやつ) を入れたら corepack コマンドは使
     corepack cache clean    # (0.25.0以降のみ) キャッシュを削除。(lastKnownGool.jsonは残る)
     corepack cache clear    # 同上
 
-    cprepack prepare yarn@1.22.9 --activate   # ~/.cache/node/corepack/lastKnownGood.json に書き込む
-                                              # (deprecated)
+    corepack prepare yarn@1.22.9 --activate
+        0.20.0 で deprecated になっている。
+        おそらく corepack install -g yarn@1.22.0 と同じ = lastKnownGood.json に書き込む。
 
 
 ``corepack enable`` をやっておけば、
