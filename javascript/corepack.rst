@@ -103,7 +103,7 @@ nodenv で Node.js (最近のやつ) を入れたら corepack コマンドは使
 
         package.json の packageManager の項目を、
         既存の値と同じメジャーバージョンで最新のものに更新する。
-        同時にそのバーンをダウンロード、インストール。
+        同時にそのバージョンをダウンロード、インストール。
 
     corepack install 
 
