@@ -352,26 +352,28 @@ TODO どういうとき空白が詰まる？
 
 ### デフォルト値 +α
 
+シェルスクリプトのmanとかを見ると、空文字列(長さ0の文字列)という意味で NULL という用語を使っている。
+
 ```
 # なければ代わりにデフォルト値を返す
-${FOO-aaa}   # FOOが未使用であれば、 aaa 値を返す (代入はしない)
-${FOO:-aaa}  # FOOが未使用か空文字列であれば、 aaa 値を返す (代入はしない)
+${FOO-aaa}   # FOOが未定義であれば、 aaa 値を返す (代入はしない)
+${FOO:-aaa}  # FOOが未定義か空文字列であれば、 aaa 値を返す (代入はしない)
 
 # 上に加えて、代入もしてしまう
-${FOO=aaa}   # FOOが未使用であれば、FOOにaaaを代入し、aaaを返す。
-${FOO:=aaa}  # FOOが未使用か空文字列であれば、FOOにaaaを代入し、aaaを返す。
+${FOO=aaa}   # FOOが未定義であれば、FOOにaaaを代入し、aaaを返す。
+${FOO:=aaa}  # FOOが未定義か空文字列であれば、FOOにaaaを代入し、aaaを返す。
 
 
 # ある場合は代わりにデフォルトの値を返す
-${FOO+aaa}   # FOOが未使用であればそのままの値。それ以外がセットされていれば aaa を返す
-${FOO:+aaa}  # FOOが未使用か空文字であればそのままの値。それ以外がセットされていれば aaa を返す
+${FOO+aaa}   # FOOが未定義であればそのままの値。それ以外がセットされていれば aaa を返す
+${FOO:+aaa}  # FOOが未定義か空文字であればそのままの値。それ以外がセットされていれば aaa を返す
 
-if [ -n "${HOGE+x}" ]; then ...   # HOGEが未使用であることのチェック？意味あるか？
+if [ -n "${HOGE+x}" ]; then ...   # HOGEが未定義であることのチェック？意味あるか？
 
 
 # ない場合はエラー終了
-${FOO?FOO is not set}   # FOOが未使用であれば 'FOO is not set' を表示してエラー終了
-${FOO:?FOO is not set}  # FOOが未使用か空文字であれば 'FOO is not set' を表示してエラー終了
+${FOO?FOO is not set}   # FOOが未定義であれば 'FOO is not set' を表示してエラー終了
+${FOO:?FOO is not set}  # FOOが未定義か空文字であれば 'FOO is not set' を表示してエラー終了
 
 % echo ${HOGE:?not set}
 zsh: HOGE: not set
