@@ -92,3 +92,41 @@ tap/untap
         - 他のtap
 
 
+
+仕組み
+==============
+
+どのディレクトリにインストールされるか
+-------------------------------------------
+
+特に指定しなければ、 
+
+- ``/usr/local/Cellar/<package名>/<version/`` に実体が入る
+- ``/usr/local/opt/<package名>`` が Celler 配下の実体ディレクトリへのシンボリックリンクが置かれる
+- ``/usr/local/bin/`` or ``/usr/local/sbin`` に実体コマンドへのシンボリックリンクが置かれる(置かれないものもある)
+
+
+``brew --prefix`` で確認できる。
+
+
+``@version`` 付きのパッケージ
+----------------------------------
+
+``@version`` 付きのパッケージは完全に別パッケージ扱いになるっぽい。::
+
+    % ls -l /usr/local/Cellar
+    go/
+    go@1.22/
+
+``@version`` 付きのパッケージは ``/usr/local/bin`` などへのシンボリックリンクを作らないことがある。
+(作ったらバージョン違いで衝突しちゃうしね)。
+
+go info で見ると下記のようなメッセージが出ているものは、シンボリックリンクを作らない。::
+
+    go@1.22 is keg-only, which means it was not symlinked into /usr/local,
+    because this is an alternate version of another formula.
+
+    If you need to have go@1.22 first in your PATH, run:
+      echo 'export PATH="/usr/local/opt/go@1.22/bin:$PATH"' >> ~/.zshrc
+
+
