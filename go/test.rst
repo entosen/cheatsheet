@@ -932,7 +932,7 @@ SetUp/TearDown的なことも可能になる。
     // suite.T() で *testing.T が取れるので、下記のように assert パッケージを使う
     assert.Equal(suite.T(), 2, 1+1)
 
-    // suiteで用意されている各assertion関数が、suiteのメソッドとしているのでそれを使う。
+    // assertで用意されている各assertion関数が、suiteのメソッドとしているのでそれを使う。
     // しかも T を指定する必要も無い
     suite.Equal(2, 1+1)
 
