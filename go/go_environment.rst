@@ -104,6 +104,9 @@ GOPATH を切り替えたいなら
 標準のインストール方法
 ==================================
 
+手動インストール
+---------------------------------
+
 https://go.dev/doc/install
 
 こんな感じで、ダウンロードしてきた tar.gz を解凍して、
@@ -119,7 +122,7 @@ PATH環境変数に、GOROOT/bin, GOPATH/bin 相当のパスを追加する。::
 
     export PATH="$PATH:/usr/local/go/bin:$HOME/go/bin"
 
-::
+入る場所::
 
     % which go
     /usr/local/go/bin/go
@@ -132,6 +135,33 @@ PATH環境変数に、GOROOT/bin, GOPATH/bin 相当のパスを追加する。::
     GOPATH="/home/hogehoge/go"
 
 
+mac で brew で入れる場合
+-----------------------------------------
+
+::
+
+    brew install go
+
+PATH環境変数に、GOROOT/bin, GOPATH/bin 相当のパスを追加する。::
+
+    (/usr/local/bin は既に入ってるだろうから省略)
+    export PATH="$PATH:$HOME/go/bin"
+
+入る場所::
+
+    /usr/local/bin/go
+    -> /usr/local/Cellar/go/1.22.2/bin/go
+    -> /usr/local/Cellar/go/1.22.2/libexec/bin/go 
+      (にシンボリックリンクが張られてる)
+
+    % go version 
+    go version go1.22.2 darwin/amd64
+
+    % go env (抜粋)
+    GOROOT='/usr/local/Cellar/go/1.22.2/libexec'
+    GOPATH='/Users/hogehoge/go'
+
+    
 
 
 複数バージョンをインストールする方法
@@ -164,8 +194,8 @@ goenv
 
 
 
-go標準の仕組みで、複数バージョンインストール
------------------------------------------------------
+go標準の仕組みで、複数バージョンインストール(ちょっと前のやつ)
+-------------------------------------------------------------------
 
 go標準の仕組みで、複数バージョンをインストールする方法が用意されている。
 
@@ -197,6 +227,27 @@ GOPATH は共通のものを使う戦略のようで、特にいじらない。
 ``~/sdk/go<version>/bin`` をPATHに追加することで、それの環境に差し替わる。
 
 
+go 1.21 以降の自動でインストールされるやつ
+-----------------------------------------------------
+
+Go 1.21 以降では、goコマンドを実行したときに、
+go.mod ファイル内の go 行のバージョン指定を見て、
+自動で指定のバージョンのgoをダウンロードしてきて、それで実行される。
+
+ただ、必ず指定のバージョンが使われるわけではなく
+
+- go.mod 指定のバージョンの方が、入っている go より新しい場合は、そのバージョンがダウンロードされる
+- go.mod 指定のバージョンの方が、入っている go より古い場合は、ダウンロードされない？
+
+
+ちょっとよくわかっていないんだが、
+これはユーザーが狙ったバージョンを選択するというよりは、
+ビルドの一連の流れの中で必要になるケースがあって、そのとき困らないようにって感じなのかな。
+
+狙ってあるバージョンを使いたいという場合は、goenv なりを使った方がいいと思う。
+
+
+
 goenv
 -----------------------
 
@@ -205,6 +256,32 @@ goenv
 (1)(2)(3)(4) 全部できる感じなので、これがお勧め。
 
 ただ、理解した上で、まめに goenv rehash しないとハマる。
+
+
+
+mac の brew で複数バージョン
+--------------------------------
+
+``@version`` 付きのパッケージも用意されているが。
+
+::
+
+    go        # 最新バージョン
+    go@1.22   # go-1.22.x の最新バージョン
+
+``@version`` 付きのパッケージは、/usr/local/bin/go にシンボリックを作ってくれない。::
+
+    % brew info go@1.22
+
+    go@1.22 is keg-only, which means it was not symlinked into /usr/local,
+    because this is an alternate version of another formula.
+
+    If you need to have go@1.22 first in your PATH, run:
+      echo 'export PATH="/usr/local/opt/go@1.22/bin:$PATH"' >> ~/.zshrc
+
+つまり、PATH 環境変数を自力で都度うまいことしないといけない。
+
+
 
 
 VSCode の Go の複数バージョン対応
