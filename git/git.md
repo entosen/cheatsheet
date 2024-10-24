@@ -769,3 +769,35 @@ git lfs lock foo/bar/example.png
 git lfs locks      # ロック中のファイル一覧
 git lfs unlock foo/bar/example.png
 ```
+
+
+
+
+## 既にgit管理下にあるファイルへの変更をgitに無視させる
+
+
+無視させたいファイルが、git管理下にない(untracked)な場合、.gitignore で除外させる。
+
+無視させたいファイルが、既にgit管理下にある場合、下記の方法でgitに差分を無視させる。
+
+```
+git update-index --skip-worktree <path>      # フラグ付ける
+git update-index --no-skip-worktree <path>   # フラグ外す
+git ls-files -v | grep ^S                    # 確認
+```
+
+このフラグを付けると、ローカルで編集してもgitは編集がないものとして扱ってくれる。
+
+ただし、リポジトリ側でそのファイルが更新された場合、
+つまり、git merge や git checkout でそのファイルにリポジトリ側の変更を反映しようとするとエラーになる。
+つまり、自動でマージはしてくれない。
+
+その場合、下記のような手順になる
+
+- 一旦 ``--no-skip-worktree`` 
+- git stash などで適切に退避
+- git merge など
+- git stash pop でローカル変更を戻す
+- 再度 ``--skip-worktree``
+
+
