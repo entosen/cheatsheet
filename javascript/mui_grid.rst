@@ -238,7 +238,28 @@ justifyContentによる配置は、幅12に対してitem幅やgap幅が決定し
 
 alignItems: CSS Flexbox の align-items に相当
 
-alignContent: これも使えるのか？ CSS Flexbox のalign-contentに相当？
+各行のitemを垂直方向(cross axis)のどこに揃えるか。(各itemの高さが異なる場合)
+
+- stretch (規定値)
+- flex-start
+- flex-end
+- center
+- baseline
+
+alignContent: CSS Flexbox のalign-contentに相当
+
+(複数行の)itemの塊を、containerの領域の中で垂直方向(cross axis)のどこに揃えるか。
+(containerの領域の高さが、複数行のitemの塊よりも高い場合)
+
+- stretch (規定値)
+- flex-start
+- flex-end
+- center
+- space-between
+- space-around
+- space-evenly
+
+
 
 
 columns
