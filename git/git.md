@@ -647,6 +647,37 @@ git diff HEAD..stash@{0}
 ```
 
 
+### worktree
+
+1つのローカルリポジトリで、作業ツリーを複数同時に持てる。
+
+同じリポジトリに対し、複数の作業を同時にやる(開発と他の人のレビューとか)場合に便利。
+
+前提として、自分の場合、下記のようなディレクトリ構造にする
+```
+workgit/repoA/
+    repoA/          --- clone してきたローカルリポジトリ本体ディレクトリ
+    worktree/
+        review/     --- 他の人のレビュー用に使う追加のワークツリー
+        hoge/       --- その他、必要であればこんな感じで
+        fuga/
+```
+
+```
+git worktree add [-b <new_branch>] <path> [<commit-ish>]
+
+例
+git worktree add ../worktree/docs
+    今いる位置を、新しく docs ブランチとして、 ../worktree/docs にワークツリーを追加する
+```
+
+
+不要になったワークツリーを消す
+
+```
+git worktree remove <ワークツリーのパス>
+```
+
 
 # github 検索
 
