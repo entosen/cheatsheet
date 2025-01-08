@@ -214,6 +214,8 @@ sed -f スクリプトファイル [入力ファイル]...
 
     -n    自動出力しない。
     -r    正規表現を拡張正規表現を使う
+
+    -i  --in-place   既存のファイルを上書き更新
 ```
 
 コマンド
@@ -237,6 +239,12 @@ Q     これ以上入力を処理せず、直ちに終了する
 ```
 # foo を bar に出力
 sed 's/foo/bar/g' 
+```
+
+## 複数ファイルの中身をまとめて置換
+
+```
+find . -type f -exec sed -i 's/DadControlAccount/DadControlDomainDiffer/g' {} +
 ```
 
 ## q
