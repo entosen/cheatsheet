@@ -161,6 +161,42 @@ echo $input | grep -E -o '\.feserver([0-9]+)\.'
     カッコの部分だけではなく、パターン全体を表示する
 ```
 
+## カラムを整形する
+
+各行を1要素として指定の全体幅に収まるように整形する。まず縦に並ぶ。
+(ls の結果と同じかも。)
+
+```
+cat input.txt | column [-c <ページ幅>]
+
+入力:
+red aka
+blue ao
+green midori
+white shiro
+black kuro
+
+出力(-c 50):
+red aka		green midori	black kuro
+blue ao		white shiro
+```
+
+既に空白でカラムが分かれているものを整形する。
+
+```
+cat input.txt | column -t [-s <デリミタ>]
+
+入力:
+red aka
+blue ao
+green midori
+
+出力:
+red    aka
+blue   ao
+green  midori
+```
+
 
 ## sort, uniq
 
