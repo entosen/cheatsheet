@@ -46,6 +46,13 @@ SpringのDIコンテナから、インスタンスを注入するための指定
       }
   }
 
+  省略可能なので、下記のようにもできる
+
+  @AllArgsConstructor
+  public class MemoController {
+      private final MemoService memoService;
+  }
+
 セッター インジェクション::
 
   public class MemoController {
@@ -64,6 +71,20 @@ SpringのDIコンテナから、インスタンスを注入するための指定
       private MemoService memoService;
   }
 
+
+@Component 系
+==========================
+
+``@Component`` を付けたクラスはDIコンテナに登録される。
+
+下記も同様に機能する。
+
+- @Repository
+- @Service
+- @Controller
+- @ControllAdvice
+- @ManagedBean
+- @Named
 
 
 
