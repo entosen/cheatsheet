@@ -445,6 +445,9 @@ https://github.com/testing-library/jest-dom
 - toBePartiallyChecked
 - toHaveDescription
 
+not::
+
+  expect(getByTestId('invalid-form')).not.toBeValid()
 
 
 イベントの発火
