@@ -198,6 +198,11 @@ green  midori
 ```
 
 
+linux の column コマンドだと、
+`--table-right` といったオプションがあって右寄せができたりするのだが、
+Mac の column コマンドはない。Homebrew でも入れられるものはないっぽい。
+
+
 ## sort, uniq
 
 ### ソートしないで重複行を削除する
