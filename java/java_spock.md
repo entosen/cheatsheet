@@ -257,6 +257,11 @@ def "should send messages to all subscribers"() {
 ただし、Object.equals、Object.hashCode、Object.toStringメソッドは例外。
 いわゆる緩いモック。予期しないメソッド呼び出しをしても例外を投げない。
 
+定義していないモック呼び出しを失敗としたい場合は、下記の記述を最後に入れておく。
+Strict Mocking 。
+```
+0 * _
+```
 
 多重度
 
