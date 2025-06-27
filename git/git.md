@@ -669,6 +669,9 @@ git worktree add [-b <new_branch>] <path> [<commit-ish>]
 例
 git worktree add ../worktree/docs
     今いる位置を、新しく docs ブランチとして、 ../worktree/docs にワークツリーを追加する
+
+git worktree add ../worktree/feature1 feature1
+    既存の feature1 ブランチを ../worktree/feature1 にワークツリーとして追加する
 ```
 
 
