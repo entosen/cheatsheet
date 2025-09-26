@@ -435,6 +435,12 @@ sphinxのみ。
   :collapsible: open       --- 折り畳み可。初期状態 open
   :collapsible: close      --- 折り畳み可。初期状態 close
 
+  例)
+  .. hint::
+   :collapsible: closed
+
+   This hint is collapsible, but initially closed.
+
 
 テーブル
 ***********************
