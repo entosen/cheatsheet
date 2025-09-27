@@ -68,6 +68,11 @@ Cheatsheet
     brew install --cask firefox    # caskを入れる場合
 
 
+更新系
+
+::
+
+    brew update        # brew自体の更新
 
 
 tap/untap
