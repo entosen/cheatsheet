@@ -427,13 +427,24 @@ sphinxのみ。
 
   .. seealso::       参考 (緑(i))
 
-  .. admonition:: title      
+  .. admonition:: title      戒め、忠告、叱責。フォーマル。先生の戒めの言葉。
 
 ::
 
   :collapsible:            --- 折り畳み可。初期状態 open (default)
   :collapsible: open       --- 折り畳み可。初期状態 open
   :collapsible: close      --- 折り畳み可。初期状態 close
+
+
+注意系のニュアンス::
+
+  note        補足・参考。覚えておくべき情報。参考情報や小さな注意。
+  attention   注意を向けてほしい。見逃さないで。案内、支持、掲示版、放送など。
+  important   重要。危険性ではなく、見逃すと困る。これを見ないと不便・損をする。
+  caution     軽い危険。事故・怪我を防ぐために気を付けて。床が濡れています。
+  warning     トラブル警告。やると悪いことが起こる
+  danger      命の危険。今すぐやめろ。死ぬぞ。
+
 
 
 
