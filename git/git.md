@@ -9,9 +9,12 @@ git config --global user.email johndoe@example.com
 git config --global push.default simple
 
 # pagerの設定
-git config --global pager.branch false
-git config --global pager.stash false
-git config --global pager.config false
+git config --global core.pager="less -F"
+# 別途 LESS 環境変数に -R -X を入れておく。
+# 上記をやっておけば下記は不要だと思う
+# git config --global pager.branch false
+# git config --global pager.stash false
+# git config --global pager.config false
 他にも pager.<cmd> の形で他コマンドについても指定できる
 
 # windows でも今は(NTFSは)大文字小文字区別できるので、false にしておく。
@@ -833,5 +836,66 @@ git ls-files -v | grep ^S                    # 確認
 - git merge など
 - git stash pop でローカル変更を戻す
 - 再度 ``--skip-worktree``
+
+
+
+# pager
+
+git コマンドは出力が長くなるような場合、自動的に pager (less) を通す。
+
+参考
+
+- GitのPagerの設定 https://rcmdnk.com/blog/2018/08/26/computer-git/
+- man git
+- man git-config
+
+
+基本的に、
+
+- パイプやリダイレクトした場合(出力先がttyではない場合)は pager しない。その場合カラー表示もしなくなる。
+- コマンドやアクション(--listなど)によっても pager するしないがあるっぽい。
+
+優先順位
+
+1. `--no-pager` / `--paginate` コマンドラインオプション
+
+   - これはpagerを使うか使わないかの設定で、実際使うpagerは下で決められたものを使う。
+
+2. `pager.<cmd>` 設定
+
+   - boolean または コマンドの指定ができる。
+   - ただし、上の `--no-pager` / `--paginate` コマンドラインオプションを使った場合、 
+     この `pager.<cmd>` の指定は無視される。
+     booleanの場合でもコマンドが書かれている場合でも無視される。
+     これは、 `pager.<cmd>` が基本的には使うか使わないかという設定に
+     用いるように設計されているようで、下の3つのものとは役割が違うっぽい。
+
+3. `GIT_PAGER` 環境変数
+4. `core.pager` 設定
+5. `PAGER` 環境変数
+6. 全ての指定がなければ `less`
+
+
+
+
+
+less のオプション。
+
+LESS 環境変数が指定されていない場合、git が下記の環境変数をセットした上で less を起動する。
+
+```
+-F  (--quit-if-one-screen)  最初の画面でファイル全体が表示できる場合、 less を自動的に終了させる。
+-R  (--RAW-CONTROL-CHARS)   制御文字(色コードとhyperlinkのみ)を解釈(制御文字のまま出力)
+-X  (--no-init)             less終了後表示内容がターミナルに残る。
+```
+
+自分好みの設定としては
+
+- `core.pager` を `less -F` に設定
+- `LESS` 環境変数 に `-R -X` を入れておく
+
+
+
+
 
 
