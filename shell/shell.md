@@ -523,6 +523,17 @@ zsh: HOGE: not set
 zsh: HOGE: parameter not set
 ```
 
+### 一部削除
+
+```
+${parameter#word}       前方一致削除(最短一致) 先頭でマッチした部分を削除
+${parameter##word}      前方一致削除(最長一致) 先頭でマッチした部分を削除
+${parameter%word}       後方一致削除(最短一致) 末尾でマッチした部分を削除
+${parameter%%word}      後方一致削除(最長一致) 末尾でマッチした部分を削除
+```
+
+word の部分は pattern というのが使える。
+
 
 ### Word-Splitting 空白や改行を含む変数展開
 
