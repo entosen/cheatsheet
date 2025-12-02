@@ -291,3 +291,12 @@ find . -type f -exec sed -i 's/DadControlAccount/DadControlDomainDiffer/g' {} +
 ## q
 
 csv などを SQL でアクセスできる。
+
+
+## パスワード生成
+
+大文字、小文字、数字、記号のうち4種類を含むもの。
+
+```
+cat /dev/urandom | LC_ALL=C tr -d -c '[:alnum:]_-' | fold -w 24 | grep '[A-Z]' | grep '[a-z]' | grep '[0-9]' | grep '[_-]' | head -n 1
+```
