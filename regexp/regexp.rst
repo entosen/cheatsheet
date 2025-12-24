@@ -33,10 +33,11 @@ vim のフラグ::
 
 ::
 
-  肯定先読み (?=pattern)
-  肯定後読み (?<=pattern)
-  否定先読み (?!pattern)
-  否定後読み (?<!pattern)
+                                Vim (\v付けた場合)
+  肯定先読み (?=pattern)      (pattern)@=
+  肯定後読み (?<=pattern)     (pattern)@<=
+  否定先読み (?!pattern)      (pattern)@!
+  否定後読み (?<!pattern)     (pattern)@<!
 
 先読み/後読みはアンカーの一種。位置(長さ0)にマッチする。
 
@@ -44,6 +45,7 @@ vim のフラグ::
 - 後読み(lookbehind) (←):  後読みパターンの末尾位置にマッチ
 
 
+vim の場合、 ``@=`` を付けた直前のパターンが先読みの指定になる。
 
 
 vim では使える ``\zs`` ``\ze``::
