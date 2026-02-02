@@ -74,6 +74,10 @@ Cheatsheet
 
     brew update        # brew自体の更新
 
+アンインストール::
+
+    brew uninstall FORMULA|CASK
+
 
 tap/untap
 
@@ -96,6 +100,8 @@ tap/untap
         - 公式のもの
         - 他のtap
 
+    あえて tap したものを入れたいときは完全修飾名を指定する
+    brew install user/repo/vim
 
 
 仕組み
