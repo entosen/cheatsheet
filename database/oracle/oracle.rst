@@ -106,6 +106,40 @@ MView::
 
 
 
+権限系
+-------------------------------
+
+確認::
+
+  alter session set nls_date_format='YYYY/MM/DD HH24:mi:SS';
+  SET PAGESIZE 100
+  SET LINESIZE 300
+  SET NUMWIDTH 11
+
+  column username format a30;
+  column account_status format a30;
+  column grantee format a30;
+  column granted_role format a30;
+
+  SELECT username, account_status, created
+  FROM dba_users
+  WHERE username IN ('USER1', 'USER2');
+
+  SELECT grantee, granted_role
+  FROM dba_role_privs
+  WHERE grantee IN ('USER1', 'USER2')
+  ORDER BY grantee, granted_role;
+
+アカウント作成(CREATE_USER)::
+
+  DEFINE USERNAME = USER1
+  DEFINE PASS     = TempPass1234_
+  CREATE USER &USERNAME IDENTIFIED BY "&PASS" PASSWORD EXPIRE;
+  GRANT ROLE1, ROLE2 TO &USERNAME;
+
+
+
+
 
 アカウントロックの解除方法
 -------------------------------
