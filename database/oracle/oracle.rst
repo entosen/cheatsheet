@@ -50,6 +50,39 @@
 テーブルとかいろんな一覧
 ------------------------------
 
+テーブル::
+
+  -- 自分が所有しているテーブル一覧（一般ユーザー）
+  SELECT table_name FROM user_tables;
+  -- 自分がアクセス可能なテーブル一覧（権限あり）
+  SELECT owner, table_name FROM all_tables;
+  -- すべてのテーブル一覧（DBA権限）
+  SELECT owner, table_name FROM dba_tables;
+
+テーブル定義::
+
+  DESC テーブル名;
+
+  SELECT DBMS_METADATA.GET_DDL('TABLE', 'テーブル名') FROM dual;
+  SELECT DBMS_METADATA.GET_DDL('TABLE', 'テーブル名', 'スキーマ名') FROM dual;
+
+View::
+
+  -- 自分が所有しているView一覧（一般ユーザー）
+  SELECT view_name FROM user_views;
+  -- 自分がアクセス可能なView一覧（権限あり）
+  SELECT owner, view_name FROM all_views;
+  -- すべてのView一覧（DBA権限）
+  SELECT owner, view_name FROM dba_views;
+
+Viewの定義::
+
+  SELECT text FROM user_views WHERE view_name = 'ビュー名';
+
+  SELECT DBMS_METADATA.GET_DDL('VIEW', 'ビュー名') FROM dual;
+  SELECT DBMS_METADATA.GET_DDL('VIEW', 'ビュー名', 'スキーマ名') FROM dual;
+
+
 シノニム::
 
   -- 自分が所有しているシノニム
@@ -63,6 +96,10 @@
   -- すべてのシノニム(DBA権限)
   SELECT owner, synonym_name, table_owner, table_name, db_link FROM dba_synonyms
   ORDER BY owner, table_owner, table_name, synonym_name;
+
+シノニムの作成::
+
+  CREATE SYNONYM シノニム名 FOR スキーマ名.オブジェクト名;
 
 
 
@@ -111,6 +148,14 @@ MView::
 
 確認::
 
+  -- ユーザーがどんなロールを持っているか
+  select * from dba_role_privs where grantee = 'ユーザー名';
+
+  -- ユーザーまたはロールがどういう権限を持っているか
+  select * from dba_tab_privs where grantee = 'ユーザー名 もしくは ロール名';
+
+確認::
+
   alter session set nls_date_format='YYYY/MM/DD HH24:mi:SS';
   SET PAGESIZE 100
   SET LINESIZE 300
@@ -130,6 +175,7 @@ MView::
   WHERE grantee IN ('USER1', 'USER2')
   ORDER BY grantee, granted_role;
 
+
 アカウント作成(CREATE_USER)::
 
   DEFINE USERNAME = USER1
@@ -137,6 +183,12 @@ MView::
   CREATE USER &USERNAME IDENTIFIED BY "&PASS" PASSWORD EXPIRE;
   GRANT ROLE1, ROLE2 TO &USERNAME;
 
+権限付与::
+
+  -- select権限を付与
+  GRANT SELECT ON スキーマ名.テーブル名 to ユーザー名もしくはロール名;
+
+    SELECT, INSERT, UPDATE, DELETE, MERGE, REFERENCES, READ
 
 
 
