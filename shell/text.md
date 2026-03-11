@@ -240,6 +240,12 @@ awk '{a[$0]++} END {for (k in a){print k":"a[k];}}'
 
 ## wc 
 
+## tr
+
+1文字単位での置換や削除
+
+
+
 ## sed
 
 参考
@@ -285,7 +291,7 @@ sed 's/foo/bar/g'
 ## 複数ファイルの中身をまとめて置換
 
 ```
-find . -type f -exec sed -i 's/DadControlAccount/DadControlDomainDiffer/g' {} +
+find . -type f -exec sed -i 's/foo/bar/g' {} +
 ```
 
 ## q
