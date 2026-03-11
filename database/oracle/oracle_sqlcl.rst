@@ -38,16 +38,17 @@ spool
 
 ::
 
-  項目                     stdout   stderr   spool     制御方法
+  項目                          stdout   stderr   spool     制御方法
   -------
-  接続後のメッセージ        ◯       ×       ×         △   -s (silent) で出なくなる
-  SQL> プロンプト           ◯       ×       ×         ×   不可
-  直接入力したSQL文         ×       ×       選         ◯   set echo on でspool に出るようになる (default:off)
-  @file.sql で実行した中見  選       ×       選         ◯   set echo on で両方に出るようになる
-  &置換の旧新(old/new)      ◯       ×       ◯         ◯   set verify off   で stdout と spool 両方出なくなる
-  SQLの結果                 ◯       ×       ◯         ◯   set termout off  で stdout に出なくなる。 spool には出る
-  SQLの結果の件数           ◯       ×       ◯         ◯   set feedback off で stdout と spool 両方出なくなる
-  エラーメッセージ          ×       ◯       ◯         △   whenever sqlerror
+  接続後のメッセージ             ◯       ×       ×         △   -s (silent) で出なくなる
+  SQL> プロンプト                ◯       ×       ×         ×   不可
+  直接入力したSQL文              ×       ×       選         ◯   set echo on でspool に出るようになる (default:off)
+  @file.sql で実行した中見       選       ×       選         ◯   set echo on で両方に出るようになる
+  &置換の旧新(old/new)           選       ×       選         ◯   set verify off   で stdout と spool 両方出なくなる
+  対話入力で実行したのSQLの結果  ◯       ×       ◯         ×   不可
+  @file.sql で実行したSQLの結果  選       ×       ◯         ◯   set termout off  で stdout に出なくなる。 spool には出る
+  SQLの結果の件数                選       ×       選         ◯   set feedback off で stdout と spool 両方出なくなる
+  エラーメッセージ               ×       ◯       ◯         △   whenever sqlerror
 
 
 
