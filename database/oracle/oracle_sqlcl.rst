@@ -55,7 +55,73 @@ spool
 sqlformat
 ====================
 
-TODO
+指定方法
+
+- (方法1) SET SQLFORMAT で指定
+
+  - ::
+
+      SET SQLFORMAT json
+      SELECT * FROM emp;
+
+  - 次に SET SQLFORMAT するまで有効。戻すときは ``SET SQLFORMAT default``
+
+- (方法2) SELECT の直後にコメントで指定
+
+  - ::
+
+      SELECT /*json*/ * FROM emp;
+
+  - その1文だけ有効
+
+
+
+形式
+
+- default
+
+  - テキストでの表形式
+
+- json
+
+  - json 形式。1レコードがJSONの1つのMap型になる
+  - 外側に皮が1層付いているので注意::
+
+      {"results":[
+        {
+          "columns":[
+            {"name":"EMPNO","type":"NUMBER"},
+            {"name":"ENAME","type":"VARCHAR2"},
+            {"name":"JOB","type":"VARCHAR2"}
+            ],
+          "items":[
+            {"empno":7369,"ename":"SMITH","job":"CLERK"},
+            {"empno":7499,"ename":"ALLEN","job":"SALESMAN"},
+            {"empno":7521,"ename":"WARD","job":"SALESMAN"},
+            ...
+          ]
+        }
+      ]}
+
+  - 通常は ``jq '.results[0].items'`` をすると扱いやすい形になる。
+
+- json-formatted
+
+  - 改行とインデントで整形されたjson形式。いわゆる pretty 。人間が読みやすい。
+
+- csv
+
+  - 列区切りは COLSEP とは無関係にカンマで区切られる
+  - 文字列型はダブルクオートで囲われる
+  - 文字列型の中にダブルクオートが含まれる場合は、ダブルクオートが2重に出力される
+
+- html
+- xml
+- ansiconsole
+- insert
+- loader
+- fixed
+
 
 
 ファイルに書かれたsqlを実行
