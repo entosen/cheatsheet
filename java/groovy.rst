@@ -1,8 +1,42 @@
+=====================================
+Groovy
+=====================================
+
+リンク
+=======================
+
+公式
+
+- `The Apache Groovy™ programming language <https://groovy-lang.org/index.html>`__
+
+ドキュメント
+
+- `Groovy - Wikipedia <https://ja.wikipedia.org/wiki/Groovy>`__
+- `The Apache Groovy™ programming language - Documentation <https://groovy-lang.org/documentation.html>`__
+- `Apache Groovyチュートリアル <https://koji-k.github.io/groovy-tutorial/>`__
 
 
 
 TODO 以下未整理
 ========================
+
+Groovy Truth
+---------------------
+
+falseとなるもの (これ以外がtrue)::
+
+  Boolean                 false
+  Collections/Arrays      空
+  正規表現マッチ          マッチしない  ( 'a' =~ /b/ )
+  Iterators/Enumerations  さらなる値がない
+  Maps                    空
+  文字列                  空
+  数値                    0
+  オブジェクト            null
+
+
+また、 ``asBoolean()`` メソッドで、そのオブジェクトの truth をカスタマイズできる。
+
 
 オペレーター
 ---------------------
@@ -67,4 +101,56 @@ TODO 以下未整理
 
 
   
+クロージャー
+------------------------------
+
+tap, with。
+
+似てるけど、
+
+- tap は自身(it)が返る。
+- with はクロージャーの実行結果 (最後の文の実行結果)が返る
+
+::
+
+  server.name = application.name
+  server.status = status
+  server.sessionCount = 3
+  server.start()
+  server.stop()
+
+  server.with {
+    name = application.name
+    status = status
+    sessionCount = 3
+    start()
+    stop()
+  }
+
+  def person = new Person().tap {
+    name = "Ada Lovelace"
+  }
+
+
+
+インスタンスの生成
+-----------------------------
+
+辞書形式でのコンストラクト
+
+::
+
+  MyClass obj1 = new MyClass(
+    name: "Alice",
+    age: 20
+  )
+
+  // 実質下記と同様。
+  // 引数なしのコンストラクタを呼んで、その後setをしている。
+  // 引数なしのコンストラクタが定義されていないとできない。
+  MyClass obj1 = new MyClass()
+  obj1.name = "Alice"
+  obj1.age = 20
+
+
 
