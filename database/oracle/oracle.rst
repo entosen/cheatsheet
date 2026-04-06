@@ -199,16 +199,16 @@ MView::
 
 確認::
 
-  SELECT USERNAME, ACCOUNT_STATUS FROM DBA_USERS WHERE USERNAME = 'FOO';
+  SELECT USERNAME, ACCOUNT_STATUS, LOCK_DATE FROM DBA_USERS WHERE USERNAME = 'FOO';
 
-  +--------+--------------+
-  |USERNAME|ACCOUNT_STATUS|
-  +--------+--------------+
-  |FOO     |OPEN          |
-  +--------+--------------+
+  USERNAME    ACCOUNT_STATUS             LOCK_DATE
+  ___________ __________________________ ______________________
+  FOO         EXPIRED & LOCKED(TIMED)    2026/03/31 12:02:22
+
   
   - OPEN             正常
   - LOCKED(TIMED)    パスワードの繰り返し入力ミスのため、ロック。何日かすると外れる。
+  - EXPIRED          ログイン後パスワードの再設定を求められる
 
 LOCK解除::
 
