@@ -97,9 +97,27 @@ Viewの定義::
   SELECT owner, synonym_name, table_owner, table_name, db_link FROM dba_synonyms
   ORDER BY owner, table_owner, table_name, synonym_name;
 
+  ここで table_name はテーブルに限らず「実体オブジェクト名」ぐらいの意味。
+
+
 シノニムの作成::
 
   CREATE SYNONYM シノニム名 FOR スキーマ名.オブジェクト名;
+
+
+index::
+
+  -- 自分が所有しているインデックス
+  SELECT index_name, table_name, uniqueness, status FROM user_indexes
+  ORDER BY table_name, index_name;
+
+  -- 自分がアクセス可能なインデックス (自分所有＋PUBLIC＋権限あり)
+  SELECT owner, index_name, table_name, uniqueness, status FROM all_indexes
+  ORDER BY owner, table_name, index_name;
+
+  -- すべてのインデックス(DBA権限)
+  SELECT owner, index_name, table_name, uniqueness, status FROM dba_indexes
+  ORDER BY owner, table_name, index_name;
 
 
 
@@ -111,6 +129,19 @@ DBLink::
   SELECT owner, db_link, username, host FROM all_db_links;
   -- すべての DB Link 一覧（DBA権限）
   SELECT owner, db_link, username, host FROM dba_db_links;
+
+
+名前からオブジェクト種類::
+
+  -- 可能性としては、オブジェクト or シノニム。
+  SELECT owner, object_name, object_type
+  FROM dba_objects
+  WHERE object_name = 'HOGEHOGE'
+  UNION ALL
+  SELECT owner, synonym_name, 'SYNONYM'
+  FROM dba_synonyms
+  WHERE synonym_name = 'HOGEHOGE';
+
 
 
 MView
