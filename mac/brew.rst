@@ -72,7 +72,11 @@ Cheatsheet
 
 ::
 
-    brew update        # brew自体の更新
+    brew update        # パッケージリスト更新
+
+    # 既に入っているパッケージの最新化
+    brew upgrade [<FORMULA|CASK>...]
+
 
 アンインストール::
 
@@ -89,6 +93,8 @@ tap/untap
 
     brew tap <user/repo>          # https://github.com/user/repo のリポジトリの浅いクローン
     brew tap <user/repo> <URL>    # 上記のURL指定。 github.com 以外にあるリポジトリを使う場合
+
+    brew tap-info --installed    # 一覧
 
     brew untap <user/repo>...     # tap の削除
 
