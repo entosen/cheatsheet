@@ -15,6 +15,12 @@
   -- 日付時刻フォーマット
   ALTER SESSION SET nls_date_format = 'YYYY/MM/DD HH24:MI:SS';
   ALTER SESSION SET nls_timestamp_format = 'YYYY/MM/DD HH24:MI:SS';
+  ALTER SESSION SET nls_timestamp_tz_format = 'YYYY/MM/DD HH24:MI:SS';
+
+    'YYYY/MM/DD HH24:MI:SS'      -- 小数点以下なし
+    'YYYY/MM/DD HH24:MI:SS.FF'   -- 小数点以下6桁
+    'YYYY/MM/DD HH24:MI:SS.FF3'  -- 小数点以下3桁
+
 
 
   SET PAGESIZE 100
@@ -164,6 +170,7 @@ MView::
 更新ジョブ::
 
   select owner, job_name, enabled, next_run_date, last_start_date, last_run_duration
+  from dba_scheduler_jobs
   order by owner, JOB_NAME;
 
   EXEC DBMS_SCHEDULER.DISABLE('JOB_HOGEHOGE');
