@@ -150,6 +150,84 @@ DBLink::
 
 
 
+テーブル定義
+--------------------
+
+テーブルのカラム定義とコメント::
+
+  SELECT
+      column_name,
+      data_type || '(' || data_length || ')' as type,
+      nullable,
+      data_default,
+      comments
+  FROM
+      dba_tab_columns 
+  LEFT JOIN 
+      dba_col_comments USING (owner, table_name, column_name)
+  WHERE
+      owner = 'MY_SCHEMA' AND table_name = 'SALES_DATA'
+  ORDER BY
+      column_id;
+
+
+制約の確認::
+
+  SELECT
+      a.owner,
+      a.table_name,
+      CASE a.constraint_type 
+          WHEN 'P' THEN 'P (PRIMARY KEY)'
+          WHEN 'R' THEN 'R (FOREIGN KEY)'
+          WHEN 'U' THEN 'U (UNIQUE)'
+          WHEN 'C' THEN 'C (CHECK / NOT NULL)'
+          WHEN 'V' THEN 'V (WITH CHECK OPTION)'
+          WHEN 'O' THEN 'O (WITH READ ONLY)'
+          ELSE a.constraint_type 
+      END AS "TYPE",
+      a.constraint_name,
+      a.status,
+      b.column_name,
+      b.position AS "POS"
+  FROM
+      dba_constraints a
+  LEFT JOIN
+      dba_cons_columns b ON a.owner = b.owner 
+                         AND a.constraint_name = b.constraint_name
+  WHERE
+      a.owner = 'MY_SCHEMA' 
+      AND a.table_name = 'SALES_DATA'
+  ORDER BY
+      a.constraint_type, a.constraint_name, b.position;
+
+
+indexの確認::
+
+  SELECT
+      i.owner,
+      i.table_name,
+      i.index_name,
+      i.index_type,
+      i.uniqueness,
+      i.status,
+      i.visibility,
+      c.column_name,
+      c.column_position AS "POS",
+      c.descend AS "順序"
+  FROM
+      dba_indexes i
+  JOIN
+      dba_ind_columns c ON i.owner = c.index_owner 
+                        AND i.index_name = c.index_name
+  WHERE
+      i.owner = 'MY_SCHEMA' 
+      AND i.table_name = 'SALES_DATA'
+  ORDER BY
+      i.index_name, c.column_position;
+
+
+
+
 MView
 --------------------
 
