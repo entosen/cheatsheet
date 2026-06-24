@@ -104,9 +104,9 @@ Beanに直接 HttpMessageConveter (を継承したインスタンス) を追加�
   public class JacksonJsonHttpMessageConverterConfig {
 
       @Bean
-      public ClientHttpMessageConvertersCustomizer clientHttpMessageConvertersCustomizer() {
+      public ClientHttpMessageConvertersCustomizer clientHttpMessageConvertersCustomizer(JsonMapper origJsonMapper) {
           return builder -> {
-              JsonMapper jsonMapper = JsonMapper.builder()
+              JsonMapper jsonMapper = origJsonMapper.rebuild()
                       .disable(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS)
                       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                       .build();
@@ -116,9 +116,9 @@ Beanに直接 HttpMessageConveter (を継承したインスタンス) を追加�
       }
 
       @Bean
-      public ServerHttpMessageConvertersCustomizer serverHttpMessageConvertersCustomizer() {
+      public ServerHttpMessageConvertersCustomizer serverHttpMessageConvertersCustomizer(JsonMapper origJsonMapper) {
           return builder -> {
-              JsonMapper jsonMapper = JsonMapper.builder()
+              JsonMapper jsonMapper = origJsonMapper.rebuild()
                       .disable(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS)
                       .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                       .build();
@@ -136,12 +136,16 @@ ClientHttpMessageConvertersCustomizer/ServerHttpMessageConvertersCustomizer
 - https://spring.pleiades.io/spring-boot/api/java/org/springframework/boot/http/converter/autoconfigure/ClientHttpMessageConvertersCustomizer.html
 
 builder は、HttpMessageConverters.Builder 型で、下記のメソッドを持っている。
+https://docs.spring.io/spring-boot/api/java/org/springframework/boot/http/converter/autoconfigure/HttpMessageConverters.html
 
-- addCustomConverter  --- 先頭に追加
-- withStringConverter --- StringConveterを上書き
-- withJsonConverter  --- JSONのConverterを上書き
+- addCustomConverter(...)  --- 先頭に追加
+- withStringConverter(...) --- StringConveterを上書き
+- withJsonConverter(...)  --- JSONのConverterを上書き
 
 
+なお、上のサンプルコードでは、
+JsonMapper.builder() ではなく、 origJsonMapper.build() を用いている。
+これは、JsonMapper を Bean で差し替え可能な柔軟性を残すようにするため。
 
 
 
