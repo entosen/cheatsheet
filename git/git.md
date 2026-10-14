@@ -898,4 +898,48 @@ LESS 環境変数が指定されていない場合、git が下記の環境変�
 
 
 
+## git bundle
 
+リポジトリを固める (送信側)
+
+```    
+# リポジトリ全履歴 (全ブランチ・全コミット)
+git bundle create <出力ファイル名> --all
+
+# 特定ブランチ(例:main)のみ
+git buncle create <出力ファイル名>  main
+
+# 特定の差分のみ
+# HEAD~5 から HEAD までの差分だけをパッケージ化
+git buncle create <出力ファイル名> HEAD~5..HEAD
+# v1.0 タグ以降の main ブランチの変更だけを含める
+git bundle create <出力ファイル名> v1.0..main
+# branch1には存在せず、branch2 にだけ存在するコミット
+git bundle create <出力ファイル名> branch1..branch2
+```
+
+確認
+
+```
+# 確認。受け取ったbundleファイルが正常で、自身のローカルリポジトリに適用可能かを確認
+git bundle verify <ファイル名>
+# 確認。ブランチ名だけ簡潔に。
+git ls-remote <ファイル名>
+```
+
+受信側
+
+```
+# bundleから新規クローンを作成する
+git clone <ファイル名> my-repo
+
+# 既存のリポジトリにbundleから差分を取り込む
+# <bundleから取り出すブランチ名>:<ローカルでの反映先ブランチ名>
+git fetch <ファイル名> main:incomimg-main
+# FETCH_HEAD という特殊な参照に流し込まれる
+git fetch <ファイル名> main
+
+# 現在のブランチに直接マージ
+git pull <ファイル名> <bundleから取り出すブランチ名>
+git pull <ファイル名> main
+```
