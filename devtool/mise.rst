@@ -72,8 +72,8 @@ cheatsheet
   mise use --shell node@24  # 現在のターミナルセッションのみ一時的に変更
 
   # 確認
-  mise ls                   # インストール済み・使用中のツール一覧を表示
-  mise ls --current         # 現在有効なツールのみを表示
+  mise ls                   # インストール済み, 使用中, 要求されているツール一覧を表示
+  mise ls --current         # 現在有効(要求されていて、かつ、install済み)なツール(行)のみを表示
   mise current              # 現在有効なツールのみを表示 (より簡潔)
 
   # アンインストール
@@ -259,5 +259,35 @@ XXenv みたいに shims 方式ではない。 (shims方式でやることもで
   node -v
 
 
+
+Shimsモードにしていないのに、PATHにshimsが入っている件
+===========================================================
+
+はまったのでメモ。
+
+mise の動作には2パターンある。
+
+- PATH 切り替えモード ( ``mise activate zsh`` )
+- shims モード ( ``mise activate zsh --shims`` )
+
+
+PATH 切り替えモードにしていた場合にも、PATH環境変数にshims用のパスが入る。::
+
+  ``~/.local/share/mise/shims``
+
+不自然に感じるが、これは意図したもの。
+lazyなツールやない場合に自動インストールするためにshimsも有効にしてある。
+
+shimsモードは、shimsでの動作のみを有効にするもの (PATH切り替え動作は無効) 。
+
+常に shimp モードで動かすためには、下記のsettingsを加える。::
+
+  mise settings set activate_shims=false
+
+参考
+
+- ``mise activate` adds shims directory to path · jdx/mise · Discussion #12924 <https://github.com/jdx/mise/discussions/12924>`__
+- https://mise.jdx.dev/dev-tools/shims.html#activate-shims
+- https://mise.jdx.dev/configuration/settings.html#activate_shims
 
 
